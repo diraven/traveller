@@ -1,0 +1,3 @@
+"""
+Publicroles commands package.
+"""

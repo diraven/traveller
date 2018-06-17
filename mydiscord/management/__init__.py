@@ -1,0 +1,3 @@
+"""
+Game django management package.
+"""
