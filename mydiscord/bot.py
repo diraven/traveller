@@ -1,10 +1,14 @@
 """
 Custom override for default discord.py bot implementation.
 """
-from discord.ext.commands import Bot, Context
+import importlib
+import re
 
-from mydiscord.commands.test import test
+from discord.ext.commands import Bot
+
+from mydiscord.context import Context
 from mydiscord.models import Guild, Alias
+from project.settings import INSTALLED_APPS
 
 
 class MyBot(Bot):
@@ -16,16 +20,27 @@ class MyBot(Bot):
         """
         Returns command invocation context.
         """
-        ctx = await super().get_context(message)  # type: Context
+        ctx = await super().get_context(message, cls=Context)  # type: Context
 
         # If command not found - try to find it using alias.
         if ctx.command is None:
             try:
+                # Try to get alias.
                 alias = Alias.objects.get(
                     guild__uid=ctx.guild.id,
                     source=ctx.invoked_with,
                 )
-                ctx.command = self.all_commands.get(alias.target)
+                # Replace start of the message with the alias target.
+                message.content = re.sub(
+                    '^{}{}'.format(self.command_prefix, alias.source),
+                    '{}{}'.format(self.command_prefix, alias.target),
+                    message.content,
+                )
+                # Try to fetch context anew.
+                ctx = await super().get_context(
+                    message,
+                    cls=Context,
+                )
             except Alias.DoesNotExist:
                 pass
 
@@ -34,7 +49,14 @@ class MyBot(Bot):
 
 bot = MyBot('.')
 
-bot.add_command(test)
+# Add all cogs to the bot.
+for app in INSTALLED_APPS:
+    try:
+        bot.add_cog(
+            importlib.import_module('{}.cog'.format(app)).Cog()  # noqa: T484
+        )
+    except ModuleNotFoundError:
+        pass
 
 
 @bot.check

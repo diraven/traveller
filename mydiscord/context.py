@@ -1,0 +1,38 @@
+"""
+Custom bot commands context.
+"""
+from typing import Optional
+
+import discord
+from discord.ext.commands import Context as DiscordPyContext
+
+from mydiscord.message import Message
+
+
+class Context(DiscordPyContext):
+
+    async def acknowledge(
+            self,
+            msg: Optional[discord.Message] = None
+    ) -> discord.Reaction:
+        """
+        Marks message as acknowledged by bot.
+        """
+        if not msg:
+            msg = self.message
+        return await msg.add_reaction("🦀")
+
+    async def post(self, message: Message,
+                   with_mention: bool = True) -> discord.Message:
+        """
+        Posts response to party, or to player if specified.
+        """
+
+        if with_mention:
+            return await self.send(
+                "{}\n{}".format(
+                    self.message.author.mention,
+                    message.as_text()),
+            )
+
+        return await self.send(embed=message.as_embed())

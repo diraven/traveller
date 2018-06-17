@@ -11,7 +11,7 @@ admin.site.register(Module, admin.ModelAdmin)
 
 
 class AliasAdmin(admin.ModelAdmin):
-    list_display = ['guild', 'source', 'target']
+    list_display = ['source', 'target', 'guild']
     list_filter = ['guild']
 
 
