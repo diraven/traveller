@@ -86,7 +86,7 @@ for app in INSTALLED_APPS:
             importlib.import_module(  # noqa: T484
                 '{}.cog'.format(app)).Cog(bot)
         )
-    except ModuleNotFoundError:
+    except ImportError:
         pass
 
 
