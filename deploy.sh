@@ -21,9 +21,9 @@ echo "$LOG_INFO_PREFIX Migrating DB..."
 ./manage.py migrate
 echo "$LOG_DONE"
 
-#echo "$LOG_INFO_PREFIX Collecting static files..."
-#./manage.py collectstatic --no-input
-#echo "$LOG_DONE"
+echo "$LOG_INFO_PREFIX Collecting static files..."
+./manage.py collectstatic --no-input
+echo "$LOG_DONE"
 
 echo "$LOG_INFO_PREFIX Restarting services..."
 sudo supervisorctl restart tbc_testing
