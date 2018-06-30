@@ -1,0 +1,6 @@
+[program:crabot]
+command = /home/crabot/run.sh
+user = crabot
+stdout_logfile = /home/crabot/logs/supervisor.log
+redirect_stderr = true
+environment = LANG=en_US.UTF-8,LC_ALL=en_US.UTF-8
