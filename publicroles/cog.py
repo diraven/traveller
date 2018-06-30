@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 
 from discord import Role, Forbidden
 from discord.ext import commands
@@ -15,9 +15,8 @@ def sync_roles(ctx: Context) -> None:
     """
     Synchronizes locally stored list of roles with the real server roles.
     """
-
     # Get a list of stored public roles uids.
-    public_role_uids = PublicRole.objects.filter(
+    public_roles_uids = PublicRole.objects.filter(
         guild__uid=ctx.guild.id,
     ).values_list('uid', flat=True)
 
@@ -28,30 +27,9 @@ def sync_roles(ctx: Context) -> None:
 
     # Delete all roles we have stored locally that do not exist on the server
     # any more.
-    for uid in public_role_uids:
+    for uid in public_roles_uids:
         if uid not in real_roles.keys():
             PublicRole.objects.get(uid=uid).delete()
-
-
-def find_public_roles(ctx: Context, term: Optional[str]) -> List[Role]:
-    """
-    Searches for a role in the public roles list and returns the result.
-    """
-    if not term:
-        term = ""
-
-    # Get a list of stored public roles uids.
-    public_role_uids = PublicRole.objects.filter(
-        guild__uid=ctx.guild.id,
-    ).values_list('uid', flat=True)
-
-    # Now search guild roles list for the term provided.
-    roles_found = []
-    for role in ctx.guild.roles:
-        if role.id in public_role_uids and term.lower() in role.name.lower():
-            roles_found.append(role)
-
-    return roles_found
 
 
 def format_roles(roles: List[Role]) -> str:
@@ -79,10 +57,108 @@ class Cog(CogBase):
             ctx: Context,
             arg: str = ""
     ) -> None:
+        """
+        Searches available public roles.
+        """
         sync_roles(ctx)
 
-        roles = find_public_roles(ctx, arg)
+        # Get a list of stored public roles uids.
+        public_roles_uids = PublicRole.objects.filter(
+            guild__uid=ctx.guild.id,
+        ).values_list('uid', flat=True)
+
+        # Now search guild roles list for the term provided.
+        roles = []
+        for role in ctx.guild.roles:
+            if role.id in public_roles_uids and slugify(arg) in slugify(
+                    role.name):
+                roles.append(role)
+
         await ctx.post(Message(format_roles(roles), title="Public Roles"))
+
+    @publicroles.command()
+    async def my(
+            self,
+            ctx: Context
+    ) -> None:
+        """
+        Shows public roles you have.
+        """
+        # Get a list of stored public roles uids.
+        public_roles_uids = PublicRole.objects.filter(
+            guild__uid=ctx.guild.id,
+        ).values_list('uid', flat=True)
+
+        roles = []
+        for role in ctx.author.roles:
+            if role.id in public_roles_uids:
+                roles.append(role)
+
+        await ctx.post(Message(format_roles(roles), title="Your Public Roles"))
+
+    @publicroles.command()
+    async def join(
+            self,
+            ctx: Context,
+            arg: str = "",
+    ) -> None:
+        """
+        Shows public roles you have.
+        """
+        # Get a list of stored public roles uids.
+        public_roles_uids = PublicRole.objects.filter(
+            guild__uid=ctx.guild.id,
+        ).values_list('uid', flat=True)
+
+        # Find the role of question in the list of server roles and make
+        # sure it's public.
+        for role in ctx.guild.roles:
+            if slugify(role.name) == slugify(
+                    arg) and role.id in public_roles_uids:
+                try:  # Try to grant the role to the user.
+                    await ctx.author.add_roles(role)
+                except Forbidden as e:
+                    await ctx.post(Message.danger(str(e)))
+                    return
+
+                await ctx.success()
+                return
+
+        await ctx.post(
+            Message.danger('There is no `{}` role.'.format(arg))
+        )
+
+    @publicroles.command()
+    async def leave(
+            self,
+            ctx: Context,
+            arg: str = "",
+    ) -> None:
+        """
+        Shows public roles you have.
+        """
+        # Get a list of stored public roles uids.
+        public_roles_uids = PublicRole.objects.filter(
+            guild__uid=ctx.guild.id,
+        ).values_list('uid', flat=True)
+
+        # Find the role of question in the list of server roles and make
+        # sure it's public.
+        for role in ctx.author.roles:
+            if slugify(role.name) == slugify(
+                    arg) and role.id in public_roles_uids:
+                try:  # Try to grant the role to the user.
+                    await ctx.author.remove_roles(role)
+                except Forbidden as e:
+                    await ctx.post(Message.danger(str(e)))
+                    return
+
+                await ctx.success()
+                return
+
+        await ctx.post(
+            Message.danger('You don\'t have `{}` role.'.format(arg))
+        )
 
     @publicroles.command()
     @commands.check(lambda ctx: ctx.author.guild_permissions.manage_roles)
@@ -91,6 +167,7 @@ class Cog(CogBase):
             ctx: Context,
             arg: str
     ) -> None:
+
         sync_roles(ctx)
 
         # Try to get current guild.
@@ -172,3 +249,6 @@ class Cog(CogBase):
         PublicRole(guild=guild, uid=r.id).save()
 
         await ctx.success()
+
+# who
+# stats
