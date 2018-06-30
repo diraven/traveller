@@ -39,8 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'raven.contrib.django.raven_compat',
+
     'mydiscord',
-    
+
     'base',
     'publicroles',
 ]
@@ -124,6 +126,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+RAVEN_CONFIG = None
 
 try:
     from .settings_local import *  # noqa: F403

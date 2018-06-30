@@ -305,5 +305,4 @@ class Cog(CogBase):
 
         await ctx.success()
 
-# who
 # stats

@@ -4,11 +4,13 @@ Custom override for default discord.py bot implementation.
 import importlib
 import re
 
-from discord.ext.commands import Bot
+from discord.ext.commands import Bot, CheckFailure, CommandNotFound, \
+    MissingRequiredArgument
 
 from mydiscord.context import Context
+from mydiscord.message import Message
 from mydiscord.models import Guild, Alias
-from project.settings import INSTALLED_APPS
+from project.settings import INSTALLED_APPS, RAVEN_CONFIG
 
 
 class MyBot(Bot):
@@ -45,6 +47,34 @@ class MyBot(Bot):
                 pass
 
         return ctx
+
+    # noinspection PyBroadException
+    async def on_command_error(self, ctx: Context, error) -> None:
+        """
+        Global command errors handler.
+        """
+        # Ignore checks failures.
+        if isinstance(error, CheckFailure) or isinstance(error,
+                                                         CommandNotFound):
+            return
+
+        # Process missing command arguments error by responding to the user.
+        if isinstance(error, MissingRequiredArgument):
+            await ctx.post(
+                Message.danger(
+                    "Incorrect command usage, missing argument. "
+                    "Did you forget to add something?"
+                )
+            )
+            return
+
+        # Raise error if raven is not configured.
+        if not RAVEN_CONFIG:
+            raise error
+
+        # Send issue to sentry otherwise.
+        from raven.contrib.django.raven_compat.models import client
+        client.captureException()
 
 
 bot = MyBot('.')
