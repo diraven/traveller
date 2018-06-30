@@ -26,5 +26,6 @@ echo "$LOG_INFO_PREFIX Collecting static files..."
 echo "$LOG_DONE"
 
 echo "$LOG_INFO_PREFIX Restarting services..."
-sudo supervisorctl restart tbc_testing
+sudo supervisorctl restart crabot
+sudo supervisorctl restart crabot_http
 echo "$LOG_DONE"

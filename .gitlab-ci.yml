@@ -12,7 +12,7 @@ stages:
 
 deploy_testing:
   stage: deploy
-  script: ssh tbc@diraven.com 'cd /home/crabot/crabot/ && bash -s' < /builds/diraven/crabot/deploy.sh
+  script: ssh crabot@diraven.com 'cd /home/crabot/crabot/ && bash -s' < /builds/diraven/crabot/deploy.sh
   environment:
     name: stable
     url: 'http://crabot.diraven.com'
