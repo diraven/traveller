@@ -18,8 +18,8 @@ class Guild(models.Model):
     """
     Discord guild.
     """
-    uid = models.PositiveIntegerField(unique=True)
-    name = models.CharField(max_length=16, unique=True)
+    uid = models.CharField(max_length=16, unique=True)
+    name = models.CharField(max_length=32, unique=True)
     modules = models.ManyToManyField(Module, related_name="guilds", blank=True)
 
     def __str__(self) -> str:
