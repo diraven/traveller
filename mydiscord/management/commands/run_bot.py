@@ -1,15 +1,9 @@
-"""
-Discord bot start django management command.
-"""
 from django.core.management.base import BaseCommand
 
 from mydiscord.bot import bot
 
 
 class Command(BaseCommand):
-    """
-    Django management command.
-    """
     help = 'Starts discord bot.'
 
     def add_arguments(self, parser) -> None:
