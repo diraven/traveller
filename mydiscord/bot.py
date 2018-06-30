@@ -53,7 +53,8 @@ bot = MyBot('.')
 for app in INSTALLED_APPS:
     try:
         bot.add_cog(
-            importlib.import_module('{}.cog'.format(app)).Cog()  # noqa: T484
+            importlib.import_module(  # noqa: T484
+                '{}.cog'.format(app)).Cog(bot)
         )
     except ModuleNotFoundError:
         pass

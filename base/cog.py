@@ -1,15 +1,15 @@
 from discord.ext import commands
 
+from mydiscord.cogbase import CogBase
 from mydiscord.context import Context
 from mydiscord.message import Message
 
 
-class Cog:
+class Cog(CogBase):
     @commands.group(invoke_without_command=True)
-    async def ping(self, ctx: Context) -> None:
-        pass
-        await ctx.post(Message('pong'))
-
-    @ping.command()
     async def test(self, ctx: Context) -> None:
-        await ctx.post(Message.danger('tost'))
+        await ctx.acknowledge()
+
+    @test.command()
+    async def ping(self, ctx: Context) -> None:
+        await ctx.post(Message('pong'))
