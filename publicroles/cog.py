@@ -32,22 +32,25 @@ def sync_roles(ctx: Context) -> None:
             PublicRole.objects.get(uid=uid).delete()
 
 
-def format_roles(roles: List[Role]) -> str:
+def format_list(items: List[Role]) -> str:
     """
     Converts discord roles list to the string representation. Limited to 1000
     symbols.
     """
-    if roles:
+    if items:
         names = []
         length = 0
-        for role in roles:
-            length += len(role.name)
+        for item in items:
+            length += len(str(item))
             if length > 1000:
                 break
-            names.append(role.name)
-        return ", ".join(['`{}`'.format(name) for name in names])
+            names.append(item.name)
+        result = ", ".join(['`{}`'.format(name) for name in names])
+        if len(names) < len(items):
+            result += " and {} more...".format(len(items) - len(names))
+        return result
     else:
-        return "No roles found."
+        return "Nothing found."
 
 
 class Cog(CogBase):
@@ -74,7 +77,7 @@ class Cog(CogBase):
                     role.name):
                 roles.append(role)
 
-        await ctx.post(Message(format_roles(roles), title="Public Roles"))
+        await ctx.post(Message(format_list(roles), title="Public Roles"))
 
     @publicroles.command()
     async def my(
@@ -84,6 +87,8 @@ class Cog(CogBase):
         """
         Shows public roles you have.
         """
+        sync_roles(ctx)
+
         # Get a list of stored public roles uids.
         public_roles_uids = PublicRole.objects.filter(
             guild__uid=ctx.guild.id,
@@ -94,7 +99,7 @@ class Cog(CogBase):
             if role.id in public_roles_uids:
                 roles.append(role)
 
-        await ctx.post(Message(format_roles(roles), title="Your Public Roles"))
+        await ctx.post(Message(format_list(roles), title="Your Public Roles"))
 
     @publicroles.command()
     async def join(
@@ -103,8 +108,10 @@ class Cog(CogBase):
             arg: str = "",
     ) -> None:
         """
-        Shows public roles you have.
+        Gives you a public role.
         """
+        sync_roles(ctx)
+
         # Get a list of stored public roles uids.
         public_roles_uids = PublicRole.objects.filter(
             guild__uid=ctx.guild.id,
@@ -135,8 +142,10 @@ class Cog(CogBase):
             arg: str = "",
     ) -> None:
         """
-        Shows public roles you have.
+        Removes you from a public role.
         """
+        sync_roles(ctx)
+
         # Get a list of stored public roles uids.
         public_roles_uids = PublicRole.objects.filter(
             guild__uid=ctx.guild.id,
@@ -161,13 +170,53 @@ class Cog(CogBase):
         )
 
     @publicroles.command()
+    async def who(
+            self,
+            ctx: Context,
+            arg: str = "",
+    ) -> None:
+        """
+        Shows a list of people who has the public role.
+        """
+        sync_roles(ctx)
+
+        # Get a role we are interested in.
+        for role in ctx.guild.roles:
+            if slugify(role.name) == slugify(arg):
+                try:  # Try to get the role from our public roles list.
+                    PublicRole.objects.get(uid=role.id)
+                    members = []
+                    for member in ctx.guild.members:
+                        for member_role in member.roles:
+                            if member_role.id == role.id:
+                                members.append(member)
+
+                    await ctx.post(Message(
+                        format_list(members),
+                        title='People with "{}" public role'.format(arg))
+                    )
+                    return
+
+                except PublicRole.DoesNotExist:
+                    await ctx.post(Message.danger(
+                        "The '{}' role is not public.".format(arg)
+                    ))
+                    return
+
+        await ctx.post(
+            Message.danger('There is no `{}` role.'.format(arg))
+        )
+
+    @publicroles.command()
     @commands.check(lambda ctx: ctx.author.guild_permissions.manage_roles)
     async def register(
             self,
             ctx: Context,
             arg: str
     ) -> None:
-
+        """
+        Registers existing role as a public role.
+        """
         sync_roles(ctx)
 
         # Try to get current guild.
@@ -194,6 +243,9 @@ class Cog(CogBase):
             ctx: Context,
             arg: str
     ) -> None:
+        """
+        Unregisters role as a public role.
+        """
         sync_roles(ctx)
 
         # Argument must be an exact name of the role that's public.
@@ -223,6 +275,9 @@ class Cog(CogBase):
             ctx: Context,
             arg: str
     ) -> None:
+        """
+        Creates new role and makes it public.
+        """
         sync_roles(ctx)
 
         # Get current guild.
