@@ -35,5 +35,10 @@ class Alias(models.Model):
     source = models.CharField(max_length=16)
     target = models.CharField(max_length=64)
 
+    class Meta:
+        unique_together = (
+            ('guild', 'source'),
+        )
+
     def __str__(self) -> str:
         return "{}->{}".format(self.source, self.target)
