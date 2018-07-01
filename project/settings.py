@@ -42,8 +42,6 @@ INSTALLED_APPS = [
     'raven.contrib.django.raven_compat',
 
     'mydiscord',
-
-    'base',
     'publicroles',
 ]
 
