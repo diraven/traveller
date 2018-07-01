@@ -18,7 +18,7 @@ class Guild(models.Model):
     """
     Discord guild.
     """
-    uid = models.CharField(max_length=32, unique=True)
+    uid = models.BigIntegerField(unique=True)
     name = models.CharField(max_length=32, unique=True)
     modules = models.ManyToManyField(Module, related_name="guilds", blank=True)
 
