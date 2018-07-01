@@ -287,7 +287,8 @@ class Cog(CogBase):
         for role in ctx.guild.roles:
             if slugify(role.name) == slugify(arg):
                 await ctx.post(Message.danger(
-                    'Role `{}` already exists.'.format(arg)
+                    'Role `{}` already exists. Try `register` '
+                    'instead of `create`.'.format(arg)
                 ))
                 return
 
