@@ -23,7 +23,7 @@ def sync_roles(ctx: Context) -> None:
     # Get a list of real roles of the server.
     real_roles = {}
     for discord_role in ctx.guild.roles:
-        real_roles[discord_role.id] = discord_role
+        real_roles[str(discord_role.id)] = discord_role
 
     # Delete all roles we have stored locally that do not exist on the server
     # any more.
@@ -73,7 +73,7 @@ class Cog(CogBase):
         # Now search guild roles list for the term provided.
         roles = []
         for role in ctx.guild.roles:
-            if role.id in public_roles_uids and slugify(arg) in slugify(
+            if str(role.id) in public_roles_uids and slugify(arg) in slugify(
                     role.name):
                 roles.append(role)
 
@@ -96,7 +96,7 @@ class Cog(CogBase):
 
         roles = []
         for role in ctx.author.roles:
-            if role.id in public_roles_uids:
+            if str(role.id) in public_roles_uids:
                 roles.append(role)
 
         await ctx.post(Message(format_list(roles), title="Your Public Roles"))
@@ -121,7 +121,7 @@ class Cog(CogBase):
         # sure it's public.
         for role in ctx.guild.roles:
             if slugify(role.name) == slugify(
-                    arg) and role.id in public_roles_uids:
+                    arg) and str(role.id) in public_roles_uids:
                 try:  # Try to grant the role to the user.
                     await ctx.author.add_roles(role)
                 except Forbidden as e:
@@ -155,7 +155,7 @@ class Cog(CogBase):
         # sure it's public.
         for role in ctx.author.roles:
             if slugify(role.name) == slugify(
-                    arg) and role.id in public_roles_uids:
+                    arg) and str(role.id) in public_roles_uids:
                 try:  # Try to grant the role to the user.
                     await ctx.author.remove_roles(role)
                 except Forbidden as e:
