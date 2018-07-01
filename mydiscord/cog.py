@@ -25,4 +25,4 @@ class Cog(CogBase):
         """
         Shows an invite to the bot development server.
         """
-        await ctx.post(Message('https://discord.gg/3yPyzMZ'))
+        await ctx.post(Message('https://discord.gg/X3gv2Zb'))
