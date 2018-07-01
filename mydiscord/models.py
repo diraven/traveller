@@ -33,7 +33,7 @@ class Alias(models.Model):
     guild = models.ForeignKey(Guild, on_delete=models.CASCADE,
                               related_name='aliases')
     source = models.CharField(max_length=16)
-    target = models.CharField(max_length=16)
+    target = models.CharField(max_length=64)
 
     def __str__(self) -> str:
         return "{}->{}".format(self.source, self.target)
