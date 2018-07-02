@@ -58,7 +58,7 @@ class Cog(CogBase):
     async def publicroles(
             self,
             ctx: Context,
-            *args,
+            *args
     ) -> None:
         """
         Searches available public roles.
@@ -106,7 +106,7 @@ class Cog(CogBase):
     async def join(
             self,
             ctx: Context,
-            *args,
+            *args
     ) -> None:
         """
         Gives you a public role.
@@ -141,7 +141,7 @@ class Cog(CogBase):
     async def leave(
             self,
             ctx: Context,
-            *args,
+            *args
     ) -> None:
         """
         Removes you from a public role.
@@ -176,7 +176,7 @@ class Cog(CogBase):
     async def who(
             self,
             ctx: Context,
-            *args,
+            *args
     ) -> None:
         """
         Shows a list of people who has the public role.
@@ -216,7 +216,7 @@ class Cog(CogBase):
     async def register(
             self,
             ctx: Context,
-            *args,
+            *args
     ) -> None:
         """
         Registers existing role as a public role.
@@ -246,7 +246,7 @@ class Cog(CogBase):
     async def unregister(
             self,
             ctx: Context,
-            *args,
+            *args
     ) -> None:
         """
         Unregisters role as a public role.
@@ -279,7 +279,7 @@ class Cog(CogBase):
     async def create(
             self,
             ctx: Context,
-            *args,
+            *args
     ) -> None:
         """
         Creates new role and makes it public.
