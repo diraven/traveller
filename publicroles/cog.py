@@ -58,12 +58,13 @@ class Cog(CogBase):
     async def publicroles(
             self,
             ctx: Context,
-            arg: str = ""
+            *args,
     ) -> None:
         """
         Searches available public roles.
         """
         sync_roles(ctx)
+        arg = ' '.join(args)
 
         # Get a list of stored public roles uids.
         public_roles_uids = PublicRole.objects.filter(
@@ -105,12 +106,13 @@ class Cog(CogBase):
     async def join(
             self,
             ctx: Context,
-            arg: str = "",
+            *args,
     ) -> None:
         """
         Gives you a public role.
         """
         sync_roles(ctx)
+        arg = ' '.join(args)
 
         # Get a list of stored public roles uids.
         public_roles_uids = PublicRole.objects.filter(
@@ -139,12 +141,13 @@ class Cog(CogBase):
     async def leave(
             self,
             ctx: Context,
-            arg: str = "",
+            *args,
     ) -> None:
         """
         Removes you from a public role.
         """
         sync_roles(ctx)
+        arg = ' '.join(args)
 
         # Get a list of stored public roles uids.
         public_roles_uids = PublicRole.objects.filter(
@@ -173,12 +176,13 @@ class Cog(CogBase):
     async def who(
             self,
             ctx: Context,
-            arg: str = "",
+            *args,
     ) -> None:
         """
         Shows a list of people who has the public role.
         """
         sync_roles(ctx)
+        arg = ' '.join(args)
 
         # Get a role we are interested in.
         for role in ctx.guild.roles:
@@ -212,12 +216,13 @@ class Cog(CogBase):
     async def register(
             self,
             ctx: Context,
-            arg: str
+            *args,
     ) -> None:
         """
         Registers existing role as a public role.
         """
         sync_roles(ctx)
+        arg = ' '.join(args)
 
         # Try to get current guild.
         guild = Guild.objects.get(uid=ctx.guild.id)
@@ -241,12 +246,13 @@ class Cog(CogBase):
     async def unregister(
             self,
             ctx: Context,
-            arg: str
+            *args,
     ) -> None:
         """
         Unregisters role as a public role.
         """
         sync_roles(ctx)
+        arg = ' '.join(args)
 
         # Argument must be an exact name of the role that's public.
         # Find out the role uid first.
@@ -273,12 +279,13 @@ class Cog(CogBase):
     async def create(
             self,
             ctx: Context,
-            arg: str
+            *args,
     ) -> None:
         """
         Creates new role and makes it public.
         """
         sync_roles(ctx)
+        arg = ' '.join(args)
 
         # Get current guild.
         guild = Guild.objects.get(uid=ctx.guild.id)
