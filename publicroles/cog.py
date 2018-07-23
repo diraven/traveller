@@ -303,6 +303,7 @@ class Cog(CogBase):
         try:
             r = await ctx.guild.create_role(
                 name=arg,
+                mentionable=True,
             )
         except Forbidden as e:
             await ctx.post(Message.danger(str(e)))
