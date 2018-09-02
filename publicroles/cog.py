@@ -1,8 +1,9 @@
+import asyncio
 import re
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import editdistance
-from discord import Role, Forbidden
+from discord import Role, Forbidden, Reaction, User
 from discord.ext import commands
 from django.utils.text import slugify as django_slugify
 
@@ -39,7 +40,7 @@ def sync_roles(ctx: Context) -> None:
             PublicRole.objects.get(uid=uid).delete()
 
 
-def format_list(items: List[Role]) -> str:
+def format_list(items: List[Role], offset: int = 0) -> Tuple[str, int]:
     """
     Converts discord roles list to the string representation. Limited to 1000
     symbols.
@@ -47,17 +48,51 @@ def format_list(items: List[Role]) -> str:
     if items:
         names = []
         length = 0
-        for item in items:
+        for item in items[offset:]:
             length += len(str(item))
             if length > 1000:
                 break
             names.append(item.name)
+            offset += 1
         result = ", ".join(['`{}`'.format(name) for name in names])
-        if len(names) < len(items):
-            result += " and {} more...".format(len(items) - len(names))
-        return result
+        if len(names) + (offset - 1) < len(items):
+            result += "... Click button below to see more.".format(
+                len(items) - len(names) - (offset - 1)
+            )
+        return result, offset
     else:
-        return "Nothing found."
+        return "Nothing found.", offset
+
+
+async def post_list(
+        ctx: Context,
+        items: List,
+        offset: int = 0,
+        title: str = None
+):
+    result, offset = format_list(items, offset)
+    message = await ctx.post(Message(result, title))
+
+    if offset < len(items):
+        # Emoji to be used as button.
+        emoji = '▶'
+
+        # Add emoji.
+        await ctx.react(emoji, message)
+
+        def check(reaction: Reaction, user: User):
+            return user == ctx.author and str(reaction.emoji) == emoji
+
+        try:
+            await ctx.bot.wait_for(
+                'reaction_add',
+                timeout=20.0,
+                check=check,
+            )
+            result, offset = format_list(items, offset)
+            await post_list(ctx, items, offset, title)
+        except asyncio.TimeoutError:
+            await message.remove_reaction(emoji, ctx.me)
 
 
 async def fuzzy_search_public_roles(
@@ -117,10 +152,7 @@ async def fuzzy_search_public_role(
 
     # If multiple roles found.
     if len(result) > 1:
-        await ctx.post(Message(
-            format_list(result),
-            title='Multiple roles found')
-        )
+        await post_list(ctx, result, title='Multiple roles found')
 
     return None
 
@@ -148,7 +180,7 @@ class Cog(CogBase):
         roles = await fuzzy_search_public_roles(ctx, ctx.guild.roles, arg)
 
         if len(roles) > 0:
-            await ctx.post(Message(format_list(roles), title="Public Roles"))
+            await post_list(ctx, roles, title='Public Roles')
         else:
             await ctx.post(Message.danger("No roles found."))
 
@@ -172,7 +204,7 @@ class Cog(CogBase):
             if role.id in public_roles_uids:
                 roles.append(role)
 
-        await ctx.post(Message(format_list(roles), title="Your Public Roles"))
+        await post_list(ctx, roles, title='Your Public Roles')
 
     @publicroles.command()
     async def join(
@@ -244,10 +276,8 @@ class Cog(CogBase):
                         if member_role.id == role.id:
                             members.append(member)
 
-                await ctx.post(Message(
-                    format_list(members),
-                    title='People with "{}" public role'.format(arg))
-                )
+                await post_list(ctx, members,
+                                title='People with "{}" public role')
                 return
 
             except PublicRole.DoesNotExist:
