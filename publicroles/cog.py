@@ -1,14 +1,21 @@
-from typing import List
+import re
+from typing import List, Optional
 
+import editdistance
 from discord import Role, Forbidden
 from discord.ext import commands
-from django.utils.text import slugify
+from django.utils.text import slugify as django_slugify
 
 from mydiscord.cogbase import CogBase
 from mydiscord.context import Context
 from mydiscord.message import Message
 from mydiscord.models import Guild
 from publicroles.models import PublicRole
+
+
+def slugify(text: str) -> str:
+    text = re.sub(r'[\s]', '', text).strip().lower()
+    return django_slugify(text)
 
 
 def sync_roles(ctx: Context) -> None:
@@ -53,6 +60,62 @@ def format_list(items: List[Role]) -> str:
         return "Nothing found."
 
 
+async def fuzzy_search_public_roles(
+        ctx: Context, roles: List[Role], arg: str
+) -> List[Role]:
+    public_roles_uids = PublicRole.objects.filter(
+        guild__uid=ctx.guild.id,
+    ).values_list('uid', flat=True)
+
+    # Now search guild roles list for the term provided.
+    result = []
+
+    # Strict search.
+    for role in roles:
+        if role.id in public_roles_uids and arg == role.name:
+            result.append(role)
+    if result:
+        return result
+
+    # Partial match search.
+    for role in roles:
+        if role.id in public_roles_uids and slugify(arg) in slugify(role.name):
+            result.append(role)
+    if result:
+        return result
+
+    # Fuzzy search.
+    for role in roles:
+        if role.id in public_roles_uids and \
+                editdistance.eval(
+                    slugify(role.name),
+                    slugify(arg),
+                ) < 4:
+            result.append(role)
+    return result
+
+
+async def fuzzy_search_public_role(
+        ctx: Context, roles: List[Role], arg: str
+) -> Optional[Role]:
+    result = await fuzzy_search_public_roles(ctx, roles, arg)
+
+    # If no roles found.
+    if len(result) == 0:
+        await ctx.post(Message.danger('Role not found.'))
+
+    # If one role found.
+    if len(result) == 1:
+        return result[0]
+
+    # If multiple roles found.
+    if len(result) > 1:
+        await ctx.post(Message(
+            format_list(result),
+            title='Multiple roles found')
+        )
+
+
 class Cog(CogBase):
     @commands.group(invoke_without_command=True)
     async def publicroles(
@@ -66,19 +129,12 @@ class Cog(CogBase):
         sync_roles(ctx)
         arg = ' '.join(args)
 
-        # Get a list of stored public roles uids.
-        public_roles_uids = PublicRole.objects.filter(
-            guild__uid=ctx.guild.id,
-        ).values_list('uid', flat=True)
+        roles = await fuzzy_search_public_roles(ctx, ctx.guild.roles, arg)
 
-        # Now search guild roles list for the term provided.
-        roles = []
-        for role in ctx.guild.roles:
-            if role.id in public_roles_uids and slugify(arg) in slugify(
-                    role.name):
-                roles.append(role)
-
-        await ctx.post(Message(format_list(roles), title="Public Roles"))
+        if len(roles) > 0:
+            await ctx.post(Message(format_list(roles), title="Public Roles"))
+        else:
+            await ctx.post(Message.danger("No roles found."))
 
     @publicroles.command()
     async def my(
@@ -114,28 +170,16 @@ class Cog(CogBase):
         sync_roles(ctx)
         arg = ' '.join(args)
 
-        # Get a list of stored public roles uids.
-        public_roles_uids = PublicRole.objects.filter(
-            guild__uid=ctx.guild.id,
-        ).values_list('uid', flat=True)
+        # Search roles.
+        role = await fuzzy_search_public_role(ctx, ctx.guild.roles, arg)
 
-        # Find the role of question in the list of server roles and make
-        # sure it's public.
-        for role in ctx.guild.roles:
-            if slugify(role.name) == slugify(
-                    arg) and role.id in public_roles_uids:
-                try:  # Try to grant the role to the user.
-                    await ctx.author.add_roles(role)
-                except Forbidden as e:
-                    await ctx.post(Message.danger(str(e)))
-                    return
-
+        if role:
+            try:
+                await ctx.author.add_roles(role)
                 await ctx.success()
-                return
-
-        await ctx.post(
-            Message.danger('There is no `{}` role.'.format(arg))
-        )
+            except Forbidden as e:
+                await ctx.post(Message.danger(str(e)))
+            return
 
     @publicroles.command()
     async def leave(
@@ -149,28 +193,16 @@ class Cog(CogBase):
         sync_roles(ctx)
         arg = ' '.join(args)
 
-        # Get a list of stored public roles uids.
-        public_roles_uids = PublicRole.objects.filter(
-            guild__uid=ctx.guild.id,
-        ).values_list('uid', flat=True)
+        # Search roles.
+        role = await fuzzy_search_public_role(ctx, ctx.author.roles, arg)
 
-        # Find the role of question in the list of server roles and make
-        # sure it's public.
-        for role in ctx.author.roles:
-            if slugify(role.name) == slugify(
-                    arg) and role.id in public_roles_uids:
-                try:  # Try to grant the role to the user.
-                    await ctx.author.remove_roles(role)
-                except Forbidden as e:
-                    await ctx.post(Message.danger(str(e)))
-                    return
-
+        if role:
+            try:
+                await ctx.author.remove_roles(role)
                 await ctx.success()
-                return
-
-        await ctx.post(
-            Message.danger('You don\'t have `{}` role.'.format(arg))
-        )
+            except Forbidden as e:
+                await ctx.post(Message.danger(str(e)))
+            return
 
     @publicroles.command()
     async def who(
@@ -184,32 +216,29 @@ class Cog(CogBase):
         sync_roles(ctx)
         arg = ' '.join(args)
 
-        # Get a role we are interested in.
-        for role in ctx.guild.roles:
-            if slugify(role.name) == slugify(arg):
-                try:  # Try to get the role from our public roles list.
-                    PublicRole.objects.get(uid=role.id)
-                    members = []
-                    for member in ctx.guild.members:
-                        for member_role in member.roles:
-                            if member_role.id == role.id:
-                                members.append(member)
+        # Search roles.
+        role = await fuzzy_search_public_role(ctx, ctx.guild.roles, arg)
 
-                    await ctx.post(Message(
-                        format_list(members),
-                        title='People with "{}" public role'.format(arg))
-                    )
-                    return
+        if role:
+            try:  # Try to get the role from our public roles list.
+                PublicRole.objects.get(uid=role.id)
+                members = []
+                for member in ctx.guild.members:
+                    for member_role in member.roles:
+                        if member_role.id == role.id:
+                            members.append(member)
 
-                except PublicRole.DoesNotExist:
-                    await ctx.post(Message.danger(
-                        "The '{}' role is not public.".format(arg)
-                    ))
-                    return
+                await ctx.post(Message(
+                    format_list(members),
+                    title='People with "{}" public role'.format(arg))
+                )
+                return
 
-        await ctx.post(
-            Message.danger('There is no `{}` role.'.format(arg))
-        )
+            except PublicRole.DoesNotExist:
+                await ctx.post(Message.danger(
+                    "The '{}' role is not public.".format(arg)
+                ))
+                return
 
     @publicroles.command()
     @commands.check(lambda ctx: ctx.author.guild_permissions.manage_roles)
@@ -313,5 +342,3 @@ class Cog(CogBase):
         PublicRole(guild=guild, uid=r.id).save()
 
         await ctx.success()
-
-# stats

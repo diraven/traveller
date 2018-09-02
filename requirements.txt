@@ -4,6 +4,7 @@ attrs==18.1.0
 chardet==3.0.4
 discord-rewrite==1.0.0
 Django==2.0.6
+editdistance==0.4
 flake8==3.5.0
 flake8-mypy==17.8.0
 idna==2.7
