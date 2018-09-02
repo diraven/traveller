@@ -65,7 +65,7 @@ def format_list(items: List[Role], offset: int = 0) -> Tuple[str, int]:
         if offset < len(items):
             # Post a message notifying of leftover items.
             result += "... Click button below to see {} more.".format(
-                len(items) - len(names) - (offset - 1)
+                len(items) - offset
             )
         return result, offset
     else:
