@@ -48,14 +48,22 @@ def format_list(items: List[Role], offset: int = 0) -> Tuple[str, int]:
     if items:
         names = []
         length = 0
+        # For eash item after an offset.
         for item in items[offset:]:
+            # Calculate resulting string length.
             length += len(str(item))
+            # If list is too large - stop adding further.
             if length > 1000:
                 break
+            # Add item to the list.
             names.append(item.name)
+            # Adjust offset.
             offset += 1
+        # Prepare result.
         result = ", ".join(['`{}`'.format(name) for name in names])
+        # Offset already contains count of names, so we should not add it here.
         if offset < len(items):
+            # Post a message notifying of leftover items.
             result += "... Click button below to see {} more.".format(
                 len(items) - len(names) - (offset - 1)
             )
