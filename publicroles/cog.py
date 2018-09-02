@@ -55,7 +55,7 @@ def format_list(items: List[Role], offset: int = 0) -> Tuple[str, int]:
             names.append(item.name)
             offset += 1
         result = ", ".join(['`{}`'.format(name) for name in names])
-        if offset + len(names) < len(items):
+        if offset < len(items):
             result += "... Click button below to see {} more.".format(
                 len(items) - len(names) - (offset - 1)
             )
