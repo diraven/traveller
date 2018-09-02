@@ -56,7 +56,7 @@ def format_list(items: List[Role], offset: int = 0) -> Tuple[str, int]:
             offset += 1
         result = ", ".join(['`{}`'.format(name) for name in names])
         if len(names) + (offset - 1) < len(items):
-            result += "... Click button below to see more.".format(
+            result += "... Click button below to see {} more.".format(
                 len(items) - len(names) - (offset - 1)
             )
         return result, offset
@@ -89,7 +89,6 @@ async def post_list(
                 timeout=20.0,
                 check=check,
             )
-            result, offset = format_list(items, offset)
             await post_list(ctx, items, offset, title)
         except asyncio.TimeoutError:
             await message.remove_reaction(emoji, ctx.me)
