@@ -100,6 +100,13 @@ async def fuzzy_search_public_role(
 ) -> Optional[Role]:
     result = await fuzzy_search_public_roles(ctx, roles, arg)
 
+    # Set symbols limit to optimize search results.
+    if 0 < len(arg) < 3:
+        await ctx.post(
+            Message.danger('Search must contain at least 3 symbols.')
+        )
+        return
+
     # If no roles found.
     if len(result) == 0:
         await ctx.post(Message.danger('Role not found.'))
@@ -114,6 +121,8 @@ async def fuzzy_search_public_role(
             format_list(result),
             title='Multiple roles found')
         )
+
+    return
 
 
 class Cog(CogBase):
