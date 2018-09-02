@@ -284,7 +284,9 @@ class Cog(CogBase):
                             members.append(member)
 
                 await post_list(ctx, members,
-                                title='People with "{}" public role')
+                                title='People with "{}" public role'.format(
+                                    role.name)
+                                )
                 return
 
             except PublicRole.DoesNotExist:
