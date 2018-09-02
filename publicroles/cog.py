@@ -138,6 +138,13 @@ class Cog(CogBase):
         sync_roles(ctx)
         arg = ' '.join(args)
 
+        # Set symbols limit to optimize search results.
+        if 0 < len(arg) < 3:
+            await ctx.post(
+                Message.danger('Search must contain at least 3 symbols.')
+            )
+            return None
+
         roles = await fuzzy_search_public_roles(ctx, ctx.guild.roles, arg)
 
         if len(roles) > 0:
