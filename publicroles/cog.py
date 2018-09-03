@@ -132,7 +132,7 @@ async def fuzzy_search_public_roles(
                 editdistance.eval(
                     slugify(role.name),
                     slugify(arg),
-                ) < 4:
+                ) < 2:
             result.append(role)
     return result
 
