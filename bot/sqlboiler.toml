@@ -1,0 +1,9 @@
+[psql]
+  dbname = "crabot"
+  host   = "localhost"
+  port   = 5432
+  user   = "diraven"
+  pass   = "123456"
+  schema = "public"
+  sslmode = "disable"
+  blacklist = ["django_admin_log", "django_content_type", "django_migrations", "django_session"]
