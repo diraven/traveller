@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"gitlab.com/diraven/crabot/bot/modules/help"
 	"gitlab.com/diraven/crabot/bot/modules/info"
-	"gitlab.com/diraven/crabot/bot/modules/moderation"
+	"gitlab.com/diraven/crabot/bot/modules/mod"
 	"gitlab.com/diraven/crabot/bot/modules/test"
 	"gitlab.com/diraven/crabot/bot/settings"
 	"log"
@@ -59,7 +59,7 @@ func main() {
 		log.Println(err)
 		return
 	}
-	if err := moderation.Init(bot); err != nil {
+	if err := mod.Init(bot); err != nil {
 		log.Println(err)
 		return
 	}
@@ -70,6 +70,6 @@ func main() {
 
 	// Start the bot.
 	if err := bot.Startup(os.Getenv("DISCORD_BOT_TOKEN")); err != nil {
-		bot.HandleError(err, nil)
+		bot.HandleError(err)
 	}
 }

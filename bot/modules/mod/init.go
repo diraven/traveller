@@ -1,4 +1,4 @@
-package moderation
+package mod
 
 import (
 	"github.com/diraven/sugo"

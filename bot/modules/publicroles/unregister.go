@@ -6,7 +6,7 @@ import (
 )
 
 var delCmd = &sugo.Command{
-	Trigger:             "del",
+	Trigger:             "unregister",
 	Description:         "Makes given role not public (does not delete the role itself).",
 	PermissionsRequired: discordgo.PermissionManageRoles,
 	HasParams:           true,
@@ -15,8 +15,7 @@ var delCmd = &sugo.Command{
 
 		// Make sure query is not empty.
 		if req.Query == "" {
-			_, err = req.RespondBadCommandUsage("", "")
-			return err
+			return sugo.NewBadCommandUsageError(req)
 		}
 
 		// Try to find role based on query.
@@ -32,7 +31,7 @@ var delCmd = &sugo.Command{
 		}
 
 		// Notify user about success of the operation.
-		_, err = req.RespondSuccess("", "role `"+roles[0].Name+"` is not public any more")
+		_, err = req.Respond("", sugo.NewSuccessEmbed(req, "role `"+roles[0].Name+"` is not public any more"), false)
 		return err
 	},
 }

@@ -7,7 +7,7 @@ import (
 )
 
 var addCmd = &sugo.Command{
-	Trigger:             "add",
+	Trigger:             "register",
 	Description:         "Makes existing role public.",
 	PermissionsRequired: discordgo.PermissionManageRoles,
 	HasParams:           true,
@@ -16,8 +16,7 @@ var addCmd = &sugo.Command{
 
 		// Make sure query is not empty.
 		if req.Query == "" {
-			_, err = req.RespondBadCommandUsage("", "")
-			return err
+			return sugo.NewBadCommandUsageError(req)
 		}
 
 		// Get guild.
@@ -29,8 +28,7 @@ var addCmd = &sugo.Command{
 		// Get all guild roles.
 		roles, err := req.Sugo.Session.GuildRoles(guild.ID)
 		if err != nil {
-			_, err = req.RespondDanger("", err.Error())
-			return err
+			return sugo.WrapError(req, err)
 		}
 
 		// Process request.
@@ -51,11 +49,7 @@ var addCmd = &sugo.Command{
 		for _, role := range roles {
 			if strings.ToLower(role.Name) == strings.ToLower(request) || role.ID == request {
 				if matchedRole != nil {
-					_, err = req.RespondDanger(
-						"",
-						"too many roles found, try again with a different search",
-					)
-					return err
+					return sugo.NewError(req, "too many roles found, try again with a different search")
 				}
 				matchedRole = role
 			}
@@ -64,26 +58,23 @@ var addCmd = &sugo.Command{
 		// If we did not find any match:
 		if matchedRole == nil {
 			// Notify user about fail.
-			_, err = req.RespondDanger("", "no roles found for query")
-			return err
+			return sugo.NewError(req, "no roles found")
 		}
 
 		// Otherwise add new role to the public roles list.
 		err = storage.add(matchedRole.ID)
 		if err != nil {
-			_, err = req.RespondDanger("", err.Error())
-			return err
+			return sugo.WrapError(req, err)
 		}
 
 		// Save our changes.
 		err = storage.save()
 		if err != nil {
-			_, err = req.RespondDanger("", err.Error())
-			return err
+			return sugo.WrapError(req, err)
 		}
 
 		// And notify user about success.
-		_, err = req.RespondSuccess("", "role `"+matchedRole.Name+"` is public now")
+		_, err = req.Respond("", sugo.NewSuccessEmbed(req, "role `"+matchedRole.Name+"` is public now"), false)
 		return err
 	},
 }

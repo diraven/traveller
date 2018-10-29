@@ -85,9 +85,6 @@ var cmd = &sugo.Command{
 		}
 
 		// Otherwise no embed is generated, this means command not found.
-		if _, err = req.RespondWarning("", "Oops... command not found."); err != nil {
-			return
-		}
-		return
+		return sugo.NewCommandNotFoundError(req)
 	},
 }

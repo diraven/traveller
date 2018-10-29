@@ -1,6 +1,7 @@
-package moderation
+package mod
 
 import (
+	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"github.com/diraven/sugo"
 	"github.com/diraven/sugo/helpers"
@@ -9,10 +10,12 @@ import (
 	"time"
 )
 
+var maxCount = 100 // Maximum amount of messages deleted.
+
 // Module to handle messages cleanup from the channel.
 var clear = &sugo.Command{
 	Trigger: "clear",
-	Description: "Deletes last few messages.\n" +
+	Description: fmt.Sprintf("Deletes last few messages (up to %d in one go).\n", maxCount) +
 		"**Example:** `clean @user 15` will delete last 15 messages in the channel by user @user\n" +
 		"**Example:** `clean 15` will delete last 15 messages in the channel\n" +
 		"**Example:** `clean @user` will delete last 100 messages in the channel by @user\n" +
@@ -24,15 +27,13 @@ var clear = &sugo.Command{
 		ss := strings.Split(req.Query, " ")
 
 		var batchSize = 100  // Amount of messages to get in one go.
-		var maxCount = 100   // Maximum amount of messages deleted.
 		var userID string    // UserID to delete messages for.
 		var count = maxCount // Default amount of messages to be deleted.
 
 		switch len(ss) {
 		case 1: // Means we have got either user mention or amount of messages to delete.
 			if ss[0] == "" { // No parameters given.
-				_, err := req.RespondBadCommandUsage("", "")
-				return err
+				return sugo.NewBadCommandUsageError(req)
 			}
 
 			if len(req.Message.Mentions) > 0 { // Get user mention if available.
@@ -48,9 +49,7 @@ var clear = &sugo.Command{
 			break
 		case 2: // Means we've got both user mention and amount of messages to delete.
 			if len(req.Message.Mentions) == 0 { // Query must have mention.
-				if _, err := req.RespondBadCommandUsage("", ""); err != nil {
-					return err
-				}
+				return sugo.NewBadCommandUsageError(req)
 			}
 			userID = req.Message.Mentions[0].ID
 
@@ -61,24 +60,17 @@ var clear = &sugo.Command{
 			if err != nil { // If first argument did not work.
 				count, err = strconv.Atoi(ss[1]) // Try second one.
 				if err != nil {
-					if _, err := req.RespondBadCommandUsage("", ""); err != nil {
-						return err
-					}
+					return sugo.NewBadCommandUsageError(req)
 				}
 			}
 			break
 		default:
-			if _, err := req.RespondBadCommandUsage("", ""); err != nil {
-				return err
-			}
-			return nil
+			return sugo.NewBadCommandUsageError(req)
 		}
 
 		// Validate count.
 		if count > maxCount {
-			if _, err := req.RespondBadCommandUsage("", "max messages count I can delete is "+strconv.Itoa(maxCount)); err != nil {
-				return err
-			}
+			return sugo.NewBadCommandUsageError(req)
 		}
 
 		lastMessageID := req.Message.ID      // To store last message id.
@@ -111,11 +103,7 @@ var clear = &sugo.Command{
 
 				if time.Since(then).Hours() >= 24*14 {
 					// We are unable to delete messages older then 14 days.
-					_, err = req.RespondDanger("", "unable to delete messages older then 2 weeks")
-					if err != nil {
-						return err
-					}
-					break messageLoop
+					return sugo.NewError(req, "unable to delete messages older then 2 weeks (discord restriction)")
 				}
 				if userID != "" {
 					// If user ID is specified, we compare message with the user ID.
@@ -151,7 +139,7 @@ var clear = &sugo.Command{
 		_ = req.Sugo.Session.ChannelMessagesBulkDelete(req.Channel.ID, messageIDs)
 
 		// Notify user about deletion.
-		msg, err := req.RespondWarning("", "cleaning done, this message will self-destruct in 10 seconds")
+		msg, err := req.Respond("", sugo.NewWarningEmbed(req, "cleaning done, this message will self-destruct in 10 seconds"), false)
 		if err != nil {
 			return err
 		}
