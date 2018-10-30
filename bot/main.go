@@ -9,6 +9,8 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 	"gitlab.com/diraven/crabot/bot/modules/help"
+	"gitlab.com/diraven/crabot/bot/modules/mod"
+	"gitlab.com/diraven/crabot/bot/modules/publicroles"
 	"gitlab.com/diraven/crabot/bot/settings"
 	"log"
 	"os"
@@ -58,14 +60,14 @@ func main() {
 		log.Println(err)
 		return
 	}
-	//if err := mod.Init(bot); err != nil {
-	//	log.Println(err)
-	//	return
-	//}
-	//if err := publicroles.Init(bot, db); err != nil {
-	//	log.Println(err)
-	//	return
-	//}
+	if err := mod.Init(bot); err != nil {
+		log.Println(err)
+		return
+	}
+	if err := publicroles.Init(bot, db); err != nil {
+		log.Println(err)
+		return
+	}
 
 	// Start the bot.
 	if err := bot.Startup(os.Getenv("DISCORD_BOT_TOKEN")); err != nil {

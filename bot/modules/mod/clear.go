@@ -139,7 +139,7 @@ var clear = &sugo.Command{
 		_ = req.Sugo.Session.ChannelMessagesBulkDelete(req.Channel.ID, messageIDs)
 
 		// Notify user about deletion.
-		msg, err := req.Respond("", sugo.NewWarningEmbed(req, "cleaning done, this message will self-destruct in 10 seconds"), false)
+		msg, err := req.SimpleResponse("cleaning done, this message will self-destruct in 10 seconds").Send()
 		if err != nil {
 			return err
 		}

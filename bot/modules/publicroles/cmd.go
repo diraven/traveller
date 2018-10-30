@@ -17,7 +17,7 @@ var cmd = &sugo.Command{
 		if len(roles) > 0 {
 			// Make an array of suggested role names.
 			response := helpers.FmtStringsSlice(rolesToRoleNames(roles), ", ", "`", 1500, "...", "")
-			_, err = req.Respond("", sugo.NewInfoEmbed(req, "available public roles: "+response), false)
+			_, err = req.Respond("", sugo.NewInfoEmbed(req, response), false)
 		} else {
 			_, err = req.Respond("", sugo.NewInfoEmbed(req, "nothing found"), false)
 		}
