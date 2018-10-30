@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/diraven/sugo"
+	"github.com/diraven/sugo/examples/info"
 	"github.com/diraven/sugo/examples/test"
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
@@ -53,10 +54,10 @@ func main() {
 		log.Println(err)
 		return
 	}
-	//if err := info.Init(bot); err != nil {
-	//	log.Println(err)
-	//	return
-	//}
+	if err := info.Init(bot); err != nil {
+		log.Println(err)
+		return
+	}
 	//if err := mod.Init(bot); err != nil {
 	//	log.Println(err)
 	//	return
