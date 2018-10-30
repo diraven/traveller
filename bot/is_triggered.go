@@ -26,7 +26,7 @@ func isTriggeredFactory(db *sql.DB) (isTriggered func(req *sugo.Request) (trigge
 			return
 		} else if req.Channel.Type == discordgo.ChannelTypeGuildText || req.Channel.Type == discordgo.ChannelTypeGroupDM {
 			// It's either Guild Text Channel or multiple people direct group Channel.
-			// In order to detect command we need to check for bot Triggereq.
+			// In order to detect command we need to check for bot Trigger.
 
 			// Check for guild specific trigger.
 			var dbGuild *models.MydiscordGuild
