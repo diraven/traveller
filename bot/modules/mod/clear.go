@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"github.com/diraven/sugo"
-	"github.com/diraven/sugo/helpers"
+	"gitlab.com/diraven/crabot/bot/utils"
 	"strconv"
 	"strings"
 	"time"
@@ -22,7 +22,7 @@ var clear = &sugo.Command{
 		"",
 	HasParams:           true,
 	PermissionsRequired: discordgo.PermissionManageMessages,
-	Execute: func(req *sugo.Request) error {
+	Execute: func(req *sugo.Request) (err error) {
 		// Command has to have 1 or 2 parameters.
 		ss := strings.Split(req.Query, " ")
 
@@ -33,14 +33,14 @@ var clear = &sugo.Command{
 		switch len(ss) {
 		case 1: // Means we have got either user mention or amount of messages to delete.
 			if ss[0] == "" { // No parameters given.
-				return sugo.NewBadCommandUsageError(req)
+				_, err = req.NewResponse(sugo.ResponseWarning, "", "not sure what messages to delete... can you give more info, please? see help for details").Send()
+				return
 			}
 
 			if len(req.Message.Mentions) > 0 { // Get user mention if available.
 				// Get user id.
 				userID = req.Message.Mentions[0].ID
 			} else { // Get amount of messages to delete.
-				var err error
 				count, err = strconv.Atoi(ss[0]) // Try to parse count.
 				if err != nil {
 					return err
@@ -49,28 +49,34 @@ var clear = &sugo.Command{
 			break
 		case 2: // Means we've got both user mention and amount of messages to delete.
 			if len(req.Message.Mentions) == 0 { // Query must have mention.
-				return sugo.NewBadCommandUsageError(req)
+				_, err = req.NewResponse(sugo.ResponseWarning, "", "unable to find a mention of the person to delete messages from").Send()
+				return
+
 			}
 			userID = req.Message.Mentions[0].ID
 
 			// Try to get count of messages to delete.
-			var err error
 			count, err = strconv.Atoi(ss[0]) // Try first argument.
 
 			if err != nil { // If first argument did not work.
 				count, err = strconv.Atoi(ss[1]) // Try second one.
 				if err != nil {
-					return sugo.NewBadCommandUsageError(req)
+					_, err = req.NewResponse(sugo.ResponseWarning, "", "unable to find count of messages to delete").Send()
+					return
 				}
 			}
 			break
 		default:
-			return sugo.NewBadCommandUsageError(req)
+			_, err = req.NewResponse(sugo.ResponseWarning, "", "unable to understand what needs to be done, sorry... see help for details").Send()
+			return
+
 		}
 
 		// Validate count.
 		if count > maxCount {
-			return sugo.NewBadCommandUsageError(req)
+			_, err = req.NewResponse(sugo.ResponseWarning, "", "too many messages to delete, I don't think I can handle that many, try less or equal then "+strconv.Itoa(maxCount)).Send()
+			return
+
 		}
 
 		lastMessageID := req.Message.ID      // To store last message id.
@@ -86,7 +92,6 @@ var clear = &sugo.Command{
 	messageLoop:
 		for {
 			// Get next 100 messages.
-			var err error
 			tmpMessages, err = req.Sugo.Session.ChannelMessages(req.Channel.ID, limit, lastMessageID, "", "")
 			if err != nil {
 				return err
@@ -96,14 +101,15 @@ var clear = &sugo.Command{
 			for _, message := range tmpMessages {
 				// Get message creation date.
 				var then time.Time
-				then, err = helpers.DiscordTimestampToTime(string(message.Timestamp))
+				then, err = utils.DiscordTimestampToTime(string(message.Timestamp))
 				if err != nil {
 					return err
 				}
 
 				if time.Since(then).Hours() >= 24*14 {
 					// We are unable to delete messages older then 14 days.
-					return sugo.NewError(req, "unable to delete messages older then 2 weeks (discord restriction)")
+					_, err = req.NewResponse(sugo.ResponseWarning, "", "unable to delete messages older then 2 weeks (discord does not allow me to do that)").Send()
+					return
 				}
 				if userID != "" {
 					// If user ID is specified, we compare message with the user ID.
@@ -139,16 +145,10 @@ var clear = &sugo.Command{
 		_ = req.Sugo.Session.ChannelMessagesBulkDelete(req.Channel.ID, messageIDs)
 
 		// Notify user about deletion.
-		msg, err := req.SimpleResponse("cleaning done, this message will self-destruct in 10 seconds").Send()
-		if err != nil {
-			return err
+		if err = req.AddReaction(sugo.ReactionOk); err != nil {
+			return
 		}
 
-		// Wait for 10 seconds.
-		time.Sleep(10 * time.Second)
-
-		// Delete notification. Ignore errors (such as message already deleted by someone) for now.
-		_ = req.Sugo.Session.ChannelMessageDelete(msg.ChannelID, msg.ID)
-		return err
+		return
 	},
 }

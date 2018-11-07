@@ -5,15 +5,15 @@ import (
 	"database/sql"
 	"github.com/bwmarrin/discordgo"
 	"github.com/diraven/sugo"
+	"github.com/pkg/errors"
 	"github.com/volatiletech/sqlboiler/boil"
 	"github.com/volatiletech/sqlboiler/queries/qm"
 	"gitlab.com/diraven/crabot/bot/models"
-	"log"
 	"strings"
 )
 
-func isTriggeredFactory(db *sql.DB) (isTriggered func(req *sugo.Request) (triggered bool, err error)) {
-	return func(req *sugo.Request) (triggered bool, err error) {
+func isTriggeredFactory(db *sql.DB) (isTriggered func(req *sugo.Request) (triggered bool)) {
+	return func(req *sugo.Request) (triggered bool) {
 		// Check channel type:
 		if req.Channel.Type == discordgo.ChannelTypeDM {
 			// It's Direct Messaging Channel. Every message here is in fact a direct message to the bot, so we consider
@@ -33,8 +33,10 @@ func isTriggeredFactory(db *sql.DB) (isTriggered func(req *sugo.Request) (trigge
 			var guild *discordgo.Guild
 
 			// Get guild from the request.
+			var err error
 			guild, err = req.GetGuild()
 			if err != nil {
+				req.Sugo.HandleError(req, errors.Wrap(err, "unable to get discord guild"))
 				return
 			}
 
@@ -42,7 +44,7 @@ func isTriggeredFactory(db *sql.DB) (isTriggered func(req *sugo.Request) (trigge
 			var dbGuilds models.MydiscordGuildSlice
 			dbGuilds, err = models.MydiscordGuilds(qm.Where("discord_id = ?", guild.ID)).All(context.TODO(), db)
 			if err != nil {
-				log.Println("database guilds retrieval error error: ", err.Error())
+				req.Sugo.HandleError(req, errors.Wrap(err, "unable to retrieve guild from the db"))
 				return
 			}
 
@@ -60,6 +62,7 @@ func isTriggeredFactory(db *sql.DB) (isTriggered func(req *sugo.Request) (trigge
 				// Add guild to the DB.
 				err = dbGuild.Insert(context.TODO(), db, boil.Infer())
 				if err != nil {
+					req.Sugo.HandleError(req, errors.Wrap(err, "unable to save guild to the db"))
 					return
 				}
 			}

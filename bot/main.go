@@ -4,13 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/diraven/sugo"
-	"github.com/diraven/sugo/examples/info"
-	"github.com/diraven/sugo/examples/test"
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 	"gitlab.com/diraven/crabot/bot/modules/help"
+	"gitlab.com/diraven/crabot/bot/modules/info"
 	"gitlab.com/diraven/crabot/bot/modules/mod"
 	"gitlab.com/diraven/crabot/bot/modules/publicroles"
+	"gitlab.com/diraven/crabot/bot/modules/test"
 	"gitlab.com/diraven/crabot/bot/settings"
 	"log"
 	"os"
@@ -71,6 +71,6 @@ func main() {
 
 	// Start the bot.
 	if err := bot.Startup(os.Getenv("DISCORD_BOT_TOKEN")); err != nil {
-		bot.HandleError(err)
+		bot.HandleError(nil, err)
 	}
 }

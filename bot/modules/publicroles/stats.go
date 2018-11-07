@@ -3,6 +3,7 @@ package publicroles
 import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/diraven/sugo"
+	"gitlab.com/diraven/crabot/bot/utils"
 	"sort"
 	"strconv"
 )
@@ -37,10 +38,18 @@ var statsCmd = &sugo.Command{
 	Trigger:     "stats",
 	Description: "Lists public roles with the highest/lowest count of people.",
 	HasParams:   true,
-	Execute: func(req *sugo.Request) error {
-		var err error
+	Execute: func(req *sugo.Request) (err error) {
+		// Get guild.
+		var guild *discordgo.Guild
+		if guild, err = req.GetGuild(); err != nil {
+			return
+		}
+
 		// Get all public roles.
-		roles, err := storage.findGuildPublicRole(req, "")
+		var roles discordgo.Roles
+		if roles, _, err = publicRoles.filter(req, guild.Roles, ""); err != nil {
+			return
+		}
 
 		// Make a storage for stats we are about to gather.
 		stats := &tStats{}
@@ -51,12 +60,6 @@ var statsCmd = &sugo.Command{
 				role,
 				0,
 			})
-		}
-
-		// Get guild.
-		guild, err := req.GetGuild()
-		if err != nil {
-			return err
 		}
 
 		// Make members array we will be working with.
@@ -82,20 +85,22 @@ var statsCmd = &sugo.Command{
 		if len(*stats) > 0 {
 			// Start building response.
 			var response string
-			response = response + "```\n"
 			for i, stat := range *stats {
-				response = response + strconv.Itoa(i+1) + ". " + stat.role.Name + " (" + strconv.Itoa(stat.count) + ")\n"
+				response = response + strconv.Itoa(i+1) + ". " + utils.RoleToMention(stat.role) + " (" + strconv.Itoa(stat.count) + ")\n"
 				if i > 9 {
 					break
 				}
 			}
-			response = response + "```"
-			_, err = req.RespondInfo("", response)
-
+			response = response + ""
+			if _, err = req.NewResponse(sugo.ResponseInfo, "", response).Send(); err != nil {
+				return
+			}
 		} else {
-			_, err = req.RespondDanger("", "no data available")
+			if _, err = req.NewResponse(sugo.ResponseWarning, "", "no data available").Send(); err != nil {
+				return
+			}
 		}
 
-		return err
+		return
 	},
 }

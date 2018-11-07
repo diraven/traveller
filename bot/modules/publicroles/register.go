@@ -3,32 +3,32 @@ package publicroles
 import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/diraven/sugo"
+	"gitlab.com/diraven/crabot/bot/utils"
 	"strings"
 )
 
-var addCmd = &sugo.Command{
+var registerCmd = &sugo.Command{
 	Trigger:             "register",
 	Description:         "Makes existing role public.",
 	PermissionsRequired: discordgo.PermissionManageRoles,
 	HasParams:           true,
-	Execute: func(req *sugo.Request) error {
-		var err error
-
-		// Make sure query is not empty.
-		if req.Query == "" {
-			return sugo.NewBadCommandUsageError(req)
+	Execute: func(req *sugo.Request) (err error) {
+		// Make sure at least 3 symbols are provided in the query.
+		if len(req.Query) < 3 {
+			_, err = req.NewResponse(sugo.ResponseWarning, "", "I need at least 3 symbols of the role name to look for one").Send()
+			return
 		}
 
 		// Get guild.
 		guild, err := req.GetGuild()
 		if err != nil {
-			return err
+			return
 		}
 
 		// Get all guild roles.
 		roles, err := req.Sugo.Session.GuildRoles(guild.ID)
 		if err != nil {
-			return sugo.WrapError(req, err)
+			return
 		}
 
 		// Process request.
@@ -45,11 +45,12 @@ var addCmd = &sugo.Command{
 		// Make a storage for role we matched.
 		var matchedRole *discordgo.Role
 
-		// Try to match role.
+		// Try to find given role. Match must be exact (either ID or role name).
 		for _, role := range roles {
 			if strings.ToLower(role.Name) == strings.ToLower(request) || role.ID == request {
 				if matchedRole != nil {
-					return sugo.NewError(req, "too many roles found, try again with a different search")
+					_, err = req.NewResponse(sugo.ResponseWarning, "", "multiple roles found, try using role mention instead").Send()
+					return
 				}
 				matchedRole = role
 			}
@@ -58,23 +59,32 @@ var addCmd = &sugo.Command{
 		// If we did not find any match:
 		if matchedRole == nil {
 			// Notify user about fail.
-			return sugo.NewError(req, "no roles found")
+			_, err = req.NewResponse(sugo.ResponseWarning, "", "no roles with such name found").Send()
+			return
+		}
+
+		// Try to find matched role among public ones:
+		var fuzzy bool
+		if roles, fuzzy, err = publicRoles.filter(req, guild.Roles, matchedRole.ID); err != nil {
+			return
+		}
+		// If we have found non-fuzzy match:
+		if len(roles) > 0 && !fuzzy {
+			// Notify user that the role is already public.
+			_, err = req.NewResponse(sugo.ResponseWarning, "", "this role is already public").Send()
+			return
 		}
 
 		// Otherwise add new role to the public roles list.
-		err = storage.add(matchedRole.ID)
-		if err != nil {
-			return sugo.WrapError(req, err)
-		}
-
-		// Save our changes.
-		err = storage.save()
-		if err != nil {
-			return sugo.WrapError(req, err)
+		if err = publicRoles.register(req, matchedRole); err != nil {
+			return
 		}
 
 		// And notify user about success.
-		_, err = req.Respond("", sugo.NewSuccessEmbed(req, "role `"+matchedRole.Name+"` is public now"), false)
-		return err
+		if _, err = req.NewResponse(sugo.ResponseSuccess, "", utils.RoleToMention(matchedRole)+" role is public now").Send(); err != nil {
+			return
+		}
+
+		return
 	},
 }

@@ -12,6 +12,11 @@ func Init(sg *sugo.Instance) (err error) {
 	return sg.AddCommand(cmd)
 }
 
+// GetHint returns string that would be used to get current command's help.
+func GetHint(req *sugo.Request) string {
+	return fmt.Sprintf("`help %s`", req.Command.GetPath())
+}
+
 func generateHelpEmbed(req *sugo.Request, c *sugo.Command) (embed *discordgo.MessageEmbed, err error) {
 	embed = &discordgo.MessageEmbed{
 		Title:       c.GetPath(),
@@ -85,6 +90,10 @@ var cmd = &sugo.Command{
 		}
 
 		// Otherwise no embed is generated, this means command not found.
-		return sugo.NewCommandNotFoundError(req)
+		if _, err = req.NewResponse(sugo.ResponseWarning, "", "command not found").Send(); err != nil {
+			return
+		}
+
+		return
 	},
 }
