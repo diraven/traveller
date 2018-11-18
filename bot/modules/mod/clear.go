@@ -22,7 +22,7 @@ var clear = &sugo.Command{
 		"",
 	HasParams:           true,
 	PermissionsRequired: discordgo.PermissionManageMessages,
-	Execute: func(req *sugo.Request) (err error) {
+	Execute: func(req *sugo.Request) (resp *sugo.Response, err error) {
 		// Command has to have 1 or 2 parameters.
 		ss := strings.Split(req.Query, " ")
 
@@ -41,9 +41,9 @@ var clear = &sugo.Command{
 				// Get user id.
 				userID = req.Message.Mentions[0].ID
 			} else { // Get amount of messages to delete.
-				count, err = strconv.Atoi(ss[0]) // Try to parse count.
-				if err != nil {
-					return err
+				// Try to parse count.
+				if count, err = strconv.Atoi(ss[0]); err != nil {
+					return
 				}
 			}
 			break
@@ -92,18 +92,16 @@ var clear = &sugo.Command{
 	messageLoop:
 		for {
 			// Get next 100 messages.
-			tmpMessages, err = req.Sugo.Session.ChannelMessages(req.Channel.ID, limit, lastMessageID, "", "")
-			if err != nil {
-				return err
+			if tmpMessages, err = req.Sugo.Session.ChannelMessages(req.Channel.ID, limit, lastMessageID, "", ""); err != nil {
+				return
 			}
 
 			// For each message.
 			for _, message := range tmpMessages {
 				// Get message creation date.
 				var then time.Time
-				then, err = utils.DiscordTimestampToTime(string(message.Timestamp))
-				if err != nil {
-					return err
+				if then, err = utils.DiscordTimestampToTime(string(message.Timestamp)); err != nil {
+					return
 				}
 
 				if time.Since(then).Hours() >= 24*14 {

@@ -5,36 +5,36 @@ import (
 )
 
 // Init initializes module on the given bot.
-func Init(sg *sugo.Instance) (err error) {
-	return sg.AddCommand(cmd)
+func Init(sg *sugo.Instance) {
+	sg.AddCommand(cmd)
 }
 
 var cmd = &sugo.Command{
 	Trigger:     "test",
 	Description: "command made for testing purposes\n",
-	Execute: func(req *sugo.Request) (err error) {
-		_, err = req.SimpleResponse("test").Send()
+	Execute: func(req *sugo.Request) (resp *sugo.Response, err error) {
+		resp = req.SimpleResponse("test")
 		return
 	},
 	SubCommands: []*sugo.Command{
 		{
 			Trigger: "subtest1",
-			Execute: func(req *sugo.Request) (err error) {
-				_, err = req.SimpleResponse("subtest1").Send()
+			Execute: func(req *sugo.Request) (resp *sugo.Response, err error) {
+				resp = req.SimpleResponse("subtest1")
 				return
 			},
 			SubCommands: []*sugo.Command{
 				{
 					Trigger: "subtest11",
-					Execute: func(req *sugo.Request) (err error) {
-						_, err = req.SimpleResponse("subtest11").Send()
+					Execute: func(req *sugo.Request) (resp *sugo.Response, err error) {
+						resp = req.SimpleResponse("subtest11")
 						return
 					},
 				},
 				{
 					Trigger: "subtest12",
-					Execute: func(req *sugo.Request) (err error) {
-						_, err = req.SimpleResponse("subtest12").Send()
+					Execute: func(req *sugo.Request) (resp *sugo.Response, err error) {
+						resp = req.SimpleResponse("subtest12")
 						return
 					},
 				},
@@ -42,14 +42,14 @@ var cmd = &sugo.Command{
 		},
 		{
 			Trigger: "subtest2",
-			Execute: func(req *sugo.Request) (err error) {
-				_, err = req.SimpleResponse("subtest2").Send()
+			Execute: func(req *sugo.Request) (resp *sugo.Response, err error) {
+				resp = req.SimpleResponse("subtest2")
 				return
 			},
 		},
 		{
 			Trigger: "plaintext",
-			Execute: func(req *sugo.Request) (err error) {
+			Execute: func(req *sugo.Request) (resp *sugo.Response, err error) {
 				_, err = req.NewResponse(
 					sugo.ResponsePlainText,
 					"message title",
@@ -60,14 +60,14 @@ var cmd = &sugo.Command{
 		},
 		{
 			Trigger: "simple",
-			Execute: func(req *sugo.Request) (err error) {
+			Execute: func(req *sugo.Request) (resp *sugo.Response, err error) {
 				_, err = req.SimpleResponse("message text").Send()
 				return
 			},
 		},
 		{
 			Trigger: "default",
-			Execute: func(req *sugo.Request) (err error) {
+			Execute: func(req *sugo.Request) (resp *sugo.Response, err error) {
 				_, err = req.NewResponse(
 					sugo.ResponseDefault,
 					"message title",
@@ -78,7 +78,7 @@ var cmd = &sugo.Command{
 		},
 		{
 			Trigger: "info",
-			Execute: func(req *sugo.Request) (err error) {
+			Execute: func(req *sugo.Request) (resp *sugo.Response, err error) {
 				_, err = req.NewResponse(
 					sugo.ResponseInfo,
 					"message title",
@@ -89,7 +89,7 @@ var cmd = &sugo.Command{
 		},
 		{
 			Trigger: "success",
-			Execute: func(req *sugo.Request) (err error) {
+			Execute: func(req *sugo.Request) (resp *sugo.Response, err error) {
 				_, err = req.NewResponse(
 					sugo.ResponseSuccess,
 					"message title",
@@ -100,7 +100,7 @@ var cmd = &sugo.Command{
 		},
 		{
 			Trigger: "warning",
-			Execute: func(req *sugo.Request) (err error) {
+			Execute: func(req *sugo.Request) (resp *sugo.Response, err error) {
 				_, err = req.NewResponse(
 					sugo.ResponseWarning,
 					"message title",
@@ -111,7 +111,7 @@ var cmd = &sugo.Command{
 		},
 		{
 			Trigger: "danger",
-			Execute: func(req *sugo.Request) (err error) {
+			Execute: func(req *sugo.Request) (resp *sugo.Response, err error) {
 				_, err = req.NewResponse(
 					sugo.ResponseDanger,
 					"message title",

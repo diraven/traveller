@@ -12,10 +12,10 @@ var registerCmd = &sugo.Command{
 	Description:         "Makes existing role public.",
 	PermissionsRequired: discordgo.PermissionManageRoles,
 	HasParams:           true,
-	Execute: func(req *sugo.Request) (err error) {
+	Execute: func(req *sugo.Request) (resp *sugo.Response, err error) {
 		// Make sure at least 3 symbols are provided in the query.
 		if len(req.Query) < 3 {
-			_, err = req.NewResponse(sugo.ResponseWarning, "", "I need at least 3 symbols of the role name to look for one").Send()
+			resp = req.NewResponse(sugo.ResponseWarning, "", "I need at least 3 symbols of the role name to look for one")
 			return
 		}
 
@@ -49,7 +49,7 @@ var registerCmd = &sugo.Command{
 		for _, role := range roles {
 			if strings.ToLower(role.Name) == strings.ToLower(request) || role.ID == request {
 				if matchedRole != nil {
-					_, err = req.NewResponse(sugo.ResponseWarning, "", "multiple roles found, try using role mention instead").Send()
+					resp = req.NewResponse(sugo.ResponseWarning, "", "multiple roles found, try using role mention instead")
 					return
 				}
 				matchedRole = role
@@ -59,7 +59,7 @@ var registerCmd = &sugo.Command{
 		// If we did not find any match:
 		if matchedRole == nil {
 			// Notify user about fail.
-			_, err = req.NewResponse(sugo.ResponseWarning, "", "no roles with such name found").Send()
+			resp = req.NewResponse(sugo.ResponseWarning, "", "no roles with such name found")
 			return
 		}
 
@@ -71,7 +71,7 @@ var registerCmd = &sugo.Command{
 		// If we have found non-fuzzy match:
 		if len(roles) > 0 && !fuzzy {
 			// Notify user that the role is already public.
-			_, err = req.NewResponse(sugo.ResponseWarning, "", "this role is already public").Send()
+			resp = req.NewResponse(sugo.ResponseWarning, "", "this role is already public")
 			return
 		}
 
@@ -81,10 +81,7 @@ var registerCmd = &sugo.Command{
 		}
 
 		// And notify user about success.
-		if _, err = req.NewResponse(sugo.ResponseSuccess, "", utils.RoleToMention(matchedRole)+" role is public now").Send(); err != nil {
-			return
-		}
-
+		resp = req.NewResponse(sugo.ResponseSuccess, "", utils.RoleToMention(matchedRole)+" role is public now")
 		return
 	},
 }

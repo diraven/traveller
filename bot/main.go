@@ -6,6 +6,7 @@ import (
 	"github.com/diraven/sugo"
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
+	"gitlab.com/diraven/crabot/bot/modules/aliases"
 	"gitlab.com/diraven/crabot/bot/modules/help"
 	"gitlab.com/diraven/crabot/bot/modules/info"
 	"gitlab.com/diraven/crabot/bot/modules/mod"
@@ -48,26 +49,12 @@ func main() {
 	bot.IsTriggered = isTriggeredFactory(db)
 
 	// Initialize modules.
-	if err := test.Init(bot); err != nil {
-		log.Println(err)
-		return
-	}
-	if err := help.Init(bot); err != nil {
-		log.Println(err)
-		return
-	}
-	if err := info.Init(bot); err != nil {
-		log.Println(err)
-		return
-	}
-	if err := mod.Init(bot); err != nil {
-		log.Println(err)
-		return
-	}
-	if err := publicroles.Init(bot, db); err != nil {
-		log.Println(err)
-		return
-	}
+	aliases.Init(bot, db)
+	test.Init(bot)
+	help.Init(bot)
+	info.Init(bot)
+	mod.Init(bot)
+	publicroles.Init(bot, db)
 
 	// Start the bot.
 	if err := bot.Startup(os.Getenv("DISCORD_BOT_TOKEN")); err != nil {

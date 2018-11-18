@@ -13,18 +13,17 @@ var createCmd = &sugo.Command{
 	Description:         "Creates new guild role with the given name and makes it public.",
 	PermissionsRequired: discordgo.PermissionManageRoles,
 	HasParams:           true,
-	Execute: func(req *sugo.Request) (err error) {
+	Execute: func(req *sugo.Request) (resp *sugo.Response, err error) {
 		// Make sure at least 3 symbols are provided in the query.
 		if len(req.Query) < 3 {
-			_, err = req.NewResponse(sugo.ResponseWarning, "", "I need at least 3 symbols of the role name to look for one").Send()
+			resp = req.NewResponse(sugo.ResponseWarning, "", "I need at least 3 symbols of the role name to look for one")
 			return
 		}
 
 		// Get guild.
 		var guild *discordgo.Guild
-		guild, err = req.GetGuild()
-		if err != nil {
-			return err
+		if guild, err = req.GetGuild(); err != nil {
+			return
 		}
 
 		// Variable to hold roles lists.
@@ -37,7 +36,7 @@ var createCmd = &sugo.Command{
 		}
 		if len(roles) > 0 && !fuzzy {
 			// Role with such name already exists.
-			_, err = req.NewResponse(sugo.ResponseWarning, "", "this role is already public").Send()
+			resp = req.NewResponse(sugo.ResponseWarning, "", "this role is already public")
 			return
 		}
 
@@ -48,7 +47,7 @@ var createCmd = &sugo.Command{
 		for _, role := range roles {
 			if strings.ToLower(role.Name) == strings.ToLower(req.Query) {
 				// We have found the role with the same name.
-				_, err = req.NewResponse(sugo.ResponseWarning, "", "role with such name already exists, try to register it as public instead of creating new, see "+help.GetHint(req)+" for details ").Send()
+				resp = req.NewResponse(sugo.ResponseWarning, "", "role with such name already exists, try to register it as public instead of creating new, see "+help.GetHint(req)+" for details ")
 				return
 			}
 		}
@@ -56,7 +55,7 @@ var createCmd = &sugo.Command{
 		// If we did not filter any match, try to create new role via Discord API.
 		var role *discordgo.Role
 		if role, err = req.Sugo.Session.GuildRoleCreate(guild.ID); err != nil {
-			return errors.Wrap(err, "unable to create new discord guild role")
+			return nil, errors.Wrap(err, "unable to create new discord guild role")
 		}
 
 		// Set new role properties.

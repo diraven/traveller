@@ -8,8 +8,8 @@ import (
 )
 
 // Init initializes module on the given bot.
-func Init(sg *sugo.Instance) (err error) {
-	return sg.AddCommand(cmd)
+func Init(sg *sugo.Instance) {
+	sg.AddCommand(cmd)
 }
 
 // GetHint returns string that would be used to get current command's help.
@@ -44,7 +44,7 @@ var cmd = &sugo.Command{
 	Trigger:     "help",
 	Description: "Shows help section for the appropriate command.",
 	HasParams:   true,
-	Execute: func(req *sugo.Request) (err error) {
+	Execute: func(req *sugo.Request) (resp *sugo.Response, err error) {
 		// Remove help command from the string
 		req.Query = strings.TrimSpace(strings.TrimPrefix(req.Query, req.Command.Trigger))
 
@@ -90,10 +90,7 @@ var cmd = &sugo.Command{
 		}
 
 		// Otherwise no embed is generated, this means command not found.
-		if _, err = req.NewResponse(sugo.ResponseWarning, "", "command not found").Send(); err != nil {
-			return
-		}
-
+		resp = req.NewResponse(sugo.ResponseWarning, "", "command not found")
 		return
 	},
 }

@@ -38,7 +38,7 @@ var statsCmd = &sugo.Command{
 	Trigger:     "stats",
 	Description: "Lists public roles with the highest/lowest count of people.",
 	HasParams:   true,
-	Execute: func(req *sugo.Request) (err error) {
+	Execute: func(req *sugo.Request) (resp *sugo.Response, err error) {
 		// Get guild.
 		var guild *discordgo.Guild
 		if guild, err = req.GetGuild(); err != nil {
@@ -92,13 +92,11 @@ var statsCmd = &sugo.Command{
 				}
 			}
 			response = response + ""
-			if _, err = req.NewResponse(sugo.ResponseInfo, "", response).Send(); err != nil {
-				return
-			}
+			resp = req.NewResponse(sugo.ResponseInfo, "", response)
+			return
 		} else {
-			if _, err = req.NewResponse(sugo.ResponseWarning, "", "no data available").Send(); err != nil {
-				return
-			}
+			resp = req.NewResponse(sugo.ResponseWarning, "", "no data available")
+			return
 		}
 
 		return

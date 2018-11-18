@@ -11,7 +11,7 @@ var cmd = &sugo.Command{
 	Description:  "Allows to manipulate public roles.",
 	RequireGuild: true,
 	HasParams:    true,
-	Execute: func(req *sugo.Request) (err error) {
+	Execute: func(req *sugo.Request) (resp *sugo.Response, err error) {
 		// Make sure at least 3 symbols are provided in the query.
 		if len(req.Query) < 3 && len(req.Query) > 0 {
 			_, err = req.NewResponse(sugo.ResponseWarning, "", "I need at least 3 symbols of the role name to look for one").Send()

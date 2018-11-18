@@ -10,10 +10,10 @@ var myCmd = &sugo.Command{
 	Trigger:     "my",
 	Description: "Lists all the public roles you are in.",
 	HasParams:   true,
-	Execute: func(req *sugo.Request) (err error) {
+	Execute: func(req *sugo.Request) (resp *sugo.Response, err error) {
 		// Make sure at least 3 symbols are provided in the query.
 		if len(req.Query) < 3 && len(req.Query) > 0 {
-			_, err = req.NewResponse(sugo.ResponseWarning, "", "I need at least 3 symbols of the role name to look for one").Send()
+			resp = req.NewResponse(sugo.ResponseWarning, "", "I need at least 3 symbols of the role name to look for one")
 			return
 		}
 
@@ -38,18 +38,16 @@ var myCmd = &sugo.Command{
 		if len(roles) == 0 {
 			// Notify user about this.
 			if req.Query == "" {
-				_, err = req.NewResponse(sugo.ResponseInfo, "", "you have no public roles").Send()
+				resp = req.NewResponse(sugo.ResponseInfo, "", "you have no public roles")
 			} else {
-				_, err = req.NewResponse(sugo.ResponseInfo, "", "you have no such public roles").Send()
+				resp = req.NewResponse(sugo.ResponseInfo, "", "you have no such public roles")
 			}
 			return
 		}
 
 		// Output roles we have found to the user.
 		response := utils.FmtStringsSlice(utils.RolesToMentions(roles), ", ", "", 1500, " and more...", "")
-		if _, err = req.NewResponse(sugo.ResponseInfo, "", response).Send(); err != nil {
-			return
-		}
+		resp = req.NewResponse(sugo.ResponseInfo, "", response)
 
 		return
 	},

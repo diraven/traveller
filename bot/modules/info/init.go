@@ -11,17 +11,15 @@ import (
 )
 
 // Init initializes module on the given bot.
-func Init(sg *sugo.Instance) (err error) {
-	return sg.AddCommand(cmd)
+func Init(sg *sugo.Instance) {
+	sg.AddCommand(cmd)
 }
 
 // Info shows some general bot info.
 var cmd = &sugo.Command{
 	Trigger:     "info",
 	Description: "Shows basic info about bot.",
-	Execute: func(req *sugo.Request) error {
-		var err error
-
+	Execute: func(req *sugo.Request) (resp *sugo.Response, err error) {
 		// Set command response.
 		now := time.Now().UTC()
 
@@ -72,8 +70,8 @@ var cmd = &sugo.Command{
 			},
 		})
 		if err != nil {
-			return err
+			return
 		}
-		return nil
+		return
 	},
 }

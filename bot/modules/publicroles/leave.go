@@ -11,10 +11,10 @@ var leaveCmd = &sugo.Command{
 	Trigger:     "leave",
 	Description: "Removes person to the public role.",
 	HasParams:   true,
-	Execute: func(req *sugo.Request) (err error) {
+	Execute: func(req *sugo.Request) (resp *sugo.Response, err error) {
 		// Make sure at least 3 symbols are provided in the query.
 		if len(req.Query) < 3 {
-			_, err = req.NewResponse(sugo.ResponseWarning, "", "I need at least 3 symbols of the role name to look for one").Send()
+			resp = req.NewResponse(sugo.ResponseWarning, "", "I need at least 3 symbols of the role name to look for one")
 			return
 		}
 
@@ -41,12 +41,12 @@ var leaveCmd = &sugo.Command{
 			return
 		}
 		if len(roles) == 0 {
-			_, err = req.NewResponse(sugo.ResponseWarning, "", "you have no public roles with such name").Send()
+			resp = req.NewResponse(sugo.ResponseWarning, "", "you have no public roles with such name")
 			return
 		}
 		if len(roles) > 1 {
 			// TODO: better display what exactly roles were found
-			_, err = req.NewResponse(sugo.ResponseWarning, "", "you have multiple public with such name: ").Send()
+			resp = req.NewResponse(sugo.ResponseWarning, "", "you have multiple public with such name: ")
 			return
 		}
 		var requestedRole *discordgo.Role
@@ -55,18 +55,15 @@ var leaveCmd = &sugo.Command{
 		// Try to remove user role.
 		err = req.Sugo.Session.GuildMemberRoleRemove(guild.ID, req.Message.Author.ID, requestedRole.ID)
 		if err != nil {
-			return errors.Wrap(err, "unable to assign user role, make sure bot role is sorted above and bot has permission to manage roles")
+			return nil, errors.Wrap(err, "unable to assign user role, make sure bot role is sorted above and bot has permission to manage roles")
 		}
 
 		// Respond about operation being successful.
-		if _, err = req.NewResponse(
+		resp = req.NewResponse(
 			sugo.ResponseSuccess,
 			"",
 			"you don't have `"+requestedRole.Name+"` role any more",
-		).Send(); err != nil {
-			return
-		}
-
+		)
 		return
 	},
 }
