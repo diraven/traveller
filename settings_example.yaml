@@ -5,10 +5,6 @@ databases:
     password: ''
     name: ''
 
-helpscout:
-  app_id: ''
-  app_secret: ''
-
 sentry_io:
   dsn: ''
 

@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='guild',
             name='discord_id',
-            field=models.CharField(max_length=16, unique=True),
+            field=models.CharField(max_length=32, unique=True),
         ),
     ]
