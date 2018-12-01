@@ -8,6 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"gitlab.com/diraven/crabot/modules/aliases"
 	"gitlab.com/diraven/crabot/modules/destiny2"
+	"gitlab.com/diraven/crabot/modules/goharu"
 	"gitlab.com/diraven/crabot/modules/help"
 	"gitlab.com/diraven/crabot/modules/info"
 	"gitlab.com/diraven/crabot/modules/mod"
@@ -58,6 +59,7 @@ func main() {
 	mod.Init(bot)
 	publicroles.Init(bot, db)
 	destiny2.Init(bot)
+	goharu.Init(bot)
 
 	// Start the bot.
 	if err := bot.Startup(fmt.Sprintf("%s", cfg.Get("token"))); err != nil {
