@@ -12,6 +12,9 @@ func Init(sg *sugo.Instance) {
 	sg.AddCommand(cmd)
 }
 
+// TODO: Make a better caching mechanism.
+var cachedText string
+
 var cmd = &sugo.Command{
 	Trigger:     "goharu",
 	Description: "GoHa.ru forums search.",
@@ -27,36 +30,38 @@ var cmd = &sugo.Command{
 				return
 			}
 
-			// Load goha archive page.
-			var response *http.Response
-			response, err = http.Get("https://forums.goha.ru/archive/index.php")
-			if err != nil {
-				resp = req.NewResponse(sugo.ResponseDanger, "", err.Error())
-				return
-			}
-			defer response.Body.Close()
+			// If cached data is not available:
+			if cachedText == "" {
+				// Load goha archive page.
+				var response *http.Response
+				response, err = http.Get("https://forums.goha.ru/archive/index.php")
+				if err != nil {
+					resp = req.NewResponse(sugo.ResponseDanger, "", err.Error())
+					return
+				}
+				defer response.Body.Close()
 
-			// Make sure response is provided and status is 200-ok.
-			if response.StatusCode != http.StatusOK {
-				resp = req.NewResponse(sugo.ResponseDanger, "", response.Status)
-				return
-			}
+				// Make sure response is provided and status is 200-ok.
+				if response.StatusCode != http.StatusOK {
+					resp = req.NewResponse(sugo.ResponseDanger, "", response.Status)
+					return
+				}
 
-			var data []byte
-			data, err = ioutil.ReadAll(response.Body)
-			if err != nil {
-				resp = req.NewResponse(sugo.ResponseDanger, "", "internal error, contact developer for details")
-				return
-			}
+				var data []byte
+				data, err = ioutil.ReadAll(response.Body)
+				if err != nil {
+					resp = req.NewResponse(sugo.ResponseDanger, "", "internal error, contact developer for details")
+					return
+				}
 
-			// Convert data to text.
-			var text = string(data)
+				cachedText = string(data)
+			}
 
 			// Try to find relevant url.
 			var rexp *regexp.Regexp
 			rexp, err = regexp.Compile(`(?i)<a href="[^"]*f-(\d+)[^"]+">.*` + regexp.QuoteMeta(req.Query) + `[^<]*</a>`)
 			var results [][]string
-			results = rexp.FindAllStringSubmatch(text, -1)
+			results = rexp.FindAllStringSubmatch(cachedText, -1)
 
 			// If there are no results:
 			if len(results) == 0 {
