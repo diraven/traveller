@@ -16,7 +16,7 @@ var createCmd = &sugo.Command{
 	Execute: func(req *sugo.Request) (resp *sugo.Response, err error) {
 		// Make sure at least 3 symbols are provided in the query.
 		if len(req.Query) < 3 {
-			resp = req.NewResponse(sugo.ResponseWarning, "", "I need at least 3 symbols of the role name to look for one")
+			resp = req.NewResponse(sugo.ResponseWarning, "", "role name must have at least 3 symbols")
 			return
 		}
 
