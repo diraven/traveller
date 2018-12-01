@@ -5,6 +5,8 @@ databases:
     password: ''
     name: ''
 
+token: ''
+
 sentry_io:
   dsn: ''
 
