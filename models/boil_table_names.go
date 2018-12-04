@@ -4,27 +4,15 @@
 package models
 
 var TableNames = struct {
-	AuthGroup               string
-	AuthGroupPermissions    string
-	AuthPermission          string
-	AuthUser                string
-	AuthUserGroups          string
-	AuthUserUserPermissions string
-	MydiscordAlias          string
-	MydiscordGuild          string
-	MydiscordGuildModules   string
-	MydiscordModule         string
-	PublicrolesPublicrole   string
+	CommandAlias string
+	Guild        string
+	GuildModules string
+	Module       string
+	Publicrole   string
 }{
-	AuthGroup:               "auth_group",
-	AuthGroupPermissions:    "auth_group_permissions",
-	AuthPermission:          "auth_permission",
-	AuthUser:                "auth_user",
-	AuthUserGroups:          "auth_user_groups",
-	AuthUserUserPermissions: "auth_user_user_permissions",
-	MydiscordAlias:          "mydiscord_alias",
-	MydiscordGuild:          "mydiscord_guild",
-	MydiscordGuildModules:   "mydiscord_guild_modules",
-	MydiscordModule:         "mydiscord_module",
-	PublicrolesPublicrole:   "publicroles_publicrole",
+	CommandAlias: "command_alias",
+	Guild:        "guild",
+	GuildModules: "guild_modules",
+	Module:       "module",
+	Publicrole:   "publicrole",
 }

@@ -21,24 +21,24 @@ var (
 	_ = queries.Equal
 )
 
-func testMydiscordModules(t *testing.T) {
+func testModules(t *testing.T) {
 	t.Parallel()
 
-	query := MydiscordModules()
+	query := Modules()
 
 	if query.Query == nil {
 		t.Error("expected a query, got nothing")
 	}
 }
 
-func testMydiscordModulesDelete(t *testing.T) {
+func testModulesDelete(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordModule{}
-	if err = randomize.Struct(seed, o, mydiscordModuleDBTypes, true, mydiscordModuleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordModule struct: %s", err)
+	o := &Module{}
+	if err = randomize.Struct(seed, o, moduleDBTypes, true, moduleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Module struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -54,7 +54,7 @@ func testMydiscordModulesDelete(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := MydiscordModules().Count(ctx, tx)
+	count, err := Modules().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -64,14 +64,14 @@ func testMydiscordModulesDelete(t *testing.T) {
 	}
 }
 
-func testMydiscordModulesQueryDeleteAll(t *testing.T) {
+func testModulesQueryDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordModule{}
-	if err = randomize.Struct(seed, o, mydiscordModuleDBTypes, true, mydiscordModuleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordModule struct: %s", err)
+	o := &Module{}
+	if err = randomize.Struct(seed, o, moduleDBTypes, true, moduleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Module struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -81,13 +81,13 @@ func testMydiscordModulesQueryDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	if rowsAff, err := MydiscordModules().DeleteAll(ctx, tx); err != nil {
+	if rowsAff, err := Modules().DeleteAll(ctx, tx); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := MydiscordModules().Count(ctx, tx)
+	count, err := Modules().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -97,14 +97,14 @@ func testMydiscordModulesQueryDeleteAll(t *testing.T) {
 	}
 }
 
-func testMydiscordModulesSliceDeleteAll(t *testing.T) {
+func testModulesSliceDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordModule{}
-	if err = randomize.Struct(seed, o, mydiscordModuleDBTypes, true, mydiscordModuleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordModule struct: %s", err)
+	o := &Module{}
+	if err = randomize.Struct(seed, o, moduleDBTypes, true, moduleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Module struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -114,7 +114,7 @@ func testMydiscordModulesSliceDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := MydiscordModuleSlice{o}
+	slice := ModuleSlice{o}
 
 	if rowsAff, err := slice.DeleteAll(ctx, tx); err != nil {
 		t.Error(err)
@@ -122,7 +122,7 @@ func testMydiscordModulesSliceDeleteAll(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := MydiscordModules().Count(ctx, tx)
+	count, err := Modules().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -132,14 +132,14 @@ func testMydiscordModulesSliceDeleteAll(t *testing.T) {
 	}
 }
 
-func testMydiscordModulesExists(t *testing.T) {
+func testModulesExists(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordModule{}
-	if err = randomize.Struct(seed, o, mydiscordModuleDBTypes, true, mydiscordModuleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordModule struct: %s", err)
+	o := &Module{}
+	if err = randomize.Struct(seed, o, moduleDBTypes, true, moduleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Module struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -149,23 +149,23 @@ func testMydiscordModulesExists(t *testing.T) {
 		t.Error(err)
 	}
 
-	e, err := MydiscordModuleExists(ctx, tx, o.ID)
+	e, err := ModuleExists(ctx, tx, o.ID)
 	if err != nil {
-		t.Errorf("Unable to check if MydiscordModule exists: %s", err)
+		t.Errorf("Unable to check if Module exists: %s", err)
 	}
 	if !e {
-		t.Errorf("Expected MydiscordModuleExists to return true, but got false.")
+		t.Errorf("Expected ModuleExists to return true, but got false.")
 	}
 }
 
-func testMydiscordModulesFind(t *testing.T) {
+func testModulesFind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordModule{}
-	if err = randomize.Struct(seed, o, mydiscordModuleDBTypes, true, mydiscordModuleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordModule struct: %s", err)
+	o := &Module{}
+	if err = randomize.Struct(seed, o, moduleDBTypes, true, moduleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Module struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -175,24 +175,24 @@ func testMydiscordModulesFind(t *testing.T) {
 		t.Error(err)
 	}
 
-	mydiscordModuleFound, err := FindMydiscordModule(ctx, tx, o.ID)
+	moduleFound, err := FindModule(ctx, tx, o.ID)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if mydiscordModuleFound == nil {
+	if moduleFound == nil {
 		t.Error("want a record, got nil")
 	}
 }
 
-func testMydiscordModulesBind(t *testing.T) {
+func testModulesBind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordModule{}
-	if err = randomize.Struct(seed, o, mydiscordModuleDBTypes, true, mydiscordModuleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordModule struct: %s", err)
+	o := &Module{}
+	if err = randomize.Struct(seed, o, moduleDBTypes, true, moduleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Module struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -202,19 +202,19 @@ func testMydiscordModulesBind(t *testing.T) {
 		t.Error(err)
 	}
 
-	if err = MydiscordModules().Bind(ctx, tx, o); err != nil {
+	if err = Modules().Bind(ctx, tx, o); err != nil {
 		t.Error(err)
 	}
 }
 
-func testMydiscordModulesOne(t *testing.T) {
+func testModulesOne(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordModule{}
-	if err = randomize.Struct(seed, o, mydiscordModuleDBTypes, true, mydiscordModuleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordModule struct: %s", err)
+	o := &Module{}
+	if err = randomize.Struct(seed, o, moduleDBTypes, true, moduleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Module struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -224,38 +224,38 @@ func testMydiscordModulesOne(t *testing.T) {
 		t.Error(err)
 	}
 
-	if x, err := MydiscordModules().One(ctx, tx); err != nil {
+	if x, err := Modules().One(ctx, tx); err != nil {
 		t.Error(err)
 	} else if x == nil {
 		t.Error("expected to get a non nil record")
 	}
 }
 
-func testMydiscordModulesAll(t *testing.T) {
+func testModulesAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	mydiscordModuleOne := &MydiscordModule{}
-	mydiscordModuleTwo := &MydiscordModule{}
-	if err = randomize.Struct(seed, mydiscordModuleOne, mydiscordModuleDBTypes, false, mydiscordModuleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordModule struct: %s", err)
+	moduleOne := &Module{}
+	moduleTwo := &Module{}
+	if err = randomize.Struct(seed, moduleOne, moduleDBTypes, false, moduleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Module struct: %s", err)
 	}
-	if err = randomize.Struct(seed, mydiscordModuleTwo, mydiscordModuleDBTypes, false, mydiscordModuleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordModule struct: %s", err)
+	if err = randomize.Struct(seed, moduleTwo, moduleDBTypes, false, moduleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Module struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = mydiscordModuleOne.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = moduleOne.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = mydiscordModuleTwo.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = moduleTwo.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	slice, err := MydiscordModules().All(ctx, tx)
+	slice, err := Modules().All(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -265,31 +265,31 @@ func testMydiscordModulesAll(t *testing.T) {
 	}
 }
 
-func testMydiscordModulesCount(t *testing.T) {
+func testModulesCount(t *testing.T) {
 	t.Parallel()
 
 	var err error
 	seed := randomize.NewSeed()
-	mydiscordModuleOne := &MydiscordModule{}
-	mydiscordModuleTwo := &MydiscordModule{}
-	if err = randomize.Struct(seed, mydiscordModuleOne, mydiscordModuleDBTypes, false, mydiscordModuleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordModule struct: %s", err)
+	moduleOne := &Module{}
+	moduleTwo := &Module{}
+	if err = randomize.Struct(seed, moduleOne, moduleDBTypes, false, moduleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Module struct: %s", err)
 	}
-	if err = randomize.Struct(seed, mydiscordModuleTwo, mydiscordModuleDBTypes, false, mydiscordModuleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordModule struct: %s", err)
+	if err = randomize.Struct(seed, moduleTwo, moduleDBTypes, false, moduleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Module struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = mydiscordModuleOne.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = moduleOne.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = mydiscordModuleTwo.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = moduleTwo.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	count, err := MydiscordModules().Count(ctx, tx)
+	count, err := Modules().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -299,155 +299,155 @@ func testMydiscordModulesCount(t *testing.T) {
 	}
 }
 
-func mydiscordModuleBeforeInsertHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordModule) error {
-	*o = MydiscordModule{}
+func moduleBeforeInsertHook(ctx context.Context, e boil.ContextExecutor, o *Module) error {
+	*o = Module{}
 	return nil
 }
 
-func mydiscordModuleAfterInsertHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordModule) error {
-	*o = MydiscordModule{}
+func moduleAfterInsertHook(ctx context.Context, e boil.ContextExecutor, o *Module) error {
+	*o = Module{}
 	return nil
 }
 
-func mydiscordModuleAfterSelectHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordModule) error {
-	*o = MydiscordModule{}
+func moduleAfterSelectHook(ctx context.Context, e boil.ContextExecutor, o *Module) error {
+	*o = Module{}
 	return nil
 }
 
-func mydiscordModuleBeforeUpdateHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordModule) error {
-	*o = MydiscordModule{}
+func moduleBeforeUpdateHook(ctx context.Context, e boil.ContextExecutor, o *Module) error {
+	*o = Module{}
 	return nil
 }
 
-func mydiscordModuleAfterUpdateHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordModule) error {
-	*o = MydiscordModule{}
+func moduleAfterUpdateHook(ctx context.Context, e boil.ContextExecutor, o *Module) error {
+	*o = Module{}
 	return nil
 }
 
-func mydiscordModuleBeforeDeleteHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordModule) error {
-	*o = MydiscordModule{}
+func moduleBeforeDeleteHook(ctx context.Context, e boil.ContextExecutor, o *Module) error {
+	*o = Module{}
 	return nil
 }
 
-func mydiscordModuleAfterDeleteHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordModule) error {
-	*o = MydiscordModule{}
+func moduleAfterDeleteHook(ctx context.Context, e boil.ContextExecutor, o *Module) error {
+	*o = Module{}
 	return nil
 }
 
-func mydiscordModuleBeforeUpsertHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordModule) error {
-	*o = MydiscordModule{}
+func moduleBeforeUpsertHook(ctx context.Context, e boil.ContextExecutor, o *Module) error {
+	*o = Module{}
 	return nil
 }
 
-func mydiscordModuleAfterUpsertHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordModule) error {
-	*o = MydiscordModule{}
+func moduleAfterUpsertHook(ctx context.Context, e boil.ContextExecutor, o *Module) error {
+	*o = Module{}
 	return nil
 }
 
-func testMydiscordModulesHooks(t *testing.T) {
+func testModulesHooks(t *testing.T) {
 	t.Parallel()
 
 	var err error
 
 	ctx := context.Background()
-	empty := &MydiscordModule{}
-	o := &MydiscordModule{}
+	empty := &Module{}
+	o := &Module{}
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, o, mydiscordModuleDBTypes, false); err != nil {
-		t.Errorf("Unable to randomize MydiscordModule object: %s", err)
+	if err = randomize.Struct(seed, o, moduleDBTypes, false); err != nil {
+		t.Errorf("Unable to randomize Module object: %s", err)
 	}
 
-	AddMydiscordModuleHook(boil.BeforeInsertHook, mydiscordModuleBeforeInsertHook)
+	AddModuleHook(boil.BeforeInsertHook, moduleBeforeInsertHook)
 	if err = o.doBeforeInsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeInsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeInsertHook function to empty object, but got: %#v", o)
 	}
-	mydiscordModuleBeforeInsertHooks = []MydiscordModuleHook{}
+	moduleBeforeInsertHooks = []ModuleHook{}
 
-	AddMydiscordModuleHook(boil.AfterInsertHook, mydiscordModuleAfterInsertHook)
+	AddModuleHook(boil.AfterInsertHook, moduleAfterInsertHook)
 	if err = o.doAfterInsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterInsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterInsertHook function to empty object, but got: %#v", o)
 	}
-	mydiscordModuleAfterInsertHooks = []MydiscordModuleHook{}
+	moduleAfterInsertHooks = []ModuleHook{}
 
-	AddMydiscordModuleHook(boil.AfterSelectHook, mydiscordModuleAfterSelectHook)
+	AddModuleHook(boil.AfterSelectHook, moduleAfterSelectHook)
 	if err = o.doAfterSelectHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterSelectHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterSelectHook function to empty object, but got: %#v", o)
 	}
-	mydiscordModuleAfterSelectHooks = []MydiscordModuleHook{}
+	moduleAfterSelectHooks = []ModuleHook{}
 
-	AddMydiscordModuleHook(boil.BeforeUpdateHook, mydiscordModuleBeforeUpdateHook)
+	AddModuleHook(boil.BeforeUpdateHook, moduleBeforeUpdateHook)
 	if err = o.doBeforeUpdateHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeUpdateHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeUpdateHook function to empty object, but got: %#v", o)
 	}
-	mydiscordModuleBeforeUpdateHooks = []MydiscordModuleHook{}
+	moduleBeforeUpdateHooks = []ModuleHook{}
 
-	AddMydiscordModuleHook(boil.AfterUpdateHook, mydiscordModuleAfterUpdateHook)
+	AddModuleHook(boil.AfterUpdateHook, moduleAfterUpdateHook)
 	if err = o.doAfterUpdateHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterUpdateHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterUpdateHook function to empty object, but got: %#v", o)
 	}
-	mydiscordModuleAfterUpdateHooks = []MydiscordModuleHook{}
+	moduleAfterUpdateHooks = []ModuleHook{}
 
-	AddMydiscordModuleHook(boil.BeforeDeleteHook, mydiscordModuleBeforeDeleteHook)
+	AddModuleHook(boil.BeforeDeleteHook, moduleBeforeDeleteHook)
 	if err = o.doBeforeDeleteHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeDeleteHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeDeleteHook function to empty object, but got: %#v", o)
 	}
-	mydiscordModuleBeforeDeleteHooks = []MydiscordModuleHook{}
+	moduleBeforeDeleteHooks = []ModuleHook{}
 
-	AddMydiscordModuleHook(boil.AfterDeleteHook, mydiscordModuleAfterDeleteHook)
+	AddModuleHook(boil.AfterDeleteHook, moduleAfterDeleteHook)
 	if err = o.doAfterDeleteHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterDeleteHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterDeleteHook function to empty object, but got: %#v", o)
 	}
-	mydiscordModuleAfterDeleteHooks = []MydiscordModuleHook{}
+	moduleAfterDeleteHooks = []ModuleHook{}
 
-	AddMydiscordModuleHook(boil.BeforeUpsertHook, mydiscordModuleBeforeUpsertHook)
+	AddModuleHook(boil.BeforeUpsertHook, moduleBeforeUpsertHook)
 	if err = o.doBeforeUpsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeUpsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeUpsertHook function to empty object, but got: %#v", o)
 	}
-	mydiscordModuleBeforeUpsertHooks = []MydiscordModuleHook{}
+	moduleBeforeUpsertHooks = []ModuleHook{}
 
-	AddMydiscordModuleHook(boil.AfterUpsertHook, mydiscordModuleAfterUpsertHook)
+	AddModuleHook(boil.AfterUpsertHook, moduleAfterUpsertHook)
 	if err = o.doAfterUpsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterUpsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterUpsertHook function to empty object, but got: %#v", o)
 	}
-	mydiscordModuleAfterUpsertHooks = []MydiscordModuleHook{}
+	moduleAfterUpsertHooks = []ModuleHook{}
 }
 
-func testMydiscordModulesInsert(t *testing.T) {
+func testModulesInsert(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordModule{}
-	if err = randomize.Struct(seed, o, mydiscordModuleDBTypes, true, mydiscordModuleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordModule struct: %s", err)
+	o := &Module{}
+	if err = randomize.Struct(seed, o, moduleDBTypes, true, moduleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Module struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -457,7 +457,7 @@ func testMydiscordModulesInsert(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := MydiscordModules().Count(ctx, tx)
+	count, err := Modules().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -467,24 +467,24 @@ func testMydiscordModulesInsert(t *testing.T) {
 	}
 }
 
-func testMydiscordModulesInsertWhitelist(t *testing.T) {
+func testModulesInsertWhitelist(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordModule{}
-	if err = randomize.Struct(seed, o, mydiscordModuleDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize MydiscordModule struct: %s", err)
+	o := &Module{}
+	if err = randomize.Struct(seed, o, moduleDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize Module struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = o.Insert(ctx, tx, boil.Whitelist(mydiscordModuleColumnsWithoutDefault...)); err != nil {
+	if err = o.Insert(ctx, tx, boil.Whitelist(moduleColumnsWithoutDefault...)); err != nil {
 		t.Error(err)
 	}
 
-	count, err := MydiscordModules().Count(ctx, tx)
+	count, err := Modules().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -494,28 +494,28 @@ func testMydiscordModulesInsertWhitelist(t *testing.T) {
 	}
 }
 
-func testMydiscordModuleToManyModuleMydiscordGuildModules(t *testing.T) {
+func testModuleToManyGuildModules(t *testing.T) {
 	var err error
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var a MydiscordModule
-	var b, c MydiscordGuildModule
+	var a Module
+	var b, c GuildModule
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, &a, mydiscordModuleDBTypes, true, mydiscordModuleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordModule struct: %s", err)
+	if err = randomize.Struct(seed, &a, moduleDBTypes, true, moduleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Module struct: %s", err)
 	}
 
 	if err := a.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Fatal(err)
 	}
 
-	if err = randomize.Struct(seed, &b, mydiscordGuildModuleDBTypes, false, mydiscordGuildModuleColumnsWithDefault...); err != nil {
+	if err = randomize.Struct(seed, &b, guildModuleDBTypes, false, guildModuleColumnsWithDefault...); err != nil {
 		t.Fatal(err)
 	}
-	if err = randomize.Struct(seed, &c, mydiscordGuildModuleDBTypes, false, mydiscordGuildModuleColumnsWithDefault...); err != nil {
+	if err = randomize.Struct(seed, &c, guildModuleDBTypes, false, guildModuleColumnsWithDefault...); err != nil {
 		t.Fatal(err)
 	}
 
@@ -529,13 +529,13 @@ func testMydiscordModuleToManyModuleMydiscordGuildModules(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	mydiscordGuildModule, err := a.ModuleMydiscordGuildModules().All(ctx, tx)
+	guildModule, err := a.GuildModules().All(ctx, tx)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	bFound, cFound := false, false
-	for _, v := range mydiscordGuildModule {
+	for _, v := range guildModule {
 		if v.ModuleID == b.ModuleID {
 			bFound = true
 		}
@@ -551,44 +551,44 @@ func testMydiscordModuleToManyModuleMydiscordGuildModules(t *testing.T) {
 		t.Error("expected to find c")
 	}
 
-	slice := MydiscordModuleSlice{&a}
-	if err = a.L.LoadModuleMydiscordGuildModules(ctx, tx, false, (*[]*MydiscordModule)(&slice), nil); err != nil {
+	slice := ModuleSlice{&a}
+	if err = a.L.LoadGuildModules(ctx, tx, false, (*[]*Module)(&slice), nil); err != nil {
 		t.Fatal(err)
 	}
-	if got := len(a.R.ModuleMydiscordGuildModules); got != 2 {
+	if got := len(a.R.GuildModules); got != 2 {
 		t.Error("number of eager loaded records wrong, got:", got)
 	}
 
-	a.R.ModuleMydiscordGuildModules = nil
-	if err = a.L.LoadModuleMydiscordGuildModules(ctx, tx, true, &a, nil); err != nil {
+	a.R.GuildModules = nil
+	if err = a.L.LoadGuildModules(ctx, tx, true, &a, nil); err != nil {
 		t.Fatal(err)
 	}
-	if got := len(a.R.ModuleMydiscordGuildModules); got != 2 {
+	if got := len(a.R.GuildModules); got != 2 {
 		t.Error("number of eager loaded records wrong, got:", got)
 	}
 
 	if t.Failed() {
-		t.Logf("%#v", mydiscordGuildModule)
+		t.Logf("%#v", guildModule)
 	}
 }
 
-func testMydiscordModuleToManyAddOpModuleMydiscordGuildModules(t *testing.T) {
+func testModuleToManyAddOpGuildModules(t *testing.T) {
 	var err error
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var a MydiscordModule
-	var b, c, d, e MydiscordGuildModule
+	var a Module
+	var b, c, d, e GuildModule
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, &a, mydiscordModuleDBTypes, false, strmangle.SetComplement(mydiscordModulePrimaryKeyColumns, mydiscordModuleColumnsWithoutDefault)...); err != nil {
+	if err = randomize.Struct(seed, &a, moduleDBTypes, false, strmangle.SetComplement(modulePrimaryKeyColumns, moduleColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
-	foreigners := []*MydiscordGuildModule{&b, &c, &d, &e}
+	foreigners := []*GuildModule{&b, &c, &d, &e}
 	for _, x := range foreigners {
-		if err = randomize.Struct(seed, x, mydiscordGuildModuleDBTypes, false, strmangle.SetComplement(mydiscordGuildModulePrimaryKeyColumns, mydiscordGuildModuleColumnsWithoutDefault)...); err != nil {
+		if err = randomize.Struct(seed, x, guildModuleDBTypes, false, strmangle.SetComplement(guildModulePrimaryKeyColumns, guildModuleColumnsWithoutDefault)...); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -603,13 +603,13 @@ func testMydiscordModuleToManyAddOpModuleMydiscordGuildModules(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	foreignersSplitByInsertion := [][]*MydiscordGuildModule{
+	foreignersSplitByInsertion := [][]*GuildModule{
 		{&b, &c},
 		{&d, &e},
 	}
 
 	for i, x := range foreignersSplitByInsertion {
-		err = a.AddModuleMydiscordGuildModules(ctx, tx, i != 0, x...)
+		err = a.AddGuildModules(ctx, tx, i != 0, x...)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -631,14 +631,14 @@ func testMydiscordModuleToManyAddOpModuleMydiscordGuildModules(t *testing.T) {
 			t.Error("relationship was not added properly to the foreign slice")
 		}
 
-		if a.R.ModuleMydiscordGuildModules[i*2] != first {
+		if a.R.GuildModules[i*2] != first {
 			t.Error("relationship struct slice not set to correct value")
 		}
-		if a.R.ModuleMydiscordGuildModules[i*2+1] != second {
+		if a.R.GuildModules[i*2+1] != second {
 			t.Error("relationship struct slice not set to correct value")
 		}
 
-		count, err := a.ModuleMydiscordGuildModules().Count(ctx, tx)
+		count, err := a.GuildModules().Count(ctx, tx)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -648,14 +648,14 @@ func testMydiscordModuleToManyAddOpModuleMydiscordGuildModules(t *testing.T) {
 	}
 }
 
-func testMydiscordModulesReload(t *testing.T) {
+func testModulesReload(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordModule{}
-	if err = randomize.Struct(seed, o, mydiscordModuleDBTypes, true, mydiscordModuleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordModule struct: %s", err)
+	o := &Module{}
+	if err = randomize.Struct(seed, o, moduleDBTypes, true, moduleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Module struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -670,14 +670,14 @@ func testMydiscordModulesReload(t *testing.T) {
 	}
 }
 
-func testMydiscordModulesReloadAll(t *testing.T) {
+func testModulesReloadAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordModule{}
-	if err = randomize.Struct(seed, o, mydiscordModuleDBTypes, true, mydiscordModuleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordModule struct: %s", err)
+	o := &Module{}
+	if err = randomize.Struct(seed, o, moduleDBTypes, true, moduleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Module struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -687,21 +687,21 @@ func testMydiscordModulesReloadAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := MydiscordModuleSlice{o}
+	slice := ModuleSlice{o}
 
 	if err = slice.ReloadAll(ctx, tx); err != nil {
 		t.Error(err)
 	}
 }
 
-func testMydiscordModulesSelect(t *testing.T) {
+func testModulesSelect(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordModule{}
-	if err = randomize.Struct(seed, o, mydiscordModuleDBTypes, true, mydiscordModuleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordModule struct: %s", err)
+	o := &Module{}
+	if err = randomize.Struct(seed, o, moduleDBTypes, true, moduleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Module struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -711,7 +711,7 @@ func testMydiscordModulesSelect(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice, err := MydiscordModules().All(ctx, tx)
+	slice, err := Modules().All(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -722,25 +722,25 @@ func testMydiscordModulesSelect(t *testing.T) {
 }
 
 var (
-	mydiscordModuleDBTypes = map[string]string{`ID`: `integer`, `Name`: `character varying`}
-	_                      = bytes.MinRead
+	moduleDBTypes = map[string]string{`ID`: `integer`, `Name`: `character varying`}
+	_             = bytes.MinRead
 )
 
-func testMydiscordModulesUpdate(t *testing.T) {
+func testModulesUpdate(t *testing.T) {
 	t.Parallel()
 
-	if 0 == len(mydiscordModulePrimaryKeyColumns) {
+	if 0 == len(modulePrimaryKeyColumns) {
 		t.Skip("Skipping table with no primary key columns")
 	}
-	if len(mydiscordModuleColumns) == len(mydiscordModulePrimaryKeyColumns) {
+	if len(moduleColumns) == len(modulePrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordModule{}
-	if err = randomize.Struct(seed, o, mydiscordModuleDBTypes, true, mydiscordModuleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordModule struct: %s", err)
+	o := &Module{}
+	if err = randomize.Struct(seed, o, moduleDBTypes, true, moduleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Module struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -750,7 +750,7 @@ func testMydiscordModulesUpdate(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := MydiscordModules().Count(ctx, tx)
+	count, err := Modules().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -759,8 +759,8 @@ func testMydiscordModulesUpdate(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, mydiscordModuleDBTypes, true, mydiscordModulePrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize MydiscordModule struct: %s", err)
+	if err = randomize.Struct(seed, o, moduleDBTypes, true, modulePrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize Module struct: %s", err)
 	}
 
 	if rowsAff, err := o.Update(ctx, tx, boil.Infer()); err != nil {
@@ -770,18 +770,18 @@ func testMydiscordModulesUpdate(t *testing.T) {
 	}
 }
 
-func testMydiscordModulesSliceUpdateAll(t *testing.T) {
+func testModulesSliceUpdateAll(t *testing.T) {
 	t.Parallel()
 
-	if len(mydiscordModuleColumns) == len(mydiscordModulePrimaryKeyColumns) {
+	if len(moduleColumns) == len(modulePrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordModule{}
-	if err = randomize.Struct(seed, o, mydiscordModuleDBTypes, true, mydiscordModuleColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordModule struct: %s", err)
+	o := &Module{}
+	if err = randomize.Struct(seed, o, moduleDBTypes, true, moduleColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Module struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -791,7 +791,7 @@ func testMydiscordModulesSliceUpdateAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := MydiscordModules().Count(ctx, tx)
+	count, err := Modules().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -800,18 +800,18 @@ func testMydiscordModulesSliceUpdateAll(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, mydiscordModuleDBTypes, true, mydiscordModulePrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize MydiscordModule struct: %s", err)
+	if err = randomize.Struct(seed, o, moduleDBTypes, true, modulePrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize Module struct: %s", err)
 	}
 
 	// Remove Primary keys and unique columns from what we plan to update
 	var fields []string
-	if strmangle.StringSliceMatch(mydiscordModuleColumns, mydiscordModulePrimaryKeyColumns) {
-		fields = mydiscordModuleColumns
+	if strmangle.StringSliceMatch(moduleColumns, modulePrimaryKeyColumns) {
+		fields = moduleColumns
 	} else {
 		fields = strmangle.SetComplement(
-			mydiscordModuleColumns,
-			mydiscordModulePrimaryKeyColumns,
+			moduleColumns,
+			modulePrimaryKeyColumns,
 		)
 	}
 
@@ -829,7 +829,7 @@ func testMydiscordModulesSliceUpdateAll(t *testing.T) {
 		}
 	}
 
-	slice := MydiscordModuleSlice{o}
+	slice := ModuleSlice{o}
 	if rowsAff, err := slice.UpdateAll(ctx, tx, updateMap); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
@@ -837,29 +837,29 @@ func testMydiscordModulesSliceUpdateAll(t *testing.T) {
 	}
 }
 
-func testMydiscordModulesUpsert(t *testing.T) {
+func testModulesUpsert(t *testing.T) {
 	t.Parallel()
 
-	if len(mydiscordModuleColumns) == len(mydiscordModulePrimaryKeyColumns) {
+	if len(moduleColumns) == len(modulePrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
 	// Attempt the INSERT side of an UPSERT
-	o := MydiscordModule{}
-	if err = randomize.Struct(seed, &o, mydiscordModuleDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize MydiscordModule struct: %s", err)
+	o := Module{}
+	if err = randomize.Struct(seed, &o, moduleDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize Module struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 	if err = o.Upsert(ctx, tx, false, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert MydiscordModule: %s", err)
+		t.Errorf("Unable to upsert Module: %s", err)
 	}
 
-	count, err := MydiscordModules().Count(ctx, tx)
+	count, err := Modules().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -868,15 +868,15 @@ func testMydiscordModulesUpsert(t *testing.T) {
 	}
 
 	// Attempt the UPDATE side of an UPSERT
-	if err = randomize.Struct(seed, &o, mydiscordModuleDBTypes, false, mydiscordModulePrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize MydiscordModule struct: %s", err)
+	if err = randomize.Struct(seed, &o, moduleDBTypes, false, modulePrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize Module struct: %s", err)
 	}
 
 	if err = o.Upsert(ctx, tx, true, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert MydiscordModule: %s", err)
+		t.Errorf("Unable to upsert Module: %s", err)
 	}
 
-	count, err = MydiscordModules().Count(ctx, tx)
+	count, err = Modules().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}

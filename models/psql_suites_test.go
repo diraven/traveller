@@ -6,25 +6,13 @@ package models
 import "testing"
 
 func TestUpsert(t *testing.T) {
-	t.Run("AuthGroups", testAuthGroupsUpsert)
+	t.Run("CommandAliases", testCommandAliasesUpsert)
 
-	t.Run("AuthGroupPermissions", testAuthGroupPermissionsUpsert)
+	t.Run("Guilds", testGuildsUpsert)
 
-	t.Run("AuthPermissions", testAuthPermissionsUpsert)
+	t.Run("GuildModules", testGuildModulesUpsert)
 
-	t.Run("AuthUsers", testAuthUsersUpsert)
+	t.Run("Modules", testModulesUpsert)
 
-	t.Run("AuthUserGroups", testAuthUserGroupsUpsert)
-
-	t.Run("AuthUserUserPermissions", testAuthUserUserPermissionsUpsert)
-
-	t.Run("MydiscordAliases", testMydiscordAliasesUpsert)
-
-	t.Run("MydiscordGuilds", testMydiscordGuildsUpsert)
-
-	t.Run("MydiscordGuildModules", testMydiscordGuildModulesUpsert)
-
-	t.Run("MydiscordModules", testMydiscordModulesUpsert)
-
-	t.Run("PublicrolesPublicroles", testPublicrolesPublicrolesUpsert)
+	t.Run("Publicroles", testPublicrolesUpsert)
 }

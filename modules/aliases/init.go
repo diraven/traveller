@@ -15,9 +15,9 @@ func makeMiddleware(db *sql.DB) sugo.RequestMiddleware {
 			return
 		}
 
-		var aliases models.MydiscordAliasSlice
+		var aliases models.CommandAliasSlice
 
-		if aliases, err = models.MydiscordAliases(
+		if aliases, err = models.CommandAliases(
 			qm.InnerJoin("mydiscord_guild g ON g.id = mydiscord_alias.guild_id"),
 			qm.Where("g.discord_id = ?", req.Channel.GuildID),
 		).All(req.Ctx, db); err != nil {

@@ -21,24 +21,24 @@ var (
 	_ = queries.Equal
 )
 
-func testMydiscordAliases(t *testing.T) {
+func testCommandAliases(t *testing.T) {
 	t.Parallel()
 
-	query := MydiscordAliases()
+	query := CommandAliases()
 
 	if query.Query == nil {
 		t.Error("expected a query, got nothing")
 	}
 }
 
-func testMydiscordAliasesDelete(t *testing.T) {
+func testCommandAliasesDelete(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordAlias{}
-	if err = randomize.Struct(seed, o, mydiscordAliasDBTypes, true, mydiscordAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordAlias struct: %s", err)
+	o := &CommandAlias{}
+	if err = randomize.Struct(seed, o, commandAliasDBTypes, true, commandAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize CommandAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -54,7 +54,7 @@ func testMydiscordAliasesDelete(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := MydiscordAliases().Count(ctx, tx)
+	count, err := CommandAliases().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -64,14 +64,14 @@ func testMydiscordAliasesDelete(t *testing.T) {
 	}
 }
 
-func testMydiscordAliasesQueryDeleteAll(t *testing.T) {
+func testCommandAliasesQueryDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordAlias{}
-	if err = randomize.Struct(seed, o, mydiscordAliasDBTypes, true, mydiscordAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordAlias struct: %s", err)
+	o := &CommandAlias{}
+	if err = randomize.Struct(seed, o, commandAliasDBTypes, true, commandAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize CommandAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -81,13 +81,13 @@ func testMydiscordAliasesQueryDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	if rowsAff, err := MydiscordAliases().DeleteAll(ctx, tx); err != nil {
+	if rowsAff, err := CommandAliases().DeleteAll(ctx, tx); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := MydiscordAliases().Count(ctx, tx)
+	count, err := CommandAliases().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -97,14 +97,14 @@ func testMydiscordAliasesQueryDeleteAll(t *testing.T) {
 	}
 }
 
-func testMydiscordAliasesSliceDeleteAll(t *testing.T) {
+func testCommandAliasesSliceDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordAlias{}
-	if err = randomize.Struct(seed, o, mydiscordAliasDBTypes, true, mydiscordAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordAlias struct: %s", err)
+	o := &CommandAlias{}
+	if err = randomize.Struct(seed, o, commandAliasDBTypes, true, commandAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize CommandAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -114,7 +114,7 @@ func testMydiscordAliasesSliceDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := MydiscordAliasSlice{o}
+	slice := CommandAliasSlice{o}
 
 	if rowsAff, err := slice.DeleteAll(ctx, tx); err != nil {
 		t.Error(err)
@@ -122,7 +122,7 @@ func testMydiscordAliasesSliceDeleteAll(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := MydiscordAliases().Count(ctx, tx)
+	count, err := CommandAliases().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -132,14 +132,14 @@ func testMydiscordAliasesSliceDeleteAll(t *testing.T) {
 	}
 }
 
-func testMydiscordAliasesExists(t *testing.T) {
+func testCommandAliasesExists(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordAlias{}
-	if err = randomize.Struct(seed, o, mydiscordAliasDBTypes, true, mydiscordAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordAlias struct: %s", err)
+	o := &CommandAlias{}
+	if err = randomize.Struct(seed, o, commandAliasDBTypes, true, commandAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize CommandAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -149,23 +149,23 @@ func testMydiscordAliasesExists(t *testing.T) {
 		t.Error(err)
 	}
 
-	e, err := MydiscordAliasExists(ctx, tx, o.ID)
+	e, err := CommandAliasExists(ctx, tx, o.ID)
 	if err != nil {
-		t.Errorf("Unable to check if MydiscordAlias exists: %s", err)
+		t.Errorf("Unable to check if CommandAlias exists: %s", err)
 	}
 	if !e {
-		t.Errorf("Expected MydiscordAliasExists to return true, but got false.")
+		t.Errorf("Expected CommandAliasExists to return true, but got false.")
 	}
 }
 
-func testMydiscordAliasesFind(t *testing.T) {
+func testCommandAliasesFind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordAlias{}
-	if err = randomize.Struct(seed, o, mydiscordAliasDBTypes, true, mydiscordAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordAlias struct: %s", err)
+	o := &CommandAlias{}
+	if err = randomize.Struct(seed, o, commandAliasDBTypes, true, commandAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize CommandAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -175,24 +175,24 @@ func testMydiscordAliasesFind(t *testing.T) {
 		t.Error(err)
 	}
 
-	mydiscordAliasFound, err := FindMydiscordAlias(ctx, tx, o.ID)
+	commandAliasFound, err := FindCommandAlias(ctx, tx, o.ID)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if mydiscordAliasFound == nil {
+	if commandAliasFound == nil {
 		t.Error("want a record, got nil")
 	}
 }
 
-func testMydiscordAliasesBind(t *testing.T) {
+func testCommandAliasesBind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordAlias{}
-	if err = randomize.Struct(seed, o, mydiscordAliasDBTypes, true, mydiscordAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordAlias struct: %s", err)
+	o := &CommandAlias{}
+	if err = randomize.Struct(seed, o, commandAliasDBTypes, true, commandAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize CommandAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -202,19 +202,19 @@ func testMydiscordAliasesBind(t *testing.T) {
 		t.Error(err)
 	}
 
-	if err = MydiscordAliases().Bind(ctx, tx, o); err != nil {
+	if err = CommandAliases().Bind(ctx, tx, o); err != nil {
 		t.Error(err)
 	}
 }
 
-func testMydiscordAliasesOne(t *testing.T) {
+func testCommandAliasesOne(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordAlias{}
-	if err = randomize.Struct(seed, o, mydiscordAliasDBTypes, true, mydiscordAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordAlias struct: %s", err)
+	o := &CommandAlias{}
+	if err = randomize.Struct(seed, o, commandAliasDBTypes, true, commandAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize CommandAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -224,38 +224,38 @@ func testMydiscordAliasesOne(t *testing.T) {
 		t.Error(err)
 	}
 
-	if x, err := MydiscordAliases().One(ctx, tx); err != nil {
+	if x, err := CommandAliases().One(ctx, tx); err != nil {
 		t.Error(err)
 	} else if x == nil {
 		t.Error("expected to get a non nil record")
 	}
 }
 
-func testMydiscordAliasesAll(t *testing.T) {
+func testCommandAliasesAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	mydiscordAliasOne := &MydiscordAlias{}
-	mydiscordAliasTwo := &MydiscordAlias{}
-	if err = randomize.Struct(seed, mydiscordAliasOne, mydiscordAliasDBTypes, false, mydiscordAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordAlias struct: %s", err)
+	commandAliasOne := &CommandAlias{}
+	commandAliasTwo := &CommandAlias{}
+	if err = randomize.Struct(seed, commandAliasOne, commandAliasDBTypes, false, commandAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize CommandAlias struct: %s", err)
 	}
-	if err = randomize.Struct(seed, mydiscordAliasTwo, mydiscordAliasDBTypes, false, mydiscordAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordAlias struct: %s", err)
+	if err = randomize.Struct(seed, commandAliasTwo, commandAliasDBTypes, false, commandAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize CommandAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = mydiscordAliasOne.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = commandAliasOne.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = mydiscordAliasTwo.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = commandAliasTwo.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	slice, err := MydiscordAliases().All(ctx, tx)
+	slice, err := CommandAliases().All(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -265,31 +265,31 @@ func testMydiscordAliasesAll(t *testing.T) {
 	}
 }
 
-func testMydiscordAliasesCount(t *testing.T) {
+func testCommandAliasesCount(t *testing.T) {
 	t.Parallel()
 
 	var err error
 	seed := randomize.NewSeed()
-	mydiscordAliasOne := &MydiscordAlias{}
-	mydiscordAliasTwo := &MydiscordAlias{}
-	if err = randomize.Struct(seed, mydiscordAliasOne, mydiscordAliasDBTypes, false, mydiscordAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordAlias struct: %s", err)
+	commandAliasOne := &CommandAlias{}
+	commandAliasTwo := &CommandAlias{}
+	if err = randomize.Struct(seed, commandAliasOne, commandAliasDBTypes, false, commandAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize CommandAlias struct: %s", err)
 	}
-	if err = randomize.Struct(seed, mydiscordAliasTwo, mydiscordAliasDBTypes, false, mydiscordAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordAlias struct: %s", err)
+	if err = randomize.Struct(seed, commandAliasTwo, commandAliasDBTypes, false, commandAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize CommandAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = mydiscordAliasOne.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = commandAliasOne.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = mydiscordAliasTwo.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = commandAliasTwo.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	count, err := MydiscordAliases().Count(ctx, tx)
+	count, err := CommandAliases().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -299,155 +299,155 @@ func testMydiscordAliasesCount(t *testing.T) {
 	}
 }
 
-func mydiscordAliasBeforeInsertHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordAlias) error {
-	*o = MydiscordAlias{}
+func commandAliasBeforeInsertHook(ctx context.Context, e boil.ContextExecutor, o *CommandAlias) error {
+	*o = CommandAlias{}
 	return nil
 }
 
-func mydiscordAliasAfterInsertHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordAlias) error {
-	*o = MydiscordAlias{}
+func commandAliasAfterInsertHook(ctx context.Context, e boil.ContextExecutor, o *CommandAlias) error {
+	*o = CommandAlias{}
 	return nil
 }
 
-func mydiscordAliasAfterSelectHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordAlias) error {
-	*o = MydiscordAlias{}
+func commandAliasAfterSelectHook(ctx context.Context, e boil.ContextExecutor, o *CommandAlias) error {
+	*o = CommandAlias{}
 	return nil
 }
 
-func mydiscordAliasBeforeUpdateHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordAlias) error {
-	*o = MydiscordAlias{}
+func commandAliasBeforeUpdateHook(ctx context.Context, e boil.ContextExecutor, o *CommandAlias) error {
+	*o = CommandAlias{}
 	return nil
 }
 
-func mydiscordAliasAfterUpdateHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordAlias) error {
-	*o = MydiscordAlias{}
+func commandAliasAfterUpdateHook(ctx context.Context, e boil.ContextExecutor, o *CommandAlias) error {
+	*o = CommandAlias{}
 	return nil
 }
 
-func mydiscordAliasBeforeDeleteHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordAlias) error {
-	*o = MydiscordAlias{}
+func commandAliasBeforeDeleteHook(ctx context.Context, e boil.ContextExecutor, o *CommandAlias) error {
+	*o = CommandAlias{}
 	return nil
 }
 
-func mydiscordAliasAfterDeleteHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordAlias) error {
-	*o = MydiscordAlias{}
+func commandAliasAfterDeleteHook(ctx context.Context, e boil.ContextExecutor, o *CommandAlias) error {
+	*o = CommandAlias{}
 	return nil
 }
 
-func mydiscordAliasBeforeUpsertHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordAlias) error {
-	*o = MydiscordAlias{}
+func commandAliasBeforeUpsertHook(ctx context.Context, e boil.ContextExecutor, o *CommandAlias) error {
+	*o = CommandAlias{}
 	return nil
 }
 
-func mydiscordAliasAfterUpsertHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordAlias) error {
-	*o = MydiscordAlias{}
+func commandAliasAfterUpsertHook(ctx context.Context, e boil.ContextExecutor, o *CommandAlias) error {
+	*o = CommandAlias{}
 	return nil
 }
 
-func testMydiscordAliasesHooks(t *testing.T) {
+func testCommandAliasesHooks(t *testing.T) {
 	t.Parallel()
 
 	var err error
 
 	ctx := context.Background()
-	empty := &MydiscordAlias{}
-	o := &MydiscordAlias{}
+	empty := &CommandAlias{}
+	o := &CommandAlias{}
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, o, mydiscordAliasDBTypes, false); err != nil {
-		t.Errorf("Unable to randomize MydiscordAlias object: %s", err)
+	if err = randomize.Struct(seed, o, commandAliasDBTypes, false); err != nil {
+		t.Errorf("Unable to randomize CommandAlias object: %s", err)
 	}
 
-	AddMydiscordAliasHook(boil.BeforeInsertHook, mydiscordAliasBeforeInsertHook)
+	AddCommandAliasHook(boil.BeforeInsertHook, commandAliasBeforeInsertHook)
 	if err = o.doBeforeInsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeInsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeInsertHook function to empty object, but got: %#v", o)
 	}
-	mydiscordAliasBeforeInsertHooks = []MydiscordAliasHook{}
+	commandAliasBeforeInsertHooks = []CommandAliasHook{}
 
-	AddMydiscordAliasHook(boil.AfterInsertHook, mydiscordAliasAfterInsertHook)
+	AddCommandAliasHook(boil.AfterInsertHook, commandAliasAfterInsertHook)
 	if err = o.doAfterInsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterInsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterInsertHook function to empty object, but got: %#v", o)
 	}
-	mydiscordAliasAfterInsertHooks = []MydiscordAliasHook{}
+	commandAliasAfterInsertHooks = []CommandAliasHook{}
 
-	AddMydiscordAliasHook(boil.AfterSelectHook, mydiscordAliasAfterSelectHook)
+	AddCommandAliasHook(boil.AfterSelectHook, commandAliasAfterSelectHook)
 	if err = o.doAfterSelectHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterSelectHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterSelectHook function to empty object, but got: %#v", o)
 	}
-	mydiscordAliasAfterSelectHooks = []MydiscordAliasHook{}
+	commandAliasAfterSelectHooks = []CommandAliasHook{}
 
-	AddMydiscordAliasHook(boil.BeforeUpdateHook, mydiscordAliasBeforeUpdateHook)
+	AddCommandAliasHook(boil.BeforeUpdateHook, commandAliasBeforeUpdateHook)
 	if err = o.doBeforeUpdateHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeUpdateHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeUpdateHook function to empty object, but got: %#v", o)
 	}
-	mydiscordAliasBeforeUpdateHooks = []MydiscordAliasHook{}
+	commandAliasBeforeUpdateHooks = []CommandAliasHook{}
 
-	AddMydiscordAliasHook(boil.AfterUpdateHook, mydiscordAliasAfterUpdateHook)
+	AddCommandAliasHook(boil.AfterUpdateHook, commandAliasAfterUpdateHook)
 	if err = o.doAfterUpdateHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterUpdateHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterUpdateHook function to empty object, but got: %#v", o)
 	}
-	mydiscordAliasAfterUpdateHooks = []MydiscordAliasHook{}
+	commandAliasAfterUpdateHooks = []CommandAliasHook{}
 
-	AddMydiscordAliasHook(boil.BeforeDeleteHook, mydiscordAliasBeforeDeleteHook)
+	AddCommandAliasHook(boil.BeforeDeleteHook, commandAliasBeforeDeleteHook)
 	if err = o.doBeforeDeleteHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeDeleteHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeDeleteHook function to empty object, but got: %#v", o)
 	}
-	mydiscordAliasBeforeDeleteHooks = []MydiscordAliasHook{}
+	commandAliasBeforeDeleteHooks = []CommandAliasHook{}
 
-	AddMydiscordAliasHook(boil.AfterDeleteHook, mydiscordAliasAfterDeleteHook)
+	AddCommandAliasHook(boil.AfterDeleteHook, commandAliasAfterDeleteHook)
 	if err = o.doAfterDeleteHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterDeleteHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterDeleteHook function to empty object, but got: %#v", o)
 	}
-	mydiscordAliasAfterDeleteHooks = []MydiscordAliasHook{}
+	commandAliasAfterDeleteHooks = []CommandAliasHook{}
 
-	AddMydiscordAliasHook(boil.BeforeUpsertHook, mydiscordAliasBeforeUpsertHook)
+	AddCommandAliasHook(boil.BeforeUpsertHook, commandAliasBeforeUpsertHook)
 	if err = o.doBeforeUpsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeUpsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeUpsertHook function to empty object, but got: %#v", o)
 	}
-	mydiscordAliasBeforeUpsertHooks = []MydiscordAliasHook{}
+	commandAliasBeforeUpsertHooks = []CommandAliasHook{}
 
-	AddMydiscordAliasHook(boil.AfterUpsertHook, mydiscordAliasAfterUpsertHook)
+	AddCommandAliasHook(boil.AfterUpsertHook, commandAliasAfterUpsertHook)
 	if err = o.doAfterUpsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterUpsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterUpsertHook function to empty object, but got: %#v", o)
 	}
-	mydiscordAliasAfterUpsertHooks = []MydiscordAliasHook{}
+	commandAliasAfterUpsertHooks = []CommandAliasHook{}
 }
 
-func testMydiscordAliasesInsert(t *testing.T) {
+func testCommandAliasesInsert(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordAlias{}
-	if err = randomize.Struct(seed, o, mydiscordAliasDBTypes, true, mydiscordAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordAlias struct: %s", err)
+	o := &CommandAlias{}
+	if err = randomize.Struct(seed, o, commandAliasDBTypes, true, commandAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize CommandAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -457,7 +457,7 @@ func testMydiscordAliasesInsert(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := MydiscordAliases().Count(ctx, tx)
+	count, err := CommandAliases().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -467,24 +467,24 @@ func testMydiscordAliasesInsert(t *testing.T) {
 	}
 }
 
-func testMydiscordAliasesInsertWhitelist(t *testing.T) {
+func testCommandAliasesInsertWhitelist(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordAlias{}
-	if err = randomize.Struct(seed, o, mydiscordAliasDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize MydiscordAlias struct: %s", err)
+	o := &CommandAlias{}
+	if err = randomize.Struct(seed, o, commandAliasDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize CommandAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = o.Insert(ctx, tx, boil.Whitelist(mydiscordAliasColumnsWithoutDefault...)); err != nil {
+	if err = o.Insert(ctx, tx, boil.Whitelist(commandAliasColumnsWithoutDefault...)); err != nil {
 		t.Error(err)
 	}
 
-	count, err := MydiscordAliases().Count(ctx, tx)
+	count, err := CommandAliases().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -494,20 +494,20 @@ func testMydiscordAliasesInsertWhitelist(t *testing.T) {
 	}
 }
 
-func testMydiscordAliasToOneMydiscordGuildUsingGuild(t *testing.T) {
+func testCommandAliasToOneGuildUsingGuild(t *testing.T) {
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var local MydiscordAlias
-	var foreign MydiscordGuild
+	var local CommandAlias
+	var foreign Guild
 
 	seed := randomize.NewSeed()
-	if err := randomize.Struct(seed, &local, mydiscordAliasDBTypes, false, mydiscordAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordAlias struct: %s", err)
+	if err := randomize.Struct(seed, &local, commandAliasDBTypes, false, commandAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize CommandAlias struct: %s", err)
 	}
-	if err := randomize.Struct(seed, &foreign, mydiscordGuildDBTypes, false, mydiscordGuildColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	if err := randomize.Struct(seed, &foreign, guildDBTypes, false, guildColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
 
 	if err := foreign.Insert(ctx, tx, boil.Infer()); err != nil {
@@ -528,8 +528,8 @@ func testMydiscordAliasToOneMydiscordGuildUsingGuild(t *testing.T) {
 		t.Errorf("want: %v, got %v", foreign.ID, check.ID)
 	}
 
-	slice := MydiscordAliasSlice{&local}
-	if err = local.L.LoadGuild(ctx, tx, false, (*[]*MydiscordAlias)(&slice), nil); err != nil {
+	slice := CommandAliasSlice{&local}
+	if err = local.L.LoadGuild(ctx, tx, false, (*[]*CommandAlias)(&slice), nil); err != nil {
 		t.Fatal(err)
 	}
 	if local.R.Guild == nil {
@@ -545,24 +545,24 @@ func testMydiscordAliasToOneMydiscordGuildUsingGuild(t *testing.T) {
 	}
 }
 
-func testMydiscordAliasToOneSetOpMydiscordGuildUsingGuild(t *testing.T) {
+func testCommandAliasToOneSetOpGuildUsingGuild(t *testing.T) {
 	var err error
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var a MydiscordAlias
-	var b, c MydiscordGuild
+	var a CommandAlias
+	var b, c Guild
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, &a, mydiscordAliasDBTypes, false, strmangle.SetComplement(mydiscordAliasPrimaryKeyColumns, mydiscordAliasColumnsWithoutDefault)...); err != nil {
+	if err = randomize.Struct(seed, &a, commandAliasDBTypes, false, strmangle.SetComplement(commandAliasPrimaryKeyColumns, commandAliasColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
-	if err = randomize.Struct(seed, &b, mydiscordGuildDBTypes, false, strmangle.SetComplement(mydiscordGuildPrimaryKeyColumns, mydiscordGuildColumnsWithoutDefault)...); err != nil {
+	if err = randomize.Struct(seed, &b, guildDBTypes, false, strmangle.SetComplement(guildPrimaryKeyColumns, guildColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
-	if err = randomize.Struct(seed, &c, mydiscordGuildDBTypes, false, strmangle.SetComplement(mydiscordGuildPrimaryKeyColumns, mydiscordGuildColumnsWithoutDefault)...); err != nil {
+	if err = randomize.Struct(seed, &c, guildDBTypes, false, strmangle.SetComplement(guildPrimaryKeyColumns, guildColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
 
@@ -573,7 +573,7 @@ func testMydiscordAliasToOneSetOpMydiscordGuildUsingGuild(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for i, x := range []*MydiscordGuild{&b, &c} {
+	for i, x := range []*Guild{&b, &c} {
 		err = a.SetGuild(ctx, tx, i != 0, x)
 		if err != nil {
 			t.Fatal(err)
@@ -583,7 +583,7 @@ func testMydiscordAliasToOneSetOpMydiscordGuildUsingGuild(t *testing.T) {
 			t.Error("relationship struct not set to correct value")
 		}
 
-		if x.R.GuildMydiscordAliases[0] != &a {
+		if x.R.CommandAliases[0] != &a {
 			t.Error("failed to append to foreign relationship struct")
 		}
 		if a.GuildID != x.ID {
@@ -603,14 +603,14 @@ func testMydiscordAliasToOneSetOpMydiscordGuildUsingGuild(t *testing.T) {
 	}
 }
 
-func testMydiscordAliasesReload(t *testing.T) {
+func testCommandAliasesReload(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordAlias{}
-	if err = randomize.Struct(seed, o, mydiscordAliasDBTypes, true, mydiscordAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordAlias struct: %s", err)
+	o := &CommandAlias{}
+	if err = randomize.Struct(seed, o, commandAliasDBTypes, true, commandAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize CommandAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -625,14 +625,14 @@ func testMydiscordAliasesReload(t *testing.T) {
 	}
 }
 
-func testMydiscordAliasesReloadAll(t *testing.T) {
+func testCommandAliasesReloadAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordAlias{}
-	if err = randomize.Struct(seed, o, mydiscordAliasDBTypes, true, mydiscordAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordAlias struct: %s", err)
+	o := &CommandAlias{}
+	if err = randomize.Struct(seed, o, commandAliasDBTypes, true, commandAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize CommandAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -642,21 +642,21 @@ func testMydiscordAliasesReloadAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := MydiscordAliasSlice{o}
+	slice := CommandAliasSlice{o}
 
 	if err = slice.ReloadAll(ctx, tx); err != nil {
 		t.Error(err)
 	}
 }
 
-func testMydiscordAliasesSelect(t *testing.T) {
+func testCommandAliasesSelect(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordAlias{}
-	if err = randomize.Struct(seed, o, mydiscordAliasDBTypes, true, mydiscordAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordAlias struct: %s", err)
+	o := &CommandAlias{}
+	if err = randomize.Struct(seed, o, commandAliasDBTypes, true, commandAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize CommandAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -666,7 +666,7 @@ func testMydiscordAliasesSelect(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice, err := MydiscordAliases().All(ctx, tx)
+	slice, err := CommandAliases().All(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -677,25 +677,25 @@ func testMydiscordAliasesSelect(t *testing.T) {
 }
 
 var (
-	mydiscordAliasDBTypes = map[string]string{`GuildID`: `integer`, `ID`: `integer`, `Source`: `character varying`, `Target`: `character varying`}
-	_                     = bytes.MinRead
+	commandAliasDBTypes = map[string]string{`GuildID`: `integer`, `ID`: `integer`, `Source`: `character varying`, `Target`: `character varying`}
+	_                   = bytes.MinRead
 )
 
-func testMydiscordAliasesUpdate(t *testing.T) {
+func testCommandAliasesUpdate(t *testing.T) {
 	t.Parallel()
 
-	if 0 == len(mydiscordAliasPrimaryKeyColumns) {
+	if 0 == len(commandAliasPrimaryKeyColumns) {
 		t.Skip("Skipping table with no primary key columns")
 	}
-	if len(mydiscordAliasColumns) == len(mydiscordAliasPrimaryKeyColumns) {
+	if len(commandAliasColumns) == len(commandAliasPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordAlias{}
-	if err = randomize.Struct(seed, o, mydiscordAliasDBTypes, true, mydiscordAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordAlias struct: %s", err)
+	o := &CommandAlias{}
+	if err = randomize.Struct(seed, o, commandAliasDBTypes, true, commandAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize CommandAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -705,7 +705,7 @@ func testMydiscordAliasesUpdate(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := MydiscordAliases().Count(ctx, tx)
+	count, err := CommandAliases().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -714,8 +714,8 @@ func testMydiscordAliasesUpdate(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, mydiscordAliasDBTypes, true, mydiscordAliasPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize MydiscordAlias struct: %s", err)
+	if err = randomize.Struct(seed, o, commandAliasDBTypes, true, commandAliasPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize CommandAlias struct: %s", err)
 	}
 
 	if rowsAff, err := o.Update(ctx, tx, boil.Infer()); err != nil {
@@ -725,18 +725,18 @@ func testMydiscordAliasesUpdate(t *testing.T) {
 	}
 }
 
-func testMydiscordAliasesSliceUpdateAll(t *testing.T) {
+func testCommandAliasesSliceUpdateAll(t *testing.T) {
 	t.Parallel()
 
-	if len(mydiscordAliasColumns) == len(mydiscordAliasPrimaryKeyColumns) {
+	if len(commandAliasColumns) == len(commandAliasPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordAlias{}
-	if err = randomize.Struct(seed, o, mydiscordAliasDBTypes, true, mydiscordAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordAlias struct: %s", err)
+	o := &CommandAlias{}
+	if err = randomize.Struct(seed, o, commandAliasDBTypes, true, commandAliasColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize CommandAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -746,7 +746,7 @@ func testMydiscordAliasesSliceUpdateAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := MydiscordAliases().Count(ctx, tx)
+	count, err := CommandAliases().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -755,18 +755,18 @@ func testMydiscordAliasesSliceUpdateAll(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, mydiscordAliasDBTypes, true, mydiscordAliasPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize MydiscordAlias struct: %s", err)
+	if err = randomize.Struct(seed, o, commandAliasDBTypes, true, commandAliasPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize CommandAlias struct: %s", err)
 	}
 
 	// Remove Primary keys and unique columns from what we plan to update
 	var fields []string
-	if strmangle.StringSliceMatch(mydiscordAliasColumns, mydiscordAliasPrimaryKeyColumns) {
-		fields = mydiscordAliasColumns
+	if strmangle.StringSliceMatch(commandAliasColumns, commandAliasPrimaryKeyColumns) {
+		fields = commandAliasColumns
 	} else {
 		fields = strmangle.SetComplement(
-			mydiscordAliasColumns,
-			mydiscordAliasPrimaryKeyColumns,
+			commandAliasColumns,
+			commandAliasPrimaryKeyColumns,
 		)
 	}
 
@@ -784,7 +784,7 @@ func testMydiscordAliasesSliceUpdateAll(t *testing.T) {
 		}
 	}
 
-	slice := MydiscordAliasSlice{o}
+	slice := CommandAliasSlice{o}
 	if rowsAff, err := slice.UpdateAll(ctx, tx, updateMap); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
@@ -792,29 +792,29 @@ func testMydiscordAliasesSliceUpdateAll(t *testing.T) {
 	}
 }
 
-func testMydiscordAliasesUpsert(t *testing.T) {
+func testCommandAliasesUpsert(t *testing.T) {
 	t.Parallel()
 
-	if len(mydiscordAliasColumns) == len(mydiscordAliasPrimaryKeyColumns) {
+	if len(commandAliasColumns) == len(commandAliasPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
 	// Attempt the INSERT side of an UPSERT
-	o := MydiscordAlias{}
-	if err = randomize.Struct(seed, &o, mydiscordAliasDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize MydiscordAlias struct: %s", err)
+	o := CommandAlias{}
+	if err = randomize.Struct(seed, &o, commandAliasDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize CommandAlias struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 	if err = o.Upsert(ctx, tx, false, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert MydiscordAlias: %s", err)
+		t.Errorf("Unable to upsert CommandAlias: %s", err)
 	}
 
-	count, err := MydiscordAliases().Count(ctx, tx)
+	count, err := CommandAliases().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -823,15 +823,15 @@ func testMydiscordAliasesUpsert(t *testing.T) {
 	}
 
 	// Attempt the UPDATE side of an UPSERT
-	if err = randomize.Struct(seed, &o, mydiscordAliasDBTypes, false, mydiscordAliasPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize MydiscordAlias struct: %s", err)
+	if err = randomize.Struct(seed, &o, commandAliasDBTypes, false, commandAliasPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize CommandAlias struct: %s", err)
 	}
 
 	if err = o.Upsert(ctx, tx, true, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert MydiscordAlias: %s", err)
+		t.Errorf("Unable to upsert CommandAlias: %s", err)
 	}
 
-	count, err = MydiscordAliases().Count(ctx, tx)
+	count, err = CommandAliases().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}

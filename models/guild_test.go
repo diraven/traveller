@@ -21,24 +21,24 @@ var (
 	_ = queries.Equal
 )
 
-func testMydiscordGuilds(t *testing.T) {
+func testGuilds(t *testing.T) {
 	t.Parallel()
 
-	query := MydiscordGuilds()
+	query := Guilds()
 
 	if query.Query == nil {
 		t.Error("expected a query, got nothing")
 	}
 }
 
-func testMydiscordGuildsDelete(t *testing.T) {
+func testGuildsDelete(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordGuild{}
-	if err = randomize.Struct(seed, o, mydiscordGuildDBTypes, true, mydiscordGuildColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	o := &Guild{}
+	if err = randomize.Struct(seed, o, guildDBTypes, true, guildColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -54,7 +54,7 @@ func testMydiscordGuildsDelete(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := MydiscordGuilds().Count(ctx, tx)
+	count, err := Guilds().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -64,14 +64,14 @@ func testMydiscordGuildsDelete(t *testing.T) {
 	}
 }
 
-func testMydiscordGuildsQueryDeleteAll(t *testing.T) {
+func testGuildsQueryDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordGuild{}
-	if err = randomize.Struct(seed, o, mydiscordGuildDBTypes, true, mydiscordGuildColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	o := &Guild{}
+	if err = randomize.Struct(seed, o, guildDBTypes, true, guildColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -81,13 +81,13 @@ func testMydiscordGuildsQueryDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	if rowsAff, err := MydiscordGuilds().DeleteAll(ctx, tx); err != nil {
+	if rowsAff, err := Guilds().DeleteAll(ctx, tx); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := MydiscordGuilds().Count(ctx, tx)
+	count, err := Guilds().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -97,14 +97,14 @@ func testMydiscordGuildsQueryDeleteAll(t *testing.T) {
 	}
 }
 
-func testMydiscordGuildsSliceDeleteAll(t *testing.T) {
+func testGuildsSliceDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordGuild{}
-	if err = randomize.Struct(seed, o, mydiscordGuildDBTypes, true, mydiscordGuildColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	o := &Guild{}
+	if err = randomize.Struct(seed, o, guildDBTypes, true, guildColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -114,7 +114,7 @@ func testMydiscordGuildsSliceDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := MydiscordGuildSlice{o}
+	slice := GuildSlice{o}
 
 	if rowsAff, err := slice.DeleteAll(ctx, tx); err != nil {
 		t.Error(err)
@@ -122,7 +122,7 @@ func testMydiscordGuildsSliceDeleteAll(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := MydiscordGuilds().Count(ctx, tx)
+	count, err := Guilds().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -132,14 +132,14 @@ func testMydiscordGuildsSliceDeleteAll(t *testing.T) {
 	}
 }
 
-func testMydiscordGuildsExists(t *testing.T) {
+func testGuildsExists(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordGuild{}
-	if err = randomize.Struct(seed, o, mydiscordGuildDBTypes, true, mydiscordGuildColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	o := &Guild{}
+	if err = randomize.Struct(seed, o, guildDBTypes, true, guildColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -149,23 +149,23 @@ func testMydiscordGuildsExists(t *testing.T) {
 		t.Error(err)
 	}
 
-	e, err := MydiscordGuildExists(ctx, tx, o.ID)
+	e, err := GuildExists(ctx, tx, o.ID)
 	if err != nil {
-		t.Errorf("Unable to check if MydiscordGuild exists: %s", err)
+		t.Errorf("Unable to check if Guild exists: %s", err)
 	}
 	if !e {
-		t.Errorf("Expected MydiscordGuildExists to return true, but got false.")
+		t.Errorf("Expected GuildExists to return true, but got false.")
 	}
 }
 
-func testMydiscordGuildsFind(t *testing.T) {
+func testGuildsFind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordGuild{}
-	if err = randomize.Struct(seed, o, mydiscordGuildDBTypes, true, mydiscordGuildColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	o := &Guild{}
+	if err = randomize.Struct(seed, o, guildDBTypes, true, guildColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -175,24 +175,24 @@ func testMydiscordGuildsFind(t *testing.T) {
 		t.Error(err)
 	}
 
-	mydiscordGuildFound, err := FindMydiscordGuild(ctx, tx, o.ID)
+	guildFound, err := FindGuild(ctx, tx, o.ID)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if mydiscordGuildFound == nil {
+	if guildFound == nil {
 		t.Error("want a record, got nil")
 	}
 }
 
-func testMydiscordGuildsBind(t *testing.T) {
+func testGuildsBind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordGuild{}
-	if err = randomize.Struct(seed, o, mydiscordGuildDBTypes, true, mydiscordGuildColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	o := &Guild{}
+	if err = randomize.Struct(seed, o, guildDBTypes, true, guildColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -202,19 +202,19 @@ func testMydiscordGuildsBind(t *testing.T) {
 		t.Error(err)
 	}
 
-	if err = MydiscordGuilds().Bind(ctx, tx, o); err != nil {
+	if err = Guilds().Bind(ctx, tx, o); err != nil {
 		t.Error(err)
 	}
 }
 
-func testMydiscordGuildsOne(t *testing.T) {
+func testGuildsOne(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordGuild{}
-	if err = randomize.Struct(seed, o, mydiscordGuildDBTypes, true, mydiscordGuildColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	o := &Guild{}
+	if err = randomize.Struct(seed, o, guildDBTypes, true, guildColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -224,38 +224,38 @@ func testMydiscordGuildsOne(t *testing.T) {
 		t.Error(err)
 	}
 
-	if x, err := MydiscordGuilds().One(ctx, tx); err != nil {
+	if x, err := Guilds().One(ctx, tx); err != nil {
 		t.Error(err)
 	} else if x == nil {
 		t.Error("expected to get a non nil record")
 	}
 }
 
-func testMydiscordGuildsAll(t *testing.T) {
+func testGuildsAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	mydiscordGuildOne := &MydiscordGuild{}
-	mydiscordGuildTwo := &MydiscordGuild{}
-	if err = randomize.Struct(seed, mydiscordGuildOne, mydiscordGuildDBTypes, false, mydiscordGuildColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	guildOne := &Guild{}
+	guildTwo := &Guild{}
+	if err = randomize.Struct(seed, guildOne, guildDBTypes, false, guildColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
-	if err = randomize.Struct(seed, mydiscordGuildTwo, mydiscordGuildDBTypes, false, mydiscordGuildColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	if err = randomize.Struct(seed, guildTwo, guildDBTypes, false, guildColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = mydiscordGuildOne.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = guildOne.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = mydiscordGuildTwo.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = guildTwo.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	slice, err := MydiscordGuilds().All(ctx, tx)
+	slice, err := Guilds().All(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -265,31 +265,31 @@ func testMydiscordGuildsAll(t *testing.T) {
 	}
 }
 
-func testMydiscordGuildsCount(t *testing.T) {
+func testGuildsCount(t *testing.T) {
 	t.Parallel()
 
 	var err error
 	seed := randomize.NewSeed()
-	mydiscordGuildOne := &MydiscordGuild{}
-	mydiscordGuildTwo := &MydiscordGuild{}
-	if err = randomize.Struct(seed, mydiscordGuildOne, mydiscordGuildDBTypes, false, mydiscordGuildColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	guildOne := &Guild{}
+	guildTwo := &Guild{}
+	if err = randomize.Struct(seed, guildOne, guildDBTypes, false, guildColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
-	if err = randomize.Struct(seed, mydiscordGuildTwo, mydiscordGuildDBTypes, false, mydiscordGuildColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	if err = randomize.Struct(seed, guildTwo, guildDBTypes, false, guildColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = mydiscordGuildOne.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = guildOne.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = mydiscordGuildTwo.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = guildTwo.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	count, err := MydiscordGuilds().Count(ctx, tx)
+	count, err := Guilds().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -299,155 +299,155 @@ func testMydiscordGuildsCount(t *testing.T) {
 	}
 }
 
-func mydiscordGuildBeforeInsertHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordGuild) error {
-	*o = MydiscordGuild{}
+func guildBeforeInsertHook(ctx context.Context, e boil.ContextExecutor, o *Guild) error {
+	*o = Guild{}
 	return nil
 }
 
-func mydiscordGuildAfterInsertHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordGuild) error {
-	*o = MydiscordGuild{}
+func guildAfterInsertHook(ctx context.Context, e boil.ContextExecutor, o *Guild) error {
+	*o = Guild{}
 	return nil
 }
 
-func mydiscordGuildAfterSelectHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordGuild) error {
-	*o = MydiscordGuild{}
+func guildAfterSelectHook(ctx context.Context, e boil.ContextExecutor, o *Guild) error {
+	*o = Guild{}
 	return nil
 }
 
-func mydiscordGuildBeforeUpdateHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordGuild) error {
-	*o = MydiscordGuild{}
+func guildBeforeUpdateHook(ctx context.Context, e boil.ContextExecutor, o *Guild) error {
+	*o = Guild{}
 	return nil
 }
 
-func mydiscordGuildAfterUpdateHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordGuild) error {
-	*o = MydiscordGuild{}
+func guildAfterUpdateHook(ctx context.Context, e boil.ContextExecutor, o *Guild) error {
+	*o = Guild{}
 	return nil
 }
 
-func mydiscordGuildBeforeDeleteHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordGuild) error {
-	*o = MydiscordGuild{}
+func guildBeforeDeleteHook(ctx context.Context, e boil.ContextExecutor, o *Guild) error {
+	*o = Guild{}
 	return nil
 }
 
-func mydiscordGuildAfterDeleteHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordGuild) error {
-	*o = MydiscordGuild{}
+func guildAfterDeleteHook(ctx context.Context, e boil.ContextExecutor, o *Guild) error {
+	*o = Guild{}
 	return nil
 }
 
-func mydiscordGuildBeforeUpsertHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordGuild) error {
-	*o = MydiscordGuild{}
+func guildBeforeUpsertHook(ctx context.Context, e boil.ContextExecutor, o *Guild) error {
+	*o = Guild{}
 	return nil
 }
 
-func mydiscordGuildAfterUpsertHook(ctx context.Context, e boil.ContextExecutor, o *MydiscordGuild) error {
-	*o = MydiscordGuild{}
+func guildAfterUpsertHook(ctx context.Context, e boil.ContextExecutor, o *Guild) error {
+	*o = Guild{}
 	return nil
 }
 
-func testMydiscordGuildsHooks(t *testing.T) {
+func testGuildsHooks(t *testing.T) {
 	t.Parallel()
 
 	var err error
 
 	ctx := context.Background()
-	empty := &MydiscordGuild{}
-	o := &MydiscordGuild{}
+	empty := &Guild{}
+	o := &Guild{}
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, o, mydiscordGuildDBTypes, false); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild object: %s", err)
+	if err = randomize.Struct(seed, o, guildDBTypes, false); err != nil {
+		t.Errorf("Unable to randomize Guild object: %s", err)
 	}
 
-	AddMydiscordGuildHook(boil.BeforeInsertHook, mydiscordGuildBeforeInsertHook)
+	AddGuildHook(boil.BeforeInsertHook, guildBeforeInsertHook)
 	if err = o.doBeforeInsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeInsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeInsertHook function to empty object, but got: %#v", o)
 	}
-	mydiscordGuildBeforeInsertHooks = []MydiscordGuildHook{}
+	guildBeforeInsertHooks = []GuildHook{}
 
-	AddMydiscordGuildHook(boil.AfterInsertHook, mydiscordGuildAfterInsertHook)
+	AddGuildHook(boil.AfterInsertHook, guildAfterInsertHook)
 	if err = o.doAfterInsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterInsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterInsertHook function to empty object, but got: %#v", o)
 	}
-	mydiscordGuildAfterInsertHooks = []MydiscordGuildHook{}
+	guildAfterInsertHooks = []GuildHook{}
 
-	AddMydiscordGuildHook(boil.AfterSelectHook, mydiscordGuildAfterSelectHook)
+	AddGuildHook(boil.AfterSelectHook, guildAfterSelectHook)
 	if err = o.doAfterSelectHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterSelectHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterSelectHook function to empty object, but got: %#v", o)
 	}
-	mydiscordGuildAfterSelectHooks = []MydiscordGuildHook{}
+	guildAfterSelectHooks = []GuildHook{}
 
-	AddMydiscordGuildHook(boil.BeforeUpdateHook, mydiscordGuildBeforeUpdateHook)
+	AddGuildHook(boil.BeforeUpdateHook, guildBeforeUpdateHook)
 	if err = o.doBeforeUpdateHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeUpdateHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeUpdateHook function to empty object, but got: %#v", o)
 	}
-	mydiscordGuildBeforeUpdateHooks = []MydiscordGuildHook{}
+	guildBeforeUpdateHooks = []GuildHook{}
 
-	AddMydiscordGuildHook(boil.AfterUpdateHook, mydiscordGuildAfterUpdateHook)
+	AddGuildHook(boil.AfterUpdateHook, guildAfterUpdateHook)
 	if err = o.doAfterUpdateHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterUpdateHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterUpdateHook function to empty object, but got: %#v", o)
 	}
-	mydiscordGuildAfterUpdateHooks = []MydiscordGuildHook{}
+	guildAfterUpdateHooks = []GuildHook{}
 
-	AddMydiscordGuildHook(boil.BeforeDeleteHook, mydiscordGuildBeforeDeleteHook)
+	AddGuildHook(boil.BeforeDeleteHook, guildBeforeDeleteHook)
 	if err = o.doBeforeDeleteHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeDeleteHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeDeleteHook function to empty object, but got: %#v", o)
 	}
-	mydiscordGuildBeforeDeleteHooks = []MydiscordGuildHook{}
+	guildBeforeDeleteHooks = []GuildHook{}
 
-	AddMydiscordGuildHook(boil.AfterDeleteHook, mydiscordGuildAfterDeleteHook)
+	AddGuildHook(boil.AfterDeleteHook, guildAfterDeleteHook)
 	if err = o.doAfterDeleteHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterDeleteHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterDeleteHook function to empty object, but got: %#v", o)
 	}
-	mydiscordGuildAfterDeleteHooks = []MydiscordGuildHook{}
+	guildAfterDeleteHooks = []GuildHook{}
 
-	AddMydiscordGuildHook(boil.BeforeUpsertHook, mydiscordGuildBeforeUpsertHook)
+	AddGuildHook(boil.BeforeUpsertHook, guildBeforeUpsertHook)
 	if err = o.doBeforeUpsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeUpsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeUpsertHook function to empty object, but got: %#v", o)
 	}
-	mydiscordGuildBeforeUpsertHooks = []MydiscordGuildHook{}
+	guildBeforeUpsertHooks = []GuildHook{}
 
-	AddMydiscordGuildHook(boil.AfterUpsertHook, mydiscordGuildAfterUpsertHook)
+	AddGuildHook(boil.AfterUpsertHook, guildAfterUpsertHook)
 	if err = o.doAfterUpsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterUpsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterUpsertHook function to empty object, but got: %#v", o)
 	}
-	mydiscordGuildAfterUpsertHooks = []MydiscordGuildHook{}
+	guildAfterUpsertHooks = []GuildHook{}
 }
 
-func testMydiscordGuildsInsert(t *testing.T) {
+func testGuildsInsert(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordGuild{}
-	if err = randomize.Struct(seed, o, mydiscordGuildDBTypes, true, mydiscordGuildColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	o := &Guild{}
+	if err = randomize.Struct(seed, o, guildDBTypes, true, guildColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -457,7 +457,7 @@ func testMydiscordGuildsInsert(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := MydiscordGuilds().Count(ctx, tx)
+	count, err := Guilds().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -467,24 +467,24 @@ func testMydiscordGuildsInsert(t *testing.T) {
 	}
 }
 
-func testMydiscordGuildsInsertWhitelist(t *testing.T) {
+func testGuildsInsertWhitelist(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordGuild{}
-	if err = randomize.Struct(seed, o, mydiscordGuildDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	o := &Guild{}
+	if err = randomize.Struct(seed, o, guildDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = o.Insert(ctx, tx, boil.Whitelist(mydiscordGuildColumnsWithoutDefault...)); err != nil {
+	if err = o.Insert(ctx, tx, boil.Whitelist(guildColumnsWithoutDefault...)); err != nil {
 		t.Error(err)
 	}
 
-	count, err := MydiscordGuilds().Count(ctx, tx)
+	count, err := Guilds().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -494,28 +494,28 @@ func testMydiscordGuildsInsertWhitelist(t *testing.T) {
 	}
 }
 
-func testMydiscordGuildToManyGuildMydiscordAliases(t *testing.T) {
+func testGuildToManyCommandAliases(t *testing.T) {
 	var err error
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var a MydiscordGuild
-	var b, c MydiscordAlias
+	var a Guild
+	var b, c CommandAlias
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, &a, mydiscordGuildDBTypes, true, mydiscordGuildColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	if err = randomize.Struct(seed, &a, guildDBTypes, true, guildColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
 
 	if err := a.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Fatal(err)
 	}
 
-	if err = randomize.Struct(seed, &b, mydiscordAliasDBTypes, false, mydiscordAliasColumnsWithDefault...); err != nil {
+	if err = randomize.Struct(seed, &b, commandAliasDBTypes, false, commandAliasColumnsWithDefault...); err != nil {
 		t.Fatal(err)
 	}
-	if err = randomize.Struct(seed, &c, mydiscordAliasDBTypes, false, mydiscordAliasColumnsWithDefault...); err != nil {
+	if err = randomize.Struct(seed, &c, commandAliasDBTypes, false, commandAliasColumnsWithDefault...); err != nil {
 		t.Fatal(err)
 	}
 
@@ -529,13 +529,13 @@ func testMydiscordGuildToManyGuildMydiscordAliases(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	mydiscordAlias, err := a.GuildMydiscordAliases().All(ctx, tx)
+	commandAlias, err := a.CommandAliases().All(ctx, tx)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	bFound, cFound := false, false
-	for _, v := range mydiscordAlias {
+	for _, v := range commandAlias {
 		if v.GuildID == b.GuildID {
 			bFound = true
 		}
@@ -551,49 +551,49 @@ func testMydiscordGuildToManyGuildMydiscordAliases(t *testing.T) {
 		t.Error("expected to find c")
 	}
 
-	slice := MydiscordGuildSlice{&a}
-	if err = a.L.LoadGuildMydiscordAliases(ctx, tx, false, (*[]*MydiscordGuild)(&slice), nil); err != nil {
+	slice := GuildSlice{&a}
+	if err = a.L.LoadCommandAliases(ctx, tx, false, (*[]*Guild)(&slice), nil); err != nil {
 		t.Fatal(err)
 	}
-	if got := len(a.R.GuildMydiscordAliases); got != 2 {
+	if got := len(a.R.CommandAliases); got != 2 {
 		t.Error("number of eager loaded records wrong, got:", got)
 	}
 
-	a.R.GuildMydiscordAliases = nil
-	if err = a.L.LoadGuildMydiscordAliases(ctx, tx, true, &a, nil); err != nil {
+	a.R.CommandAliases = nil
+	if err = a.L.LoadCommandAliases(ctx, tx, true, &a, nil); err != nil {
 		t.Fatal(err)
 	}
-	if got := len(a.R.GuildMydiscordAliases); got != 2 {
+	if got := len(a.R.CommandAliases); got != 2 {
 		t.Error("number of eager loaded records wrong, got:", got)
 	}
 
 	if t.Failed() {
-		t.Logf("%#v", mydiscordAlias)
+		t.Logf("%#v", commandAlias)
 	}
 }
 
-func testMydiscordGuildToManyGuildMydiscordGuildModules(t *testing.T) {
+func testGuildToManyGuildModules(t *testing.T) {
 	var err error
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var a MydiscordGuild
-	var b, c MydiscordGuildModule
+	var a Guild
+	var b, c GuildModule
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, &a, mydiscordGuildDBTypes, true, mydiscordGuildColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	if err = randomize.Struct(seed, &a, guildDBTypes, true, guildColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
 
 	if err := a.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Fatal(err)
 	}
 
-	if err = randomize.Struct(seed, &b, mydiscordGuildModuleDBTypes, false, mydiscordGuildModuleColumnsWithDefault...); err != nil {
+	if err = randomize.Struct(seed, &b, guildModuleDBTypes, false, guildModuleColumnsWithDefault...); err != nil {
 		t.Fatal(err)
 	}
-	if err = randomize.Struct(seed, &c, mydiscordGuildModuleDBTypes, false, mydiscordGuildModuleColumnsWithDefault...); err != nil {
+	if err = randomize.Struct(seed, &c, guildModuleDBTypes, false, guildModuleColumnsWithDefault...); err != nil {
 		t.Fatal(err)
 	}
 
@@ -607,13 +607,13 @@ func testMydiscordGuildToManyGuildMydiscordGuildModules(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	mydiscordGuildModule, err := a.GuildMydiscordGuildModules().All(ctx, tx)
+	guildModule, err := a.GuildModules().All(ctx, tx)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	bFound, cFound := false, false
-	for _, v := range mydiscordGuildModule {
+	for _, v := range guildModule {
 		if v.GuildID == b.GuildID {
 			bFound = true
 		}
@@ -629,49 +629,49 @@ func testMydiscordGuildToManyGuildMydiscordGuildModules(t *testing.T) {
 		t.Error("expected to find c")
 	}
 
-	slice := MydiscordGuildSlice{&a}
-	if err = a.L.LoadGuildMydiscordGuildModules(ctx, tx, false, (*[]*MydiscordGuild)(&slice), nil); err != nil {
+	slice := GuildSlice{&a}
+	if err = a.L.LoadGuildModules(ctx, tx, false, (*[]*Guild)(&slice), nil); err != nil {
 		t.Fatal(err)
 	}
-	if got := len(a.R.GuildMydiscordGuildModules); got != 2 {
+	if got := len(a.R.GuildModules); got != 2 {
 		t.Error("number of eager loaded records wrong, got:", got)
 	}
 
-	a.R.GuildMydiscordGuildModules = nil
-	if err = a.L.LoadGuildMydiscordGuildModules(ctx, tx, true, &a, nil); err != nil {
+	a.R.GuildModules = nil
+	if err = a.L.LoadGuildModules(ctx, tx, true, &a, nil); err != nil {
 		t.Fatal(err)
 	}
-	if got := len(a.R.GuildMydiscordGuildModules); got != 2 {
+	if got := len(a.R.GuildModules); got != 2 {
 		t.Error("number of eager loaded records wrong, got:", got)
 	}
 
 	if t.Failed() {
-		t.Logf("%#v", mydiscordGuildModule)
+		t.Logf("%#v", guildModule)
 	}
 }
 
-func testMydiscordGuildToManyGuildPublicrolesPublicroles(t *testing.T) {
+func testGuildToManyPublicroles(t *testing.T) {
 	var err error
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var a MydiscordGuild
-	var b, c PublicrolesPublicrole
+	var a Guild
+	var b, c Publicrole
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, &a, mydiscordGuildDBTypes, true, mydiscordGuildColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	if err = randomize.Struct(seed, &a, guildDBTypes, true, guildColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
 
 	if err := a.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Fatal(err)
 	}
 
-	if err = randomize.Struct(seed, &b, publicrolesPublicroleDBTypes, false, publicrolesPublicroleColumnsWithDefault...); err != nil {
+	if err = randomize.Struct(seed, &b, publicroleDBTypes, false, publicroleColumnsWithDefault...); err != nil {
 		t.Fatal(err)
 	}
-	if err = randomize.Struct(seed, &c, publicrolesPublicroleDBTypes, false, publicrolesPublicroleColumnsWithDefault...); err != nil {
+	if err = randomize.Struct(seed, &c, publicroleDBTypes, false, publicroleColumnsWithDefault...); err != nil {
 		t.Fatal(err)
 	}
 
@@ -685,13 +685,13 @@ func testMydiscordGuildToManyGuildPublicrolesPublicroles(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	publicrolesPublicrole, err := a.GuildPublicrolesPublicroles().All(ctx, tx)
+	publicrole, err := a.Publicroles().All(ctx, tx)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	bFound, cFound := false, false
-	for _, v := range publicrolesPublicrole {
+	for _, v := range publicrole {
 		if v.GuildID == b.GuildID {
 			bFound = true
 		}
@@ -707,44 +707,44 @@ func testMydiscordGuildToManyGuildPublicrolesPublicroles(t *testing.T) {
 		t.Error("expected to find c")
 	}
 
-	slice := MydiscordGuildSlice{&a}
-	if err = a.L.LoadGuildPublicrolesPublicroles(ctx, tx, false, (*[]*MydiscordGuild)(&slice), nil); err != nil {
+	slice := GuildSlice{&a}
+	if err = a.L.LoadPublicroles(ctx, tx, false, (*[]*Guild)(&slice), nil); err != nil {
 		t.Fatal(err)
 	}
-	if got := len(a.R.GuildPublicrolesPublicroles); got != 2 {
+	if got := len(a.R.Publicroles); got != 2 {
 		t.Error("number of eager loaded records wrong, got:", got)
 	}
 
-	a.R.GuildPublicrolesPublicroles = nil
-	if err = a.L.LoadGuildPublicrolesPublicroles(ctx, tx, true, &a, nil); err != nil {
+	a.R.Publicroles = nil
+	if err = a.L.LoadPublicroles(ctx, tx, true, &a, nil); err != nil {
 		t.Fatal(err)
 	}
-	if got := len(a.R.GuildPublicrolesPublicroles); got != 2 {
+	if got := len(a.R.Publicroles); got != 2 {
 		t.Error("number of eager loaded records wrong, got:", got)
 	}
 
 	if t.Failed() {
-		t.Logf("%#v", publicrolesPublicrole)
+		t.Logf("%#v", publicrole)
 	}
 }
 
-func testMydiscordGuildToManyAddOpGuildMydiscordAliases(t *testing.T) {
+func testGuildToManyAddOpCommandAliases(t *testing.T) {
 	var err error
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var a MydiscordGuild
-	var b, c, d, e MydiscordAlias
+	var a Guild
+	var b, c, d, e CommandAlias
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, &a, mydiscordGuildDBTypes, false, strmangle.SetComplement(mydiscordGuildPrimaryKeyColumns, mydiscordGuildColumnsWithoutDefault)...); err != nil {
+	if err = randomize.Struct(seed, &a, guildDBTypes, false, strmangle.SetComplement(guildPrimaryKeyColumns, guildColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
-	foreigners := []*MydiscordAlias{&b, &c, &d, &e}
+	foreigners := []*CommandAlias{&b, &c, &d, &e}
 	for _, x := range foreigners {
-		if err = randomize.Struct(seed, x, mydiscordAliasDBTypes, false, strmangle.SetComplement(mydiscordAliasPrimaryKeyColumns, mydiscordAliasColumnsWithoutDefault)...); err != nil {
+		if err = randomize.Struct(seed, x, commandAliasDBTypes, false, strmangle.SetComplement(commandAliasPrimaryKeyColumns, commandAliasColumnsWithoutDefault)...); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -759,13 +759,13 @@ func testMydiscordGuildToManyAddOpGuildMydiscordAliases(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	foreignersSplitByInsertion := [][]*MydiscordAlias{
+	foreignersSplitByInsertion := [][]*CommandAlias{
 		{&b, &c},
 		{&d, &e},
 	}
 
 	for i, x := range foreignersSplitByInsertion {
-		err = a.AddGuildMydiscordAliases(ctx, tx, i != 0, x...)
+		err = a.AddCommandAliases(ctx, tx, i != 0, x...)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -787,14 +787,14 @@ func testMydiscordGuildToManyAddOpGuildMydiscordAliases(t *testing.T) {
 			t.Error("relationship was not added properly to the foreign slice")
 		}
 
-		if a.R.GuildMydiscordAliases[i*2] != first {
+		if a.R.CommandAliases[i*2] != first {
 			t.Error("relationship struct slice not set to correct value")
 		}
-		if a.R.GuildMydiscordAliases[i*2+1] != second {
+		if a.R.CommandAliases[i*2+1] != second {
 			t.Error("relationship struct slice not set to correct value")
 		}
 
-		count, err := a.GuildMydiscordAliases().Count(ctx, tx)
+		count, err := a.CommandAliases().Count(ctx, tx)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -803,23 +803,23 @@ func testMydiscordGuildToManyAddOpGuildMydiscordAliases(t *testing.T) {
 		}
 	}
 }
-func testMydiscordGuildToManyAddOpGuildMydiscordGuildModules(t *testing.T) {
+func testGuildToManyAddOpGuildModules(t *testing.T) {
 	var err error
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var a MydiscordGuild
-	var b, c, d, e MydiscordGuildModule
+	var a Guild
+	var b, c, d, e GuildModule
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, &a, mydiscordGuildDBTypes, false, strmangle.SetComplement(mydiscordGuildPrimaryKeyColumns, mydiscordGuildColumnsWithoutDefault)...); err != nil {
+	if err = randomize.Struct(seed, &a, guildDBTypes, false, strmangle.SetComplement(guildPrimaryKeyColumns, guildColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
-	foreigners := []*MydiscordGuildModule{&b, &c, &d, &e}
+	foreigners := []*GuildModule{&b, &c, &d, &e}
 	for _, x := range foreigners {
-		if err = randomize.Struct(seed, x, mydiscordGuildModuleDBTypes, false, strmangle.SetComplement(mydiscordGuildModulePrimaryKeyColumns, mydiscordGuildModuleColumnsWithoutDefault)...); err != nil {
+		if err = randomize.Struct(seed, x, guildModuleDBTypes, false, strmangle.SetComplement(guildModulePrimaryKeyColumns, guildModuleColumnsWithoutDefault)...); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -834,13 +834,13 @@ func testMydiscordGuildToManyAddOpGuildMydiscordGuildModules(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	foreignersSplitByInsertion := [][]*MydiscordGuildModule{
+	foreignersSplitByInsertion := [][]*GuildModule{
 		{&b, &c},
 		{&d, &e},
 	}
 
 	for i, x := range foreignersSplitByInsertion {
-		err = a.AddGuildMydiscordGuildModules(ctx, tx, i != 0, x...)
+		err = a.AddGuildModules(ctx, tx, i != 0, x...)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -862,14 +862,14 @@ func testMydiscordGuildToManyAddOpGuildMydiscordGuildModules(t *testing.T) {
 			t.Error("relationship was not added properly to the foreign slice")
 		}
 
-		if a.R.GuildMydiscordGuildModules[i*2] != first {
+		if a.R.GuildModules[i*2] != first {
 			t.Error("relationship struct slice not set to correct value")
 		}
-		if a.R.GuildMydiscordGuildModules[i*2+1] != second {
+		if a.R.GuildModules[i*2+1] != second {
 			t.Error("relationship struct slice not set to correct value")
 		}
 
-		count, err := a.GuildMydiscordGuildModules().Count(ctx, tx)
+		count, err := a.GuildModules().Count(ctx, tx)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -878,23 +878,23 @@ func testMydiscordGuildToManyAddOpGuildMydiscordGuildModules(t *testing.T) {
 		}
 	}
 }
-func testMydiscordGuildToManyAddOpGuildPublicrolesPublicroles(t *testing.T) {
+func testGuildToManyAddOpPublicroles(t *testing.T) {
 	var err error
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var a MydiscordGuild
-	var b, c, d, e PublicrolesPublicrole
+	var a Guild
+	var b, c, d, e Publicrole
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, &a, mydiscordGuildDBTypes, false, strmangle.SetComplement(mydiscordGuildPrimaryKeyColumns, mydiscordGuildColumnsWithoutDefault)...); err != nil {
+	if err = randomize.Struct(seed, &a, guildDBTypes, false, strmangle.SetComplement(guildPrimaryKeyColumns, guildColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
-	foreigners := []*PublicrolesPublicrole{&b, &c, &d, &e}
+	foreigners := []*Publicrole{&b, &c, &d, &e}
 	for _, x := range foreigners {
-		if err = randomize.Struct(seed, x, publicrolesPublicroleDBTypes, false, strmangle.SetComplement(publicrolesPublicrolePrimaryKeyColumns, publicrolesPublicroleColumnsWithoutDefault)...); err != nil {
+		if err = randomize.Struct(seed, x, publicroleDBTypes, false, strmangle.SetComplement(publicrolePrimaryKeyColumns, publicroleColumnsWithoutDefault)...); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -909,13 +909,13 @@ func testMydiscordGuildToManyAddOpGuildPublicrolesPublicroles(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	foreignersSplitByInsertion := [][]*PublicrolesPublicrole{
+	foreignersSplitByInsertion := [][]*Publicrole{
 		{&b, &c},
 		{&d, &e},
 	}
 
 	for i, x := range foreignersSplitByInsertion {
-		err = a.AddGuildPublicrolesPublicroles(ctx, tx, i != 0, x...)
+		err = a.AddPublicroles(ctx, tx, i != 0, x...)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -937,14 +937,14 @@ func testMydiscordGuildToManyAddOpGuildPublicrolesPublicroles(t *testing.T) {
 			t.Error("relationship was not added properly to the foreign slice")
 		}
 
-		if a.R.GuildPublicrolesPublicroles[i*2] != first {
+		if a.R.Publicroles[i*2] != first {
 			t.Error("relationship struct slice not set to correct value")
 		}
-		if a.R.GuildPublicrolesPublicroles[i*2+1] != second {
+		if a.R.Publicroles[i*2+1] != second {
 			t.Error("relationship struct slice not set to correct value")
 		}
 
-		count, err := a.GuildPublicrolesPublicroles().Count(ctx, tx)
+		count, err := a.Publicroles().Count(ctx, tx)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -954,14 +954,14 @@ func testMydiscordGuildToManyAddOpGuildPublicrolesPublicroles(t *testing.T) {
 	}
 }
 
-func testMydiscordGuildsReload(t *testing.T) {
+func testGuildsReload(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordGuild{}
-	if err = randomize.Struct(seed, o, mydiscordGuildDBTypes, true, mydiscordGuildColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	o := &Guild{}
+	if err = randomize.Struct(seed, o, guildDBTypes, true, guildColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -976,14 +976,14 @@ func testMydiscordGuildsReload(t *testing.T) {
 	}
 }
 
-func testMydiscordGuildsReloadAll(t *testing.T) {
+func testGuildsReloadAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordGuild{}
-	if err = randomize.Struct(seed, o, mydiscordGuildDBTypes, true, mydiscordGuildColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	o := &Guild{}
+	if err = randomize.Struct(seed, o, guildDBTypes, true, guildColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -993,21 +993,21 @@ func testMydiscordGuildsReloadAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := MydiscordGuildSlice{o}
+	slice := GuildSlice{o}
 
 	if err = slice.ReloadAll(ctx, tx); err != nil {
 		t.Error(err)
 	}
 }
 
-func testMydiscordGuildsSelect(t *testing.T) {
+func testGuildsSelect(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordGuild{}
-	if err = randomize.Struct(seed, o, mydiscordGuildDBTypes, true, mydiscordGuildColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	o := &Guild{}
+	if err = randomize.Struct(seed, o, guildDBTypes, true, guildColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -1017,7 +1017,7 @@ func testMydiscordGuildsSelect(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice, err := MydiscordGuilds().All(ctx, tx)
+	slice, err := Guilds().All(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -1028,25 +1028,25 @@ func testMydiscordGuildsSelect(t *testing.T) {
 }
 
 var (
-	mydiscordGuildDBTypes = map[string]string{`DiscordID`: `text`, `ID`: `integer`, `Name`: `text`, `Trigger`: `character varying`}
-	_                     = bytes.MinRead
+	guildDBTypes = map[string]string{`DiscordID`: `text`, `ID`: `integer`, `Name`: `text`, `Trigger`: `character varying`}
+	_            = bytes.MinRead
 )
 
-func testMydiscordGuildsUpdate(t *testing.T) {
+func testGuildsUpdate(t *testing.T) {
 	t.Parallel()
 
-	if 0 == len(mydiscordGuildPrimaryKeyColumns) {
+	if 0 == len(guildPrimaryKeyColumns) {
 		t.Skip("Skipping table with no primary key columns")
 	}
-	if len(mydiscordGuildColumns) == len(mydiscordGuildPrimaryKeyColumns) {
+	if len(guildColumns) == len(guildPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordGuild{}
-	if err = randomize.Struct(seed, o, mydiscordGuildDBTypes, true, mydiscordGuildColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	o := &Guild{}
+	if err = randomize.Struct(seed, o, guildDBTypes, true, guildColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -1056,7 +1056,7 @@ func testMydiscordGuildsUpdate(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := MydiscordGuilds().Count(ctx, tx)
+	count, err := Guilds().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -1065,8 +1065,8 @@ func testMydiscordGuildsUpdate(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, mydiscordGuildDBTypes, true, mydiscordGuildPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	if err = randomize.Struct(seed, o, guildDBTypes, true, guildPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
 
 	if rowsAff, err := o.Update(ctx, tx, boil.Infer()); err != nil {
@@ -1076,18 +1076,18 @@ func testMydiscordGuildsUpdate(t *testing.T) {
 	}
 }
 
-func testMydiscordGuildsSliceUpdateAll(t *testing.T) {
+func testGuildsSliceUpdateAll(t *testing.T) {
 	t.Parallel()
 
-	if len(mydiscordGuildColumns) == len(mydiscordGuildPrimaryKeyColumns) {
+	if len(guildColumns) == len(guildPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &MydiscordGuild{}
-	if err = randomize.Struct(seed, o, mydiscordGuildDBTypes, true, mydiscordGuildColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	o := &Guild{}
+	if err = randomize.Struct(seed, o, guildDBTypes, true, guildColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -1097,7 +1097,7 @@ func testMydiscordGuildsSliceUpdateAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := MydiscordGuilds().Count(ctx, tx)
+	count, err := Guilds().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -1106,18 +1106,18 @@ func testMydiscordGuildsSliceUpdateAll(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, mydiscordGuildDBTypes, true, mydiscordGuildPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	if err = randomize.Struct(seed, o, guildDBTypes, true, guildPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
 
 	// Remove Primary keys and unique columns from what we plan to update
 	var fields []string
-	if strmangle.StringSliceMatch(mydiscordGuildColumns, mydiscordGuildPrimaryKeyColumns) {
-		fields = mydiscordGuildColumns
+	if strmangle.StringSliceMatch(guildColumns, guildPrimaryKeyColumns) {
+		fields = guildColumns
 	} else {
 		fields = strmangle.SetComplement(
-			mydiscordGuildColumns,
-			mydiscordGuildPrimaryKeyColumns,
+			guildColumns,
+			guildPrimaryKeyColumns,
 		)
 	}
 
@@ -1135,7 +1135,7 @@ func testMydiscordGuildsSliceUpdateAll(t *testing.T) {
 		}
 	}
 
-	slice := MydiscordGuildSlice{o}
+	slice := GuildSlice{o}
 	if rowsAff, err := slice.UpdateAll(ctx, tx, updateMap); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
@@ -1143,29 +1143,29 @@ func testMydiscordGuildsSliceUpdateAll(t *testing.T) {
 	}
 }
 
-func testMydiscordGuildsUpsert(t *testing.T) {
+func testGuildsUpsert(t *testing.T) {
 	t.Parallel()
 
-	if len(mydiscordGuildColumns) == len(mydiscordGuildPrimaryKeyColumns) {
+	if len(guildColumns) == len(guildPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
 	// Attempt the INSERT side of an UPSERT
-	o := MydiscordGuild{}
-	if err = randomize.Struct(seed, &o, mydiscordGuildDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	o := Guild{}
+	if err = randomize.Struct(seed, &o, guildDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 	if err = o.Upsert(ctx, tx, false, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert MydiscordGuild: %s", err)
+		t.Errorf("Unable to upsert Guild: %s", err)
 	}
 
-	count, err := MydiscordGuilds().Count(ctx, tx)
+	count, err := Guilds().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -1174,15 +1174,15 @@ func testMydiscordGuildsUpsert(t *testing.T) {
 	}
 
 	// Attempt the UPDATE side of an UPSERT
-	if err = randomize.Struct(seed, &o, mydiscordGuildDBTypes, false, mydiscordGuildPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize MydiscordGuild struct: %s", err)
+	if err = randomize.Struct(seed, &o, guildDBTypes, false, guildPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize Guild struct: %s", err)
 	}
 
 	if err = o.Upsert(ctx, tx, true, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert MydiscordGuild: %s", err)
+		t.Errorf("Unable to upsert Guild: %s", err)
 	}
 
-	count, err = MydiscordGuilds().Count(ctx, tx)
+	count, err = Guilds().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
