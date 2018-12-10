@@ -1,3 +1,2 @@
-from .alias import Alias
+from .models import *
 from .db import DB
-from .guild import Guild
