@@ -3,4 +3,4 @@ venv
 *.iml
 db.sqlite3
 .mypy_cache
-project/settings_local.py
+settings_local.py

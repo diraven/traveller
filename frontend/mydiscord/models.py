@@ -19,7 +19,7 @@ class Guild(models.Model):
     Discord guild.
     """
     discord_id = models.BigIntegerField(unique=True)
-    name = models.TextField(unique=True)
+    name = models.TextField()
     trigger = models.CharField(max_length=1, default=".")
     modules = models.ManyToManyField(Module, related_name="guilds", blank=True)
 
