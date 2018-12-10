@@ -6,10 +6,17 @@ from discord.ext import commands
 from bot.db import DB, Alias
 from bot.settings import settings
 from .context import Context
+from .get_prefix import get_prefix
 from .message import Message
 
 
 class Bot(commands.Bot):
+    def __init__(self, command_prefix=None, **options) -> None:
+        if not command_prefix:
+            command_prefix = get_prefix
+
+        super().__init__(command_prefix=command_prefix, **options)
+
     async def close(self) -> None:
         await DB.disconnect()
         await super().close()

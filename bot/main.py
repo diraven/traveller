@@ -1,11 +1,9 @@
-from bot.core import Bot, get_prefix, init_db
+from bot.core import Bot
+from bot.core.init_db import init_db
 from bot.settings import settings
 
 # Create bot instance.
-instance = Bot(
-    command_prefix=get_prefix,
-    description='A Rewrite Cog Example',
-)
+instance = Bot()
 
 # Schedule db init function for execution.
 instance.loop.create_task(init_db())
