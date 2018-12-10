@@ -1,6 +1,5 @@
-from bot import Bot, settings_local
-from bot.get_prefix import get_prefix
-from bot.init_db import init_db
+from bot.core import Bot, get_prefix, init_db
+from bot.settings import settings
 
 # Create bot instance.
 instance = Bot(
@@ -12,7 +11,7 @@ instance = Bot(
 instance.loop.create_task(init_db())
 
 # Load all the bot's extensions.
-instance.load_extension('extensions.base')
+instance.load_extension('extensions.test')
 
 # Run the bot.
-instance.run(settings_local.DISCORD_TOKEN, bot=True, reconnect=True)
+instance.run(settings.DISCORD_TOKEN, bot=True, reconnect=True)

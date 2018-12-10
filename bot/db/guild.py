@@ -1,12 +1,12 @@
 from typing import Any
 
-from bot.db import DB
+from .db import DB
 
 
 class Guild:
     @staticmethod
     async def get(discord_id: str) -> Any:
-        return await DB.get_connection().fetch(
+        return await DB.get_connection().fetchrow(
             '''SELECT * FROM mydiscord_guild WHERE discord_id = $1;''',
             discord_id,
         )

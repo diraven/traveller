@@ -1,22 +1,22 @@
 from typing import List
 
 import discord
-import settings_local
 from discord.ext import commands
 
-from bot import DB
-from bot.db.guild import Guild
+from bot.db import DB, Guild
+from bot.settings import settings
 
 
 async def get_prefix(bot: commands.Bot, message: discord.Message) -> List[str]:
     """Returns server prefix based on message."""
     # Set default prefix.
-    prefix = settings_local.DISCORD_DEFAULT_PREFIX
+    prefix = settings.DISCORD_DEFAULT_PREFIX
 
     # Get prefix from the database, create the guild if does not exist.
     async with DB.transaction():
         # Get guild we are interested in.
         db_guild = await Guild.get(message.guild.id)
+        prefix = db_guild['trigger']
 
         # If guild does not exist in the DB - put it there.
         if not db_guild and message.guild:
