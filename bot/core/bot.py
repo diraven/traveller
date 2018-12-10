@@ -7,6 +7,7 @@ from bot.db import DB, Alias
 from bot.settings import settings
 from .context import Context
 from .get_prefix import get_prefix
+from .init_db import init_db
 from .message import Message
 
 
@@ -16,6 +17,8 @@ class Bot(commands.Bot):
             command_prefix = get_prefix
 
         super().__init__(command_prefix=command_prefix, **options)
+
+        self.loop.create_task(init_db())
 
     async def close(self) -> None:
         await DB.disconnect()
