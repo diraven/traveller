@@ -1,13 +1,16 @@
-DEBUG = True
+import os
 
-DISCORD_TOKEN = ''
-DISCORD_DEFAULT_PREFIX = '.'
+DEBUG = os.getenv('DEBUG') == 'True'
 
-RAVEN_CONFIG = ""
+DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
+DISCORD_DEFAULT_PREFIX = os.getenv('DISCORD_DEFAULT_PREFIX')
 
-DB_USER = ""
-DB_PASSWORD = ""
-DB_NAME = ""
+RAVEN_CONFIG = os.getenv('RAVEN_CONFIG')
+
+DB_USER = os.getenv('POSTGRES_DB')
+DB_PASSWORD = os.getenv('POSTGRES_PASSWORD')
+DB_NAME = os.getenv('POSTGRES_USER')
+DB_HOST = os.getenv('POSTGRES_HOST')
 
 try:
     from .settings_local import *

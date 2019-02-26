@@ -28,24 +28,6 @@ class Context(commands.Context):
 
         super().__init__(**attrs)
 
-    async def react(self, reaction: str) -> discord.Reaction:
-        """
-        Adds reaction to the message.
-        """
-        return await self.message.add_reaction(reaction)
-
-    async def r_acknowledge(self) -> discord.Reaction:
-        """
-        Marks message as acknowledged by bot.
-        """
-        return await self.react("🦀")
-
-    async def r_done(self) -> discord.Reaction:
-        """
-        Marks message as confirmed by bot.
-        """
-        return await self.react("✅")
-
     async def post(
             self,
             message: 'Message',

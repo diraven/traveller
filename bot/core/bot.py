@@ -1,14 +1,42 @@
 import re
+from typing import List, Any
 
 import discord
 from discord.ext import commands
 
-from bot.db import DB, Alias
-from bot.settings import settings
+from settings import settings
 from .context import Context
-from .get_prefix import get_prefix
-from .init_db import init_db
+from .db import DB
 from .message import Message
+from .models import Guild, Alias
+
+
+async def init_db() -> Any:
+    return await DB.connect(
+        settings.DB_USER,
+        settings.DB_PASSWORD,
+        settings.DB_NAME,
+        settings.DB_HOST,
+    )
+
+
+async def get_prefix(bot: commands.Bot, message: discord.Message) -> List[str]:
+    """Returns server prefix based on message."""
+    # Get prefix from the database, create the guild if does not exist.
+    async with DB.transaction():
+        try:
+            # Try to get prefix from the DB.
+            db_guild = await Guild.get(message.guild.id)
+            return commands.when_mentioned_or(db_guild.trigger)(bot, message)
+        except AttributeError:
+            # Save guild to the DB with the default prefix and use default
+            # prefix.
+            db_guild = Guild()
+            db_guild.discord_id = message.guild.id
+            db_guild.name = message.guild.name
+            db_guild.trigger = settings.DISCORD_DEFAULT_PREFIX
+            await db_guild.save()
+            return commands.when_mentioned_or(db_guild.trigger)(bot, message)
 
 
 class Bot(commands.Bot):
@@ -37,8 +65,8 @@ class Bot(commands.Bot):
             if alias:
                 # Replace start of the message with the alias target.
                 msg.content = re.sub(
-                    '^{}{}'.format(self.command_prefix, alias['source']),
-                    '{}{}'.format(self.command_prefix, alias['target']),
+                    '^{}{}'.format(ctx.prefix, alias.source),
+                    '{}{}'.format(ctx.prefix, alias.target),
                     msg.content,
                 )
             # Try to fetch context anew.
@@ -87,6 +115,5 @@ class Bot(commands.Bot):
             return await super().on_command_error(ctx, exception)
 
         # Send issue to sentry otherwise.
-        # TODO Implement proper raven sending without django.
         from raven.contrib.django.raven_compat.models import client
         client.captureException()

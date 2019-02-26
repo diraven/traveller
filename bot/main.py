@@ -1,5 +1,5 @@
-from bot.core import Bot
-from bot.settings import settings
+from core.bot import Bot
+from settings import settings
 
 # Create bot instance.
 instance = Bot()

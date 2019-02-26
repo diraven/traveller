@@ -25,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '_t$uwr8(0&hil1cehn$+ezq0&-y!&l6aq1ec^-&944t^2%*!l1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.getenv('DEBUG') == 'True'
 
 ALLOWED_HOSTS = []  # type: List[str]
 
@@ -115,12 +115,16 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-RAVEN_CONFIG = None
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'HOST': os.getenv('POSTGRES_HOST'),
+        'NAME': os.getenv('POSTGRES_DB'),
+        'USER': os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+    }
+}
 
-DISCORD_TOKEN = ''
+RAVEN_CONFIG = os.getenv('RAVEN_CONFIG')
 
-# Load custom settings.
-try:
-    from project.settings_local import *
-except ImportError:
-    pass
+DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')

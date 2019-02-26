@@ -1,6 +1,6 @@
-venv
-.idea
+.*
+!.gitignore
+!.dockerignore
+!.gitlab-ci.yml
 *.iml
-db.sqlite3
-.mypy_cache
-settings_local.py
+docker-compose.override.yml

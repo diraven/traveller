@@ -1,11 +1,10 @@
-from typing import TYPE_CHECKING
+from discord.ext.commands import Cog
 
-if TYPE_CHECKING:
-    from bot import Bot
+from core import Bot
 
 
-class CogBase:
-    _bot = None  # type: Bot
+class CogBase(Cog):
+    _bot: Bot = None
 
     def __init__(self, bot: "Bot") -> None:
         self._bot = bot

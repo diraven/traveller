@@ -15,8 +15,7 @@ class Message:
     _icon = ""  # type: Optional[str]
     _color = ""  # type: discord.Color
 
-    def __init__(self, text: str, title: str = None, icon: str = None,
-                 color: discord.Color = None) -> None:
+    def __init__(self, *, text: str, title: str = None, icon: str = None, color: discord.Color = None) -> None:
         self._title = title
         self._text = text
         self._icon = icon
@@ -51,8 +50,12 @@ class Message:
         """
         Returns prebuilt message object of info style.
         """
-        return Message(text, title, ':information_source:',
-                       discord.Color.blue())
+        return Message(
+            text=text,
+            title=title,
+            icon=':information_source:',
+            color=discord.Color.blue(),
+        )
 
     @staticmethod
     def danger(text: str, title: str = None) -> 'Message':
@@ -61,7 +64,12 @@ class Message:
         """
         if not title:
             title = "Oops..."
-        return Message(text, title, ':no_entry:', discord.Color.red())
+        return Message(
+            text=text,
+            title=title,
+            icon=':no_entry:',
+            color=discord.Color.red()
+        )
 
     def as_text(self) -> str:
         """
