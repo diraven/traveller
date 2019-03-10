@@ -1,10 +1,11 @@
-FROM python:3.6
+FROM python:3.7
 WORKDIR /app
-COPY Pipfile.lock Pipfile ./
+ENTRYPOINT ["./docker-entrypoint"]
+CMD ["python", "main.py"]
 
-RUN apt update && apt install wait-for-it -y
+RUN apt-get update && apt-get install wait-for-it -y
+
+COPY Pipfile.lock Pipfile ./
 RUN pip install --upgrade pip pipenv && pipenv install --system --dev
 
 COPY . .
-
-CMD ["bash"]

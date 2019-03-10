@@ -57,7 +57,7 @@ class Bot(commands.Bot):
         """
         Returns command invocation context.
         """
-        ctx = await super().get_context(msg, cls=Context)  # type: Context
+        ctx: Context = await super().get_context(msg, cls=Context)
 
         # If command not found - try to find it using alias.
         if ctx.command is None and msg.guild:
@@ -87,7 +87,7 @@ class Bot(commands.Bot):
             await ctx.post(
                 Message.danger(
                     "Unable to complete operation, "
-                    "missing necessary permissions."
+                    f"missing necessary permissions: {exception.original}."
                 )
             )
             return

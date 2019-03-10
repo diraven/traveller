@@ -10,40 +10,18 @@ class Message:
     """
     Game message class.
     """
-    _title = ""  # type: Optional[str]
-    _text = ""  # type: str
-    _icon = ""  # type: Optional[str]
-    _color = ""  # type: discord.Color
 
-    def __init__(self, *, text: str, title: str = None, icon: str = None, color: discord.Color = None) -> None:
-        self._title = title
-        self._text = text
-        self._icon = icon
-        self._color = color
-
-    def set_title(self, title: str) -> None:
-        """
-        Sets title on the already existent message.
-        """
-        self._title = title
-
-    def set_text(self, text: str) -> None:
-        """
-        Sets text on the already existent message.
-        """
-        self._text = text
-
-    def set_icon(self, icon: str) -> None:
-        """
-        Sets icon on the already existent message.
-        """
-        self._icon = icon
-
-    def set_color(self, color: str) -> None:
-        """
-        Sets color on the already existent message.
-        """
-        self._color = color
+    def __init__(
+            self, *,
+            text: str,
+            title: str = None,
+            icon: str = None,
+            color: discord.Color = None
+    ) -> None:
+        self.text: str = text
+        self.title: Optional[str] = title
+        self.icon: Optional[str] = icon
+        self.color: discord.Color = color
 
     @staticmethod
     def info(text: str, title: str = None) -> 'Message':
@@ -76,13 +54,13 @@ class Message:
         Returns message in a form of text piece directed to a single
         person if specified.
         """
-        result = self._text
+        result = self.text
 
-        if self._title:
-            result = "**{}**\n{}".format(self._title, result)
+        if self.title:
+            result = "**{}**\n{}".format(self.title, result)
 
-        if self._icon:
-            result = "{} {}".format(self._icon, result)
+        if self.icon:
+            result = "{} {}".format(self.icon, result)
 
         return result
 
@@ -91,17 +69,17 @@ class Message:
         Returns message in a form of embed directed to party as a whole.
         """
         title = ""
-        if self._title:
-            title = self._title
-        if self._icon:
-            title = "{} {}".format(self._icon, title)
+        if self.title:
+            title = self.title
+        if self.icon:
+            title = "{} {}".format(self.icon, title)
 
         color = discord.Embed.Empty
-        if self._color:
-            color = self._color
+        if self.color:
+            color = self.color
 
         return discord.Embed(
             color=color,
             title=title,
-            description=self._text,
+            description=self.text,
         )

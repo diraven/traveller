@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -o errexit
+set -o pipefail
+set -o nounset
+#set -o xtrace
+
+docker-compose build
+docker push diraven/main:crabot-bot
+docker push diraven/main:crabot-frontend
+ssh diraven@diraven.com 'docker pull diraven/main:crabot-bot'
+ssh diraven@diraven.com 'docker pull diraven/main:crabot-frontend'
+ssh diraven@diraven.com 'cd /home/crabot/ && docker-compose down'
+ssh diraven@diraven.com 'cd /home/crabot/ && docker-compose run -T frontend ./manage.py migrate'
+ssh diraven@diraven.com 'cd /home/crabot/ && docker-compose up -d'

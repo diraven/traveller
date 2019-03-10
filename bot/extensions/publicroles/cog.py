@@ -1,8 +1,28 @@
-from discord import Forbidden
+import asyncio
+import typing
+
+import discord
 from discord.ext import commands
 
-from core import CogBase, Context, Message
-from extensions.publicroles.utils import sync, search
+from core import CogBase, Context, EMOJI_ALIAS_UNICODE, Message, utils
+
+
+class HighlightedRole:
+    def __init__(
+            self,
+            member: discord.Member,
+            role: discord.Role
+    ):
+        self.member: discord.Member = member
+        self.role = role
+        super().__init__()
+
+    def __str__(self) -> str:
+        user_roles_ids = [role.id for role in self.member.roles]
+        if self.role.id in user_roles_ids:
+            return f'{EMOJI_ALIAS_UNICODE[":white_check_mark:"]}' \
+                f'{self.role.mention}'
+        return self.role.mention
 
 
 class Cog(CogBase):
@@ -10,233 +30,70 @@ class Cog(CogBase):
     async def publicroles(
             self,
             ctx: Context,
-            *args
     ) -> None:
         """
-        Searches available public roles.
+        Shows available public roles.
         """
-        sync(ctx)  # synchronize locally stored roles with the server
+        roles: typing.List[discord.Role] = ctx.guild.roles
+        items = []
 
-        # Sanitize args.
-        arg = ''.join(args)
-
-        # Set symbols limit to optimize search results.
-        if 0 < len(arg) < 3:
-            await ctx.post(
-                Message.danger('Search must contain at least 3 symbols.')
-            )
-            return None
-
-        roles = await search(ctx, ctx.guild.roles, arg)
-
-        if len(roles) > 0:
-            await post_list(ctx, roles, title='Public Roles')
-        else:
-            await ctx.post(Message.danger("No roles found."))
-
-    @publicroles.command()
-    async def my(
-            self,
-            ctx: Context
-    ) -> None:
-        """
-        Shows public roles you have.
-        """
-        sync_roles(ctx)
-
-        # Get a list of stored public roles discord_ids.
-        public_roles_ids = PublicRole.objects.filter(
-            guild__discord_id=ctx.guild.id,
-        ).values_list('discord_id', flat=True)
-
-        roles = []
-        for role in ctx.author.roles:
-            if role.id in public_roles_ids:
-                roles.append(role)
-
-        await post_list(ctx, roles, title='Your Public Roles')
-
-    @publicroles.command()
-    async def join(
-            self,
-            ctx: Context,
-            *args
-    ) -> None:
-        """
-        Gives you a public role.
-        """
-        sync_roles(ctx)
-        arg = ' '.join(args)
-
-        # Search roles.
-        role = await fuzzy_search_public_role(ctx, ctx.guild.roles, arg)
-
-        if role:
-            try:
-                await ctx.author.add_roles(role)
-                await ctx.success()
-            except Forbidden as e:
-                await ctx.post(Message.danger(str(e)))
+        if 'public-roles' not in [role.name for role in roles]:
+            await ctx.post(Message.danger(
+                text='I\'m unable to find `public-roles` role.\n'
+                     'Please make a role named `public-roles` and make sure '
+                     'it\'s above all of the public roles like this:\n'
+                f'- `{ctx.bot.user.display_name}`\n'
+                     '- `some-other-role1`\n'
+                     '- `some-other-role2`\n'
+                     '- ...\n'
+                     '- `public-roles`\n'
+                     '- `public-role-1`\n'
+                     '- `public-role-2`\n'
+                     '- `public-role-3`\n'
+                     '- ...\n'
+                     '- `@everyone`\n'
+            ))
             return
 
-    @publicroles.command()
-    async def leave(
-            self,
-            ctx: Context,
-            *args
-    ) -> None:
-        """
-        Removes you from a public role.
-        """
-        sync_roles(ctx)
-        arg = ' '.join(args)
+        for role in roles[1:]:
+            if role.name == 'public-roles':
+                break
+            items.append(HighlightedRole(
+                ctx.guild.get_member(ctx.author.id),
+                role,
+            ))
 
-        # Search roles.
-        role = await fuzzy_search_public_role(ctx, ctx.author.roles, arg)
+        items = sorted(items, key=lambda item: item.role.name)
 
-        if role:
+        async def callback(
+                chosen: HighlightedRole,
+                user: discord.User,
+        ):
             try:
-                await ctx.author.remove_roles(role)
-                await ctx.success()
-            except Forbidden as e:
-                await ctx.post(Message.danger(str(e)))
-            return
+                member: discord.Member = ctx.guild.get_member(user.id)
+                if chosen.role.id in [
+                    role.id for role in member.roles
+                ]:
+                    await member.remove_roles(chosen.role)
+                else:
+                    await member.add_roles(chosen.role)
 
-    @publicroles.command()
-    async def who(
-            self,
-            ctx: Context,
-            *args
-    ) -> None:
-        """
-        Shows a list of people who has the public role.
-        """
-        sync_roles(ctx)
-        arg = ' '.join(args)
+                await asyncio.sleep(2)
 
-        # Search roles.
-        role = await fuzzy_search_public_role(ctx, ctx.guild.roles, arg)
-
-        if role:
-            try:  # Try to get the role from our public roles list.
-                PublicRole.objects.get(discord_id=role.id)
-                members = []
-                for member in ctx.guild.members:
-                    for member_role in member.roles:
-                        if member_role.id == role.id:
-                            members.append(member)
-
-                await post_list(ctx, members,
-                                title='People with "{}" public role'.format(
-                                    role.name)
-                                )
-                return
-
-            except PublicRole.DoesNotExist:
+            except asyncio.TimeoutError:
                 await ctx.post(Message.danger(
-                    "The '{}' role is not public.".format(arg)
+                    'Failed to update role, something went wrong...'
                 ))
-                return
 
-    @publicroles.command()
-    @commands.check(lambda ctx: ctx.author.guild_permissions.manage_roles)
-    async def register(
-            self,
-            ctx: Context,
-            *args
-    ) -> None:
-        """
-        Registers existing role as a public role.
-        """
-        sync_roles(ctx)
-        arg = ' '.join(args)
-
-        # Try to get current guild.
-        guild = Guild.objects.get(discord_id=ctx.guild.id)
-
-        # Argument must be an exact name of the role to be made public.
-        for role in ctx.guild.roles:
-            if role.name == arg:
-                PublicRole.objects.get_or_create(
-                    discord_id=role.id,
-                    guild=guild,
-                )
-                await ctx.success()
-                return
-
-        await ctx.post(
-            Message.danger('There is no `{}` role.'.format(arg))
+        chooser = utils.Chooser(
+            ctx=ctx,
+            user=ctx.author,
+            items=items,
+            timeout=60,
+            callback=callback,
+            multiple=True,
+            title=f'Public roles for @{ctx.author.display_name}',
+            color=discord.Color.blue(),
         )
 
-    @publicroles.command()
-    @commands.check(lambda ctx: ctx.author.guild_permissions.manage_roles)
-    async def unregister(
-            self,
-            ctx: Context,
-            *args
-    ) -> None:
-        """
-        Unregisters role as a public role.
-        """
-        sync_roles(ctx)
-        arg = ' '.join(args)
-
-        # Argument must be an exact name of the role that's public.
-        # Find out the role discord_id first.
-        for role in ctx.guild.roles:
-            if role.name == arg:
-                try:  # Try to delete the role.
-                    PublicRole.objects.get(discord_id=role.id).delete()
-                    await ctx.success()
-                    return
-                except PublicRole.DoesNotExist:
-                    await ctx.post(
-                        Message.danger(
-                            'Role `{}` is not public.'.format(arg)
-                        )
-                    )
-                    return
-
-        await ctx.post(
-            Message.danger('There is no `{}` role.'.format(arg))
-        )
-
-    @publicroles.command()
-    @commands.check(lambda ctx: ctx.author.guild_permissions.manage_roles)
-    async def create(
-            self,
-            ctx: Context,
-            *args
-    ) -> None:
-        """
-        Creates new role and makes it public.
-        """
-        sync_roles(ctx)
-        arg = ' '.join(args)
-
-        # Get current guild.
-        guild = Guild.objects.get(discord_id=ctx.guild.id)
-
-        # There should not be a server role with such name.
-        for role in ctx.guild.roles:
-            if slugify(role.name) == slugify(arg):
-                await ctx.post(Message.danger(
-                    'Role `{}` already exists. Try `register` '
-                    'instead of `create`.'.format(arg)
-                ))
-                return
-
-        # Now it's safe to create a new role.
-        try:
-            r = await ctx.guild.create_role(
-                name=arg,
-                mentionable=True,
-            )
-        except Forbidden as e:
-            await ctx.post(Message.danger(str(e)))
-            return
-
-        # Save the role locally as public.
-        PublicRole(guild=guild, discord_id=r.id).save()
-
-        await ctx.success()
+        await chooser.post()

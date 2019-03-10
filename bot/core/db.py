@@ -4,7 +4,7 @@ import asyncpg
 
 
 class DB:
-    _connection = None  # type: asyncpg.connection.Connection
+    _connection: asyncpg.connection.Connection = None
 
     @staticmethod
     async def connect(
