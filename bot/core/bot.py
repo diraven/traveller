@@ -1,3 +1,4 @@
+"""Core bot module."""
 import re
 from typing import List, Any
 
@@ -12,6 +13,7 @@ from .models import Guild, Alias
 
 
 async def init_db() -> Any:
+    """Initialize database connection."""
     return await DB.connect(
         settings.DB_USER,
         settings.DB_PASSWORD,
@@ -21,7 +23,7 @@ async def init_db() -> Any:
 
 
 async def get_prefix(bot: commands.Bot, message: discord.Message) -> List[str]:
-    """Returns server prefix based on message."""
+    """Return server prefix based on message."""
     # Get prefix from the database, create the guild if does not exist.
     async with DB.transaction():
         try:
@@ -40,7 +42,10 @@ async def get_prefix(bot: commands.Bot, message: discord.Message) -> List[str]:
 
 
 class Bot(commands.Bot):
+    """Bot class."""
+
     def __init__(self, command_prefix=None, **options) -> None:
+        """Make bot instance."""
         if not command_prefix:
             command_prefix = get_prefix
 
@@ -49,14 +54,13 @@ class Bot(commands.Bot):
         self.loop.create_task(init_db())
 
     async def close(self) -> None:
+        """Close db connection."""
         await DB.disconnect()
         await super().close()
 
     async def get_context(self, msg: discord.Message, *,
                           cls=Context) -> Context:
-        """
-        Returns command invocation context.
-        """
+        """Return command invocation context."""
         ctx: Context = await super().get_context(msg, cls=Context)
 
         # If command not found - try to find it using alias.
@@ -79,9 +83,7 @@ class Bot(commands.Bot):
 
     # noinspection PyBroadException
     async def on_command_error(self, ctx: Context, exception) -> None:
-        """
-        Global command errors handler.
-        """
+        """Global command errors handler."""
         if isinstance(exception, commands.errors.CommandInvokeError) and \
                 isinstance(exception.original, discord.errors.Forbidden):
             await ctx.post(

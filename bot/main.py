@@ -1,3 +1,4 @@
+"""Main bot module."""
 from core.bot import Bot
 from settings import settings
 

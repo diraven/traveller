@@ -1,3 +1,4 @@
+"""Bot generic utilities module."""
 import asyncio
 import enum
 import math
@@ -14,30 +15,35 @@ TIMEOUT = 10
 
 @enum.unique
 class Button(enum.Enum):
+    """Chooser control button."""
+
     ARROW_LEFT = EMOJI_ALIAS_UNICODE[':arrow_backward:']
     ARROW_RIGHT = EMOJI_ALIAS_UNICODE[':arrow_forward:']
-    # DIGIT_0 = EMOJI_ALIAS_UNICODE[':keycap_digit_zero:']
     OPTION_1 = '\U0001F1E6'
     OPTION_2 = '\U0001F1E7'
     OPTION_3 = '\U0001F1E8'
     OPTION_4 = '\U0001F1E9'
     OPTION_5 = '\U0001F1EA'
 
-    # DIGIT_6 = EMOJI_ALIAS_UNICODE[':keycap_digit_six:']
-    # DIGIT_7 = EMOJI_ALIAS_UNICODE[':keycap_digit_seven:']
-    # DIGIT_8 = EMOJI_ALIAS_UNICODE[':keycap_digit_eight:']
-    # DIGIT_9 = EMOJI_ALIAS_UNICODE[':keycap_digit_nine:']
-
     @classmethod
     def values(cls) -> typing.List[str]:
+        """Button values."""
         return [b.value for b in cls]
 
     @classmethod
     def options(cls) -> typing.Iterable['Button']:
+        """Buttons for options selection."""
         return (getattr(cls, f'OPTION_{i + 1}') for i in range(PER_PAGE))
 
 
 class Chooser:
+    """
+    Present user with choice.
+
+    Call the callback for every choice user has made. Allows navigation
+    over items list.
+    """
+
     def __init__(
             self, *,
             ctx: Context,
@@ -50,10 +56,7 @@ class Chooser:
             icon: str = None,
             color: discord.Color = None,
     ) -> None:
-        """
-        Presents user with choice and calls the callback for every choice
-        user has made. Allows navigation over items list.
-        """
+        """Make new chooser."""
         self.ctx = ctx
         self.user = user
         self.items = items
@@ -73,6 +76,7 @@ class Chooser:
 
     @property
     def pages(self) -> int:
+        """Calculate total amount of pages."""
         return math.ceil(len(self.items) / PER_PAGE)
 
     async def _update(self) -> None:
@@ -157,6 +161,7 @@ class Chooser:
                 return
 
     async def post(self):
+        """Post a chooser message."""
         try:
             # Get a timeout exception from the other event handler that
             while True:

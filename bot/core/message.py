@@ -1,15 +1,11 @@
-"""
-Game message module.
-"""
+"""Bot message module."""
 from typing import Optional
 
 import discord
 
 
 class Message:
-    """
-    Game message class.
-    """
+    """Game message class."""
 
     def __init__(
             self, *,
@@ -18,6 +14,7 @@ class Message:
             icon: str = None,
             color: discord.Color = None
     ) -> None:
+        """Make new message."""
         self.text: str = text
         self.title: Optional[str] = title
         self.icon: Optional[str] = icon
@@ -25,9 +22,7 @@ class Message:
 
     @staticmethod
     def info(text: str, title: str = None) -> 'Message':
-        """
-        Returns prebuilt message object of info style.
-        """
+        """Return prebuilt message object of info style."""
         return Message(
             text=text,
             title=title,
@@ -37,9 +32,7 @@ class Message:
 
     @staticmethod
     def danger(text: str, title: str = None) -> 'Message':
-        """
-        Returns prebuilt message object of danger style.
-        """
+        """Return prebuilt message object of danger style."""
         if not title:
             title = "Oops..."
         return Message(
@@ -51,8 +44,9 @@ class Message:
 
     def as_text(self) -> str:
         """
-        Returns message in a form of text piece directed to a single
-        person if specified.
+        Return message in a form of text.
+
+        Mention person if specified.
         """
         result = self.text
 
@@ -65,9 +59,7 @@ class Message:
         return result
 
     def as_embed(self) -> discord.Embed:
-        """
-        Returns message in a form of embed directed to party as a whole.
-        """
+        """Return message in a form of embed directed to party as a whole."""
         title = ""
         if self.title:
             title = self.title

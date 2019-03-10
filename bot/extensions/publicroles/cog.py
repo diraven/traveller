@@ -1,3 +1,4 @@
+"""Publicroles cog module."""
 import asyncio
 import typing
 
@@ -8,16 +9,20 @@ from core import CogBase, Context, EMOJI_ALIAS_UNICODE, Message, utils
 
 
 class HighlightedRole:
+    """Role that's highlighted if user has it."""
+
     def __init__(
             self,
             member: discord.Member,
             role: discord.Role
     ):
+        """Make new HighlightedRole."""
         self.member: discord.Member = member
         self.role = role
         super().__init__()
 
     def __str__(self) -> str:
+        """Render to string."""
         user_roles_ids = [role.id for role in self.member.roles]
         if self.role.id in user_roles_ids:
             return f'{EMOJI_ALIAS_UNICODE[":white_check_mark:"]}' \
@@ -26,14 +31,14 @@ class HighlightedRole:
 
 
 class Cog(CogBase):
+    """Publicroles cog."""
+
     @commands.group(invoke_without_command=True)
     async def publicroles(
             self,
             ctx: Context,
     ) -> None:
-        """
-        Shows available public roles.
-        """
+        """Show available public roles."""
         roles: typing.List[discord.Role] = ctx.guild.roles
         items = []
 

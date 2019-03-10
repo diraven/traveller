@@ -1,24 +1,24 @@
-"""
-Custom bot commands context.
-"""
+"""Custom bot commands context."""
 import typing
-from typing import List, Dict, TYPE_CHECKING
 
 import discord
 from discord.ext import commands
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from . import Bot, Message
 
 
 class Context(commands.Context):
-    def __init__(self, **attrs: Dict) -> None:
-        self.message: discord.message = None
-        self.bot: Bot = None
-        self.args: typing.List = None
-        self.kwargs: typing.Dict = None
-        self.prefix: str = None
-        self.command: commands.Command = None
+    """Bot command context."""
+
+    def __init__(self, **attrs: typing.Dict) -> None:
+        """Make new context."""
+        self.message: discord.message
+        self.bot: Bot
+        self.args: typing.List
+        self.kwargs: typing.Dict
+        self.prefix: str
+        self.command: commands.Command
 
         super().__init__(**attrs)
 
@@ -27,10 +27,7 @@ class Context(commands.Context):
             message: 'Message',
             with_mention: bool = False
     ) -> discord.Message:
-        """
-        Send response as embed, or as text with mention if requested.
-        """
-
+        """Send response as embed, or as text with mention if requested."""
         if with_mention:
             return await self.send(
                 "{}\n{}".format(

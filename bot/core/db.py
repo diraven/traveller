@@ -1,18 +1,23 @@
+"""Bot database interactions module."""
+import typing
 from typing import Any
 
 import asyncpg
 
 
 class DB:
+    """Bot's DB access implementation."""
+
     _connection: asyncpg.connection.Connection = None
 
     @staticmethod
     async def connect(
-            user: str,
-            password: str,
-            database: str,
-            host: str
+            user: typing.Optional[str],
+            password: typing.Optional[str],
+            database: typing.Optional[str],
+            host: typing.Optional[str],
     ) -> None:
+        """Connect to the database."""
         DB._connection = await asyncpg.connect(
             user=user,
             password=password,
@@ -22,10 +27,12 @@ class DB:
 
     @staticmethod
     async def disconnect() -> None:
+        """Disconnect from database."""
         await DB._connection.close()
 
     @staticmethod
     def get_connection() -> asyncpg.connection.Connection:
+        """Get database connection."""
         if DB._connection is None:
             raise Exception('Not connected to the database.')
         return DB._connection
@@ -33,21 +40,27 @@ class DB:
     @staticmethod
     def transaction(*, isolation='read_committed', readonly=False,
                     deferrable=False) -> Any:
+        """Make and return new transaction."""
         return DB._connection.transaction(isolation=isolation,
                                           readonly=readonly,
                                           deferrable=deferrable)
 
 
 class Field:
+    """Generic database field."""
+
     pass
 
 
 class Model:
-    table_name = None
+    """Generic database model."""
+
+    table_name: str = ''
 
     id = Field()
 
     def __init__(self, **kwargs) -> None:
+        """Create new object of the given model."""
         # Gather fields list.
         self._field_names = [
             field for field in dir(self) if
@@ -66,6 +79,7 @@ class Model:
                 setattr(self, field, None)
 
     async def save(self) -> None:
+        """Save object into the database."""
         # Copy field names list.
         field_names = self._field_names[:]
 
@@ -92,8 +106,8 @@ class Model:
             # noinspection SqlResolve
             await DB.get_connection().execute(
                 f'''
-                UPDATE {self.table_name} 
-                SET {set_statement} 
+                UPDATE {self.table_name}
+                SET {set_statement}
                 WHERE id={self.id};
                 ''',
                 *values,
@@ -103,13 +117,14 @@ class Model:
             fields_statement = ", ".join(field_names)
 
             await DB.get_connection().execute(
-                f'''INSERT INTO {self.table_name}({fields_statement}) 
+                f'''INSERT INTO {self.table_name}({fields_statement})
                 VALUES ({placeholders});
                 ''',
                 *values,
             )
 
     async def delete(self) -> Any:
+        """Remove the alias."""
         # noinspection SqlResolve
         return await DB.get_connection().execute(
             f'DELETE FROM {self.table_name} WHERE id=$1',

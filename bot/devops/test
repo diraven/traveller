@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -o errexit
+set -o pipefail
+set -o nounset
+#set -o xtrace
+
+docker-compose run bot python devops test | sed 's/^\/app/\/home\/diraven\/workspace\/src\/gitlab.com\/diraven\/crabot\/bot/'

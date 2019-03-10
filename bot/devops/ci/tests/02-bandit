@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -o errexit
+set -o pipefail
+set -o nounset
+#set -o xtrace
+
+bandit --ini=/app/devops/ci/configs/bandit.ini -r /app

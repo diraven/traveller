@@ -1,3 +1,4 @@
+"""General utility checks."""
 # @bot.check
 # def is_module_active(ctx: Context):
 #     """

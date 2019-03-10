@@ -1,9 +1,12 @@
+"""Publicroles models module."""
 from typing import Optional, List
 
 from core import Model, Field, DB
 
 
 class PublicRole(Model):
+    """Public role database representation."""
+
     table_name = "publicroles_publicrole"
 
     discord_id = Field()
@@ -11,13 +14,18 @@ class PublicRole(Model):
 
     @classmethod
     async def get(cls, discord_id: int) -> Optional['PublicRole']:
+        """Get one public role."""
         return await cls._get_object(discord_id=discord_id)
 
     @classmethod
-    async def get_all(cls, guild_discord_id: int) -> Optional[List['PublicRole']]:
+    async def get_all(
+            cls,
+            guild_discord_id: int,
+    ) -> Optional[List['PublicRole']]:
+        """Get all public roles."""
         # noinspection SqlResolve
         result = await DB.get_connection().fetch(
-            f'''SELECT pr.* FROM {cls.table_name} pr 
+            f'''SELECT pr.* FROM {cls.table_name} pr
         LEFT JOIN mydiscord_guild g ON pr.guild_id = g.id
         WHERE g.discord_id = $1;
         ''',
