@@ -1,6 +1,4 @@
-"""
-Discord-related admin.
-"""
+"""Discord-related admin."""
 from django.contrib import admin
 
 # Register your models here.
@@ -13,6 +11,8 @@ admin.site.register(Guild, admin.ModelAdmin)
 
 
 class AliasAdmin(admin.ModelAdmin):
+    """Command alias admin."""
+
     list_display = ['source', 'target', 'guild']
     list_filter = ['guild']
 

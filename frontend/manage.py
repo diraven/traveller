@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+"""Frontend django management module."""
 import os
 import sys
 

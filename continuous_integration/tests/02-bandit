@@ -4,4 +4,4 @@ set -o pipefail
 set -o nounset
 #set -o xtrace
 
-bandit --ini=/app/devops/ci/configs/bandit.ini -r /app
+bandit --ini=/app/continuous_integration/configs/bandit.ini -r /app

@@ -32,17 +32,17 @@ ALLOWED_HOSTS = []  # type: List[str]
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+                     'django.contrib.admin',
+                     'django.contrib.auth',
+                     'django.contrib.contenttypes',
+                     'django.contrib.sessions',
+                     'django.contrib.messages',
+                     'django.contrib.staticfiles',
 
-    'raven.contrib.django.raven_compat',
+                     'raven.contrib.django.raven_compat',
 
-    'mydiscord',
-]
+                     'mydiscord',
+                 ] + os.getenv('DJANGO_EXTRA_APPS', '').split(',')
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

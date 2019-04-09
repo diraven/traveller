@@ -1,1 +1,1 @@
-# Create your tests here.
+"""Frontend mydiscord module tests."""

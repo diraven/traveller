@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -o errexit
+set -o pipefail
+set -o nounset
+#set -o xtrace
+
+pytest \
+    -c /app/continuous_integration/configs/pytest.ini \
+    --cov=/app \
+    --cov-config=/app/continuous_integration/configs/coverage.ini \
+    --cov-report term-missing:skip-covered \
+    /app

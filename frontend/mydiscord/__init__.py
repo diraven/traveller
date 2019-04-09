@@ -1,3 +1,1 @@
-"""
-Mydiscord package.
-"""
+"""Mydiscord package."""

@@ -4,4 +4,4 @@ set -o pipefail
 set -o nounset
 #set -o xtrace
 
-flake8 --config=/app/devops/ci/configs/flake8.ini /app
+flake8 --config=/app/continuous_integration/configs/flake8.ini /app

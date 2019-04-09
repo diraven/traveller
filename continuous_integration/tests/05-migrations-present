@@ -4,4 +4,4 @@ set -o pipefail
 set -o nounset
 #set -o xtrace
 
-mypy --config-file=/app/devops/ci/configs/mypy.ini /app
+./manage.py makemigrations --dry-run | grep -q "No changes detected"

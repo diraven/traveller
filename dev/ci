@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -o errexit
+set -o pipefail
+set -o nounset
+#set -o xtrace
+
+# Runs checks and tests like CI pipeline does with few notable exceptions.
+# Migrations-related tests that influence database state will not run by default.
+
+die () {
+    echo >&2 "$@"
+    exit 1
+}
+
+[[ "$#" -eq 1 ]] || die "1 argument required (test?), $# provided"
+
+docker-compose run bot run-parts --exit-on-error continuous_integration/tests | sed -e "s|/app|$(pwd)/bot|"
+docker-compose run frontend run-parts --exit-on-error continuous_integration/tests | sed -e "s|/app|$(pwd)/frontend|"

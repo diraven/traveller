@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -o errexit
+set -o pipefail
+set -o nounset
+#set -o xtrace
+
+mypy --config-file=/app/continuous_integration/configs/mypy.ini /app

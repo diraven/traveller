@@ -48,7 +48,7 @@ class Chooser:
             self, *,
             ctx: Context,
             user: discord.User,
-            items: typing.Collection,
+            items: typing.List,
             callback: typing.Callable,
             timeout: int = TIMEOUT,  # seconds
             multiple: bool = False,

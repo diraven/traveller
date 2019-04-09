@@ -10,6 +10,8 @@ flake8-todo = "*"
 bandit = "*"
 mypy = "*"
 click = "*"
+pytest = "*"
+pytest-cov = "*"
 
 [packages]
 asyncpg = "*"
