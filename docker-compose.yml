@@ -1,4 +1,4 @@
-version: '3.3'
+version: '3.7'
 
 services:
 
@@ -13,18 +13,18 @@ services:
 
   bot:
     image: diraven/main:crabot-bot
+    init: true
     depends_on:
       - db
-      #    init: true
     env_file:
       - .env
 
   frontend:
     image: diraven/main:crabot-frontend
+    init: true
     depends_on:
       - db
     ports:
-      - "8123:8000"
-      #    init: true
+      - "80:80"
     env_file:
       - .env

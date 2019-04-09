@@ -1,0 +1,10 @@
+FROM python:3.7
+WORKDIR /app
+
+ENTRYPOINT ["./docker-entrypoint"]
+CMD ["./manage.py", "runserver", "0.0.0.0:80"]
+COPY docker-entrypoint .
+
+ENV PIPENV_VENV_IN_PROJECT=1
+RUN pip install --upgrade pip pipenv
+RUN apt-get update && apt-get install wait-for-it postgresql-client man vim -y

@@ -6,8 +6,5 @@ CMD ["python", "main.py"]
 COPY docker-entrypoint .
 
 ENV PIPENV_VENV_IN_PROJECT=1
-COPY Pipfile Pipfile.lock ./
-RUN apt-get update && apt-get install wait-for-it -y
-RUN pip install --upgrade pip pipenv && pipenv sync
-
-COPY . .
+RUN pip install --upgrade pip pipenv
+RUN apt-get update && apt-get install wait-for-it postgresql-client man vim -y

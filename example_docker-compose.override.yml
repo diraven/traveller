@@ -1,4 +1,4 @@
-version: '3.3'
+version: '3.7'
 
 services:
 
@@ -7,23 +7,18 @@ services:
       - '5432:5432'
 
   bot:
-    build: bot
-    depends_on:
-      - db
+    build:
+      context: bot
+      dockerfile: Dockerfile_dev
     volumes:
       - ./bot:/app
-#    init: true
-    env_file:
-      - .env
+      - ./.volumes/root:/root
+
 
   frontend:
-    build: frontend
-    depends_on:
-      - db
+    build:
+      context: frontend
+      dockerfile: Dockerfile_dev
     volumes:
       - ./frontend:/app
-    ports:
-      - "8000:8000"
-#    init: true
-    env_file:
-      - .env
+      - ./.volumes/root:/root
