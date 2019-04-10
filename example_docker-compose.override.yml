@@ -12,7 +12,6 @@ services:
       dockerfile: Dockerfile_dev
     volumes:
       - ./bot:/app
-      - ./continuous_integration:/app/continuous_integration
       - ./.volumes/root:/root
 
 
@@ -22,5 +21,4 @@ services:
       dockerfile: Dockerfile_dev
     volumes:
       - ./frontend:/app
-      - ./continuous_integration:/app/continuous_integration
       - ./.volumes/root:/root

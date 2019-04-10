@@ -12,6 +12,7 @@ mypy = "*"
 click = "*"
 pytest = "*"
 pytest-cov = "*"
+pytest-asyncio = "*"
 
 [packages]
 asyncpg = "*"

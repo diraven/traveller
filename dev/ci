@@ -12,7 +12,6 @@ die () {
     exit 1
 }
 
-[[ "$#" -eq 1 ]] || die "1 argument required (test?), $# provided"
+[[ "$#" -eq 2 ]] || die "2 arguments required: 'test [bot|frontend]', $# provided"
 
-docker-compose run bot run-parts --exit-on-error continuous_integration/tests | sed -e "s|/app|$(pwd)/bot|"
-docker-compose run frontend run-parts --exit-on-error continuous_integration/tests | sed -e "s|/app|$(pwd)/frontend|"
+docker-compose run $2 run-parts --exit-on-error continuous_integration/tests | sed -e "s|/app|$(pwd)/bot|"
