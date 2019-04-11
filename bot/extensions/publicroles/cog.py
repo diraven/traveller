@@ -126,7 +126,6 @@ class Cog(core.CogBase):
             member=ctx.author,
             items=[role.mention for role in roles],
             separator=', ',
-            max_items_per_page=2,
             timeout=60,
             title=f'available public roles',
             color=discord.Color.blue(),
