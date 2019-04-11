@@ -2,7 +2,7 @@
 import typing
 from typing import Optional
 
-from core.db import Model, Field, DB
+from core.db import DB, Field, Model
 
 
 class Alias(Model):
@@ -31,8 +31,7 @@ class Alias(Model):
             source,
         )
 
-        if result:
-            return cls(**result)
+        return cls(**result) if result else None
 
 
 class Guild(Model):

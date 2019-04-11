@@ -137,6 +137,7 @@ class Cog(core.CogBase):
             ctx: core.Context,
             arg: typing.Optional[str] = None,
     ) -> None:
+        """Output your public roles."""
         roles = await find_public_roles(ctx, arg, ctx.author.roles)
         await utils.Paginator(
             ctx=ctx,
@@ -154,6 +155,7 @@ class Cog(core.CogBase):
             ctx: core.Context,
             arg: str,
     ) -> None:
+        """Show who has this public role."""
         role = await find_public_role(ctx, arg)
         if role:
             members = sorted([
@@ -177,6 +179,7 @@ class Cog(core.CogBase):
             ctx: core.Context,
             arg: str,
     ) -> None:
+        """Get yourself a public role."""
         role = await find_public_role(ctx, arg)
         if role:
             await ctx.author.add_roles(role)
@@ -188,6 +191,7 @@ class Cog(core.CogBase):
             ctx: core.Context,
             arg: str,
     ) -> None:
+        """Remove public role from yourself."""
         role = await find_public_role(ctx, arg, ctx.author.roles)
         if role:
             await ctx.author.remove_roles(role)
@@ -198,6 +202,7 @@ class Cog(core.CogBase):
             self,
             ctx: core.Context,
     ) -> None:
+        """Show public roles stats."""
         roles = await find_public_roles(ctx)
 
         await utils.Paginator(

@@ -46,7 +46,7 @@ class Paginator:
             items: typing.List,
             separator: str,
             max_items_per_page: typing.Optional[int] = None,
-            no_data_str: typing.Optional[str] = 'None',
+            no_data_str: str = 'none',
             timeout: int = DEFAULT_TIMEOUT,  # seconds
             title: str = None,
             icon: str = None,
@@ -60,7 +60,7 @@ class Paginator:
         self._max_items_per_page = max_items_per_page
         self._timeout = timeout
         self._no_data_str = no_data_str
-        self._posted_msg: typing.Optional[discord.Message] = None
+        self._posted_msg: discord.Message
 
         self._message = core.Message(
             title=title,
