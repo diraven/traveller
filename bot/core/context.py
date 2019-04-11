@@ -1,8 +1,9 @@
 """Custom bot commands context."""
 import typing
-
 import discord
 from discord.ext import commands
+
+from core.emoji import EMOJI_UNICODE
 
 if typing.TYPE_CHECKING:
     from . import Bot, Message
@@ -36,3 +37,7 @@ class Context(commands.Context):
             )
 
         return await self.send(embed=message.as_embed())
+
+    async def ok(self) -> discord.Reaction:
+        """Add ok hand reaction to the message."""
+        return await self.message.add_reaction(EMOJI_UNICODE[':OK_hand:'])

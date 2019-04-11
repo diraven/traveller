@@ -31,7 +31,8 @@ class Alias(Model):
             source,
         )
 
-        return cls(**result) or None
+        if result:
+            return cls(**result)
 
 
 class Guild(Model):

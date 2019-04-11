@@ -1,49 +1,109 @@
 """Publicroles cog module."""
-import asyncio
-import typing
 
+import typing
 import discord
 from discord.ext import commands
+import Levenshtein
 
-from core import CogBase, Context, EMOJI_ALIAS_UNICODE, Message, utils
+import core
+from core import utils
 
-
-class HighlightedRole:
-    """Role that's highlighted if user has it."""
-
-    def __init__(
-            self,
-            member: discord.Member,
-            role: discord.Role
-    ):
-        """Make new HighlightedRole."""
-        self.member: discord.Member = member
-        self.role = role
-        super().__init__()
-
-    def __str__(self) -> str:
-        """Render to string."""
-        user_roles_ids = [role.id for role in self.member.roles]
-        if self.role.id in user_roles_ids:
-            return f'{EMOJI_ALIAS_UNICODE[":white_check_mark:"]}' \
-                f'{self.role.mention}'
-        return self.role.mention
+MAX_EDIT_DISTANCE = 3
 
 
-class Cog(CogBase):
+async def find_public_role(
+        ctx: core.Context,
+        term: str,
+        provided_roles: typing.Optional[typing.List[discord.Role]] = None,
+        title: typing.Optional[str] = 'roles found'
+) -> typing.Optional[discord.Role]:
+    """Find exactly one public role or output message if multiple found."""
+    roles = await find_public_roles(ctx, term, provided_roles)
+    if len(roles) == 1:
+        return roles[0]
+    else:
+        await utils.Paginator(
+            ctx=ctx,
+            member=ctx.author,
+            items=[role.mention for role in roles],
+            separator=', ',
+            timeout=60,
+            title=title,
+            color=discord.Color.blue(),
+        ).post()
+
+
+async def find_public_roles(
+        ctx: core.Context,
+        term: typing.Optional[str] = None,
+        provided_roles: typing.Optional[typing.List[discord.Role]] = None,
+) -> typing.List[discord.Role]:
+    """Filter public roles with term provided."""
+    all_public_roles = []
+    for role in ctx.guild.roles[1:]:
+        if role.name == 'public-roles':
+            break
+        all_public_roles.append(role)
+    all_public_roles_ids = [role.id for role in all_public_roles]
+
+    if provided_roles:
+        roles = [
+            role for role in provided_roles
+            if role.id in all_public_roles_ids
+        ]
+    else:
+        roles = all_public_roles
+
+    roles = sorted(roles, key=lambda x: len(x.members), reverse=True)
+
+    if not term:
+        return roles
+
+    term = term.lower()
+    filtered_roles = []
+    for role in roles:
+        if term == role.name.lower():
+            filtered_roles.append(role)
+
+    if not filtered_roles:
+        for role in roles:
+            if role.name.lower().startswith(term):
+                filtered_roles.append(role)
+        if filtered_roles:
+            return filtered_roles
+
+    if not filtered_roles:
+        for role in roles:
+            if term in role.name.lower():
+                filtered_roles.append(role)
+        if filtered_roles:
+            return filtered_roles
+
+    if not filtered_roles:
+        for role in roles:
+            if Levenshtein.distance(
+                    term,
+                    role.name.lower(),
+            ) <= MAX_EDIT_DISTANCE:
+                filtered_roles.append(role)
+
+    return filtered_roles
+
+
+class Cog(core.CogBase):
     """Publicroles cog."""
 
-    @commands.group(invoke_without_command=True)
+    @commands.group(
+        invoke_without_command=True,
+    )
     async def publicroles(
             self,
-            ctx: Context,
+            ctx: core.Context,
+            arg: typing.Optional[str] = None,
     ) -> None:
         """Show available public roles."""
-        roles: typing.List[discord.Role] = ctx.guild.roles
-        items = []
-
-        if 'public-roles' not in [role.name for role in roles]:
-            await ctx.post(Message.danger(
+        if 'public-roles' not in [role.name for role in ctx.guild.roles]:
+            await ctx.post(core.Message.danger(
                 text='I\'m unable to find `public-roles` role.\n'
                      'Please make a role named `public-roles` and make sure '
                      'it\'s above all of the public roles like this:\n'
@@ -60,45 +120,96 @@ class Cog(CogBase):
             ))
             return
 
-        for role in roles[1:]:
-            if role.name == 'public-roles':
-                break
-            items.append(HighlightedRole(
-                ctx.guild.get_member(ctx.author.id),
-                role,
-            ))
-
-        items = sorted(items, key=lambda item: item.role.name)
-
-        async def callback(
-                chosen: HighlightedRole,
-                user: discord.User,
-        ):
-            try:
-                member: discord.Member = ctx.guild.get_member(user.id)
-                if chosen.role.id in [
-                    role.id for role in member.roles
-                ]:
-                    await member.remove_roles(chosen.role)
-                else:
-                    await member.add_roles(chosen.role)
-
-                await asyncio.sleep(2)
-
-            except asyncio.TimeoutError:
-                await ctx.post(Message.danger(
-                    'Failed to update role, something went wrong...'
-                ))
-
-        chooser = utils.Chooser(
+        roles = await find_public_roles(ctx, arg)
+        await utils.Paginator(
             ctx=ctx,
-            user=ctx.author,
-            items=items,
+            member=ctx.author,
+            items=[role.mention for role in roles],
+            separator=', ',
+            max_items_per_page=2,
             timeout=60,
-            callback=callback,
-            multiple=True,
-            title=f'Public roles for @{ctx.author.display_name}',
+            title=f'available public roles',
             color=discord.Color.blue(),
-        )
+        ).post()
 
-        await chooser.post()
+    @publicroles.command()
+    async def my(
+            self,
+            ctx: core.Context,
+            arg: typing.Optional[str] = None,
+    ) -> None:
+        roles = await find_public_roles(ctx, arg, ctx.author.roles)
+        await utils.Paginator(
+            ctx=ctx,
+            member=ctx.author,
+            items=[role.mention for role in roles],
+            separator=', ',
+            timeout=60,
+            title=f'public roles for @{ctx.author.display_name}',
+            color=discord.Color.blue(),
+        ).post()
+
+    @publicroles.command()
+    async def who(
+            self,
+            ctx: core.Context,
+            arg: str,
+    ) -> None:
+        role = await find_public_role(ctx, arg)
+        if role:
+            members = sorted([
+                member for member in ctx.guild.members if role in member.roles
+            ], key=lambda x: x.display_name)
+
+            await utils.Paginator(
+                ctx=ctx,
+                member=ctx.author,
+                items=[member.mention for member in members],
+                separator=', ',
+                timeout=60,
+                no_data_str='no one',
+                title=f'members with "{role.name}" role',
+                color=discord.Color.blue(),
+            ).post()
+
+    @publicroles.command()
+    async def join(
+            self,
+            ctx: core.Context,
+            arg: str,
+    ) -> None:
+        role = await find_public_role(ctx, arg)
+        if role:
+            await ctx.author.add_roles(role)
+            await ctx.ok()
+
+    @publicroles.command()
+    async def leave(
+            self,
+            ctx: core.Context,
+            arg: str,
+    ) -> None:
+        role = await find_public_role(ctx, arg, ctx.author.roles)
+        if role:
+            await ctx.author.remove_roles(role)
+            await ctx.ok()
+
+    @publicroles.command()
+    async def stats(
+            self,
+            ctx: core.Context,
+    ) -> None:
+        roles = await find_public_roles(ctx)
+
+        await utils.Paginator(
+            ctx=ctx,
+            member=ctx.author,
+            items=[f'{role.mention} ({len(role.members)})' for role in roles],
+            separator='\n',
+            timeout=60,
+            no_data_str='no one',
+            title=f'public roles stats',
+            color=discord.Color.blue(),
+        ).post()
+
+# Expected commands: stats

@@ -18,6 +18,7 @@ pytest-asyncio = "*"
 asyncpg = "*"
 discord-py = {file = "https://github.com/Rapptz/discord.py/archive/rewrite.zip"}
 raven = "*"
+python-levenshtein = "*"
 
 [requires]
 python_version = "3.7"
