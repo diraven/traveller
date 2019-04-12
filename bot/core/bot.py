@@ -1,7 +1,8 @@
 """Core bot module."""
-import re
-from typing import List, Any
 
+import sentry_sdk
+import re
+from typing import Any, List
 import discord
 from discord.ext import commands
 
@@ -9,8 +10,10 @@ from settings import settings
 from .context import Context
 from .db import DB
 from .message import Message
-from .models import Guild, Alias
+from .models import Alias, Guild
 
+if settings.SENTRY_URL:
+    sentry_sdk.init(settings.SENTRY_URL)
 
 async def init_db() -> Any:
     """Initialize database connection."""
@@ -112,10 +115,9 @@ class Bot(commands.Bot):
             )
             return
 
-        # Raise error if raven is not configured.
-        if not settings.RAVEN_CONFIG:
+        if settings.SENTRY_URL:
+            # Send issue to sentry if configured.
+            sentry_sdk.capture_exception(exception)
+        else:
+            # Raise error otherwise.
             return await super().on_command_error(ctx, exception)
-
-        # Send issue to sentry otherwise.
-        from raven.contrib.django.raven_compat.models import client
-        client.captureException()
