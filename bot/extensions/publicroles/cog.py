@@ -211,6 +211,7 @@ class Cog(core.CogBase):
             items=[f'{role.mention} ({len(role.members)})' for role in roles],
             separator='\n',
             timeout=60,
+            max_items_per_page=10,
             no_data_str='no one',
             title=f'public roles stats',
             color=discord.Color.blue(),
