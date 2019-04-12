@@ -198,7 +198,7 @@ class Cog(core.CogBase):
             await ctx.ok()
 
     @publicroles.command()
-    async def stats(
+    async def top(
             self,
             ctx: core.Context,
     ) -> None:
