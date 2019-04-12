@@ -10,10 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
-import os
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from typing import List
+
+import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -32,17 +32,21 @@ ALLOWED_HOSTS = []  # type: List[str]
 # Application definition
 
 INSTALLED_APPS = [
-                     'django.contrib.admin',
-                     'django.contrib.auth',
-                     'django.contrib.contenttypes',
-                     'django.contrib.sessions',
-                     'django.contrib.messages',
-                     'django.contrib.staticfiles',
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
 
-                     'raven.contrib.django.raven_compat',
+    'raven.contrib.django.raven_compat',
 
-                     'mydiscord',
-                 ] + os.getenv('DJANGO_EXTRA_APPS', '').split(',')
+    'mydiscord',
+]
+
+extra_apps = os.getenv('DJANGO_EXTRA_APPS')
+if extra_apps:
+    INSTALLED_APPS += extra_apps.split(',')
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -117,9 +121,9 @@ STATIC_URL = '/static/'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'HOST': os.getenv('POSTGRES_HOST'),
-        'NAME': os.getenv('POSTGRES_DB'),
-        'USER': os.getenv('POSTGRES_USER'),
+        'HOST': 'db',
+        'NAME': 'postgres',
+        'USER': 'postgres',
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
     }
 }

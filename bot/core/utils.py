@@ -99,11 +99,11 @@ class Paginator:
             self._message.text += f'\nPage: {self._current_page_num}/' \
                 f'{len(self._pages)}'
 
-        if self._posted_msg:
+        try:
             await self._posted_msg.edit(
                 embed=self._message.as_embed(),
             )
-        else:
+        except AttributeError:
             self._posted_msg = await self._ctx.send(
                 embed=self._message.as_embed(),
             )
