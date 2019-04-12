@@ -15,7 +15,6 @@ async def find_public_role(
         ctx: core.Context,
         term: str,
         provided_roles: typing.Optional[typing.List[discord.Role]] = None,
-        title: typing.Optional[str] = 'roles found'
 ) -> typing.Optional[discord.Role]:
     """Find exactly one public role or output message if multiple found."""
     roles = await find_public_roles(ctx, term, provided_roles)
@@ -28,7 +27,7 @@ async def find_public_role(
             items=[role.mention for role in roles],
             separator=', ',
             timeout=60,
-            title=title,
+            title='multiple roles found',
             color=discord.Color.blue(),
         ).post()
 
@@ -127,7 +126,7 @@ class Cog(core.CogBase):
             items=[role.mention for role in roles],
             separator=', ',
             timeout=60,
-            title=f'available public roles',
+            title='public roles found',
             color=discord.Color.blue(),
         ).post()
 
@@ -169,7 +168,7 @@ class Cog(core.CogBase):
                 separator=', ',
                 timeout=60,
                 no_data_str='no one',
-                title=f'members with "{role.name}" role',
+                title=f'members with "{role.name}" public role',
                 color=discord.Color.blue(),
             ).post()
 
@@ -213,7 +212,7 @@ class Cog(core.CogBase):
             timeout=60,
             max_items_per_page=10,
             no_data_str='no one',
-            title=f'public roles stats',
+            title='public roles top',
             color=discord.Color.blue(),
         ).post()
 
