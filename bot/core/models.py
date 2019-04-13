@@ -40,7 +40,6 @@ class Guild(Model):
     table_name = "mydiscord_guild"
 
     discord_id = Field()
-    name = Field()
     trigger: typing.Union[Field, typing.Optional[str]] = Field()
 
     @classmethod

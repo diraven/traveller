@@ -38,7 +38,6 @@ async def get_prefix(bot: commands.Bot, message: discord.Message) -> List[str]:
             # prefix.
             db_guild = Guild()
             db_guild.discord_id = message.guild.id
-            db_guild.name = message.guild.name
             db_guild.trigger = settings.DISCORD_DEFAULT_PREFIX
             await db_guild.save()
             return commands.when_mentioned_or(db_guild.trigger)(bot, message)
