@@ -1,14 +1,15 @@
 """Publicroles cog module."""
 
 import typing
+
+import Levenshtein
 import discord
 from discord.ext import commands
-import Levenshtein
 
 import core
-from core import utils
+from core import utils, Message
 
-MAX_EDIT_DISTANCE = 3
+MAX_EDIT_DISTANCE = 2
 
 
 async def find_public_role(
@@ -20,6 +21,12 @@ async def find_public_role(
     roles = await find_public_roles(ctx, term, provided_roles)
     if len(roles) == 1:
         return roles[0]
+    elif len(roles) == 0:
+        await ctx.post(Message(
+            text='none',
+            title='roles found',
+            color=discord.Color.blue(),
+        ))
     else:
         await utils.Paginator(
             ctx=ctx,
@@ -98,7 +105,7 @@ class Cog(core.CogBase):
     async def publicroles(
             self,
             ctx: core.Context,
-            arg: typing.Optional[str] = None,
+            *args: str,
     ) -> None:
         """Show available public roles."""
         if 'public-roles' not in [role.name for role in ctx.guild.roles]:
@@ -119,7 +126,7 @@ class Cog(core.CogBase):
             ))
             return
 
-        roles = await find_public_roles(ctx, arg)
+        roles = await find_public_roles(ctx, " ".join(args))
         await utils.Paginator(
             ctx=ctx,
             member=ctx.author,
@@ -134,10 +141,10 @@ class Cog(core.CogBase):
     async def my(
             self,
             ctx: core.Context,
-            arg: typing.Optional[str] = None,
+            *args: str,
     ) -> None:
         """Output your public roles."""
-        roles = await find_public_roles(ctx, arg, ctx.author.roles)
+        roles = await find_public_roles(ctx, " ".join(args), ctx.author.roles)
         await utils.Paginator(
             ctx=ctx,
             member=ctx.author,
@@ -152,10 +159,10 @@ class Cog(core.CogBase):
     async def who(
             self,
             ctx: core.Context,
-            arg: str,
+            *args: str,
     ) -> None:
         """Show who has this public role."""
-        role = await find_public_role(ctx, arg)
+        role = await find_public_role(ctx, " ".join(args))
         if role:
             members = sorted([
                 member for member in ctx.guild.members if role in member.roles
@@ -176,10 +183,10 @@ class Cog(core.CogBase):
     async def join(
             self,
             ctx: core.Context,
-            arg: str,
+            *args: str,
     ) -> None:
         """Get yourself a public role."""
-        role = await find_public_role(ctx, arg)
+        role = await find_public_role(ctx, " ".join(args))
         if role:
             await ctx.author.add_roles(role)
             await ctx.ok()
@@ -188,10 +195,10 @@ class Cog(core.CogBase):
     async def leave(
             self,
             ctx: core.Context,
-            arg: str,
+            *args: str,
     ) -> None:
         """Remove public role from yourself."""
-        role = await find_public_role(ctx, arg, ctx.author.roles)
+        role = await find_public_role(ctx, " ".join(args), ctx.author.roles)
         if role:
             await ctx.author.remove_roles(role)
             await ctx.ok()
