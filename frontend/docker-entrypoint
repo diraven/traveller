@@ -10,4 +10,4 @@ export PGPASSWORD=$POSTGRES_PASSWORD
 export PGDATABASE=$POSTGRES_DB
 
 wait-for-it db:5432
-pipenv run "$@"
+exec "$@"
