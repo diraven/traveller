@@ -6,7 +6,9 @@ ENTRYPOINT ["docker-entrypoint"]
 CMD ["python", "main.py"]
 
 RUN apt-get update && apt-get install wait-for-it -y
+RUN pip install --upgrade pip pipenv
+
 COPY Pipfile.lock Pipfile /opt/
-RUN pip install --upgrade pip pipenv && cd /opt/ && pipenv install --system --deploy
+RUN cd /opt/ && pipenv install --system --deploy
 
 COPY . .

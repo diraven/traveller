@@ -6,6 +6,7 @@ ENTRYPOINT ["docker-entrypoint"]
 CMD ["./manage.py", "runserver", "0.0.0.0:80"]
 
 RUN apt-get update && apt-get install wait-for-it postgresql-client man vim -y
+RUN pip install --upgrade pip pipenv
 
 COPY Pipfile Pipfile.lock ./
-RUN pip install --upgrade pip pipenv && pipenv install --system --deploy --dev
+RUN pipenv install --system --deploy --dev

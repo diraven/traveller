@@ -19,6 +19,7 @@ services:
     build:
       context: frontend
       dockerfile: Dockerfile_dev
+    ports: ['80:80']
     volumes:
       - ./frontend:/app
       - ./.volumes/root:/root
