@@ -7,6 +7,7 @@ instance = Bot()
 
 # Load bot extensions.
 instance.load_extension('extensions.test')
+instance.load_extension('extensions.theburningclaw')
 instance.load_extension('extensions.publicroles')
 
 # Run the bot.
