@@ -6,6 +6,7 @@ set -o nounset
 
 docker-compose -f docker-compose.yml -f docker-compose.override.cd.yml build
 docker-compose -f docker-compose.yml -f docker-compose.override.cd.yml push
+scp docker-compose.yml diraven@diraven.com:/home/crabot/docker-compose.yml
 ssh diraven@diraven.com 'cd /home/crabot/ && docker-compose pull'
-ssh diraven@diraven.com 'cd /home/crabot/ && docker-compose run -T frontend ./manage.py migrate'
+ssh diraven@diraven.com 'cd /home/crabot/ && docker-compose run -T app ./manage.py migrate'
 ssh diraven@diraven.com 'cd /home/crabot/ && docker-compose up -d'
