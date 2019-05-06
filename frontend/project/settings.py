@@ -10,10 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
+import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from typing import List
-
-import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -38,8 +37,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    'raven.contrib.django.raven_compat',
 
     'mydiscord',
 ]
@@ -121,13 +118,13 @@ STATIC_URL = '/static/'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'HOST': 'db',
-        'NAME': 'postgres',
-        'USER': 'postgres',
+        'HOST': os.getenv('POSTGRES_HOST'),
+        'NAME': os.getenv('POSTGRES_DB'),
+        'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
     }
 }
 
-RAVEN_CONFIG = os.getenv('RAVEN_CONFIG')
+SENTRY_DSN = os.getenv('SENTRY_DSN')
 
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')

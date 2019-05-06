@@ -2,10 +2,10 @@ version: '3.7'
 
 services:
 
-  db:
+  postgres:
     image: postgres:11.2
     volumes:
-      - .volumes/db_data/:/var/lib/postgresql/data/
+      - .volumes/postgres/:/var/lib/postgresql/data/
     env_file:
       - .env
     expose:
@@ -15,15 +15,15 @@ services:
     image: diraven/main:crabot-bot
     init: true
     depends_on:
-      - db
+      - postgres
     env_file:
       - .env
 
-  frontend:
+  app:
     image: diraven/main:crabot-frontend
     init: true
     depends_on:
-      - db
+      - postgres
     ports:
       - "80:80"
     env_file:

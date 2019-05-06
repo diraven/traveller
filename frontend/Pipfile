@@ -17,8 +17,8 @@ pytest-django = "*"
 [packages]
 django = "*"
 psycopg2-binary = "*"
-raven = "*"
 gunicorn = "*"
+sentry-sdk = "*"
 
 [requires]
 python_version = "3.7"

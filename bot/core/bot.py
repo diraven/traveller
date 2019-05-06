@@ -1,10 +1,10 @@
 """Core bot module."""
 
-import sentry_sdk
-import re
-from typing import Any, List
 import discord
+import re
+import sentry_sdk
 from discord.ext import commands
+from typing import Any, List
 
 from settings import settings
 from .context import Context
@@ -12,8 +12,9 @@ from .db import DB
 from .message import Message
 from .models import Alias, Guild
 
-if settings.SENTRY_URL:
-    sentry_sdk.init(settings.SENTRY_URL)
+if settings.SENTRY_DSN:
+    sentry_sdk.init(settings.SENTRY_DSN)
+
 
 async def init_db() -> Any:
     """Initialize database connection."""
@@ -61,7 +62,7 @@ class Bot(commands.Bot):
         await super().close()
 
     async def get_context(self, msg: discord.Message, *,
-                          cls=Context) -> Context:
+            cls=Context) -> Context:
         """Return command invocation context."""
         ctx: Context = await super().get_context(msg, cls=Context)
 
@@ -114,7 +115,7 @@ class Bot(commands.Bot):
             )
             return
 
-        if settings.SENTRY_URL:
+        if settings.SENTRY_DSN:
             # Send issue to sentry if configured.
             sentry_sdk.capture_exception(exception)
         else:

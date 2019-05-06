@@ -1,13 +1,12 @@
 FROM python:3.7
 WORKDIR /app
 
+COPY docker-entrypoint /usr/bin/docker-entrypoint
 ENTRYPOINT ["docker-entrypoint"]
 CMD ["python", "main.py"]
-COPY docker-entrypoint /usr/bin/
 
 RUN apt-get update && apt-get install wait-for-it -y
-
-COPY Pipfile Pipfile.lock ./
-RUN pip install --upgrade pip pipenv && pipenv install --system --deploy
+COPY Pipfile.lock Pipfile /opt/
+RUN pip install --upgrade pip pipenv && cd /opt/ && pipenv install --system --deploy
 
 COPY . .

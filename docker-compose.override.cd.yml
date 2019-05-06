@@ -6,5 +6,5 @@ services:
     build: bot
 
 
-  frontend:
+  app:
     build: frontend

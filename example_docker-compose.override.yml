@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
 
-  db:
+  postgres:
     ports:
       - '5432:5432'
 
@@ -15,7 +15,7 @@ services:
       - ./.volumes/root:/root
 
 
-  frontend:
+  app:
     build:
       context: frontend
       dockerfile: Dockerfile_dev
