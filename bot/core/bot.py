@@ -1,16 +1,17 @@
 """Core bot module."""
 
-import discord
 import re
+from typing import Any, List
+
+import discord
 import sentry_sdk
 from discord.ext import commands
-from typing import Any, List
 
 from settings import settings
 from .context import Context
 from .db import DB
 from .message import Message
-from .models import Alias, Guild
+from .models import Alias, Guild, SocialAccount
 
 if settings.SENTRY_DSN:
     sentry_sdk.init(settings.SENTRY_DSN)
@@ -32,7 +33,7 @@ async def get_prefix(bot: commands.Bot, message: discord.Message) -> List[str]:
     async with DB.transaction():
         try:
             # Try to get prefix from the DB.
-            db_guild = await Guild.get(message.guild.id)
+            db_guild = await Guild.get(discord_id=message.guild.id)
             return commands.when_mentioned_or(db_guild.trigger)(bot, message)
         except AttributeError:
             # Save guild to the DB with the default prefix and use default
@@ -61,14 +62,21 @@ class Bot(commands.Bot):
         await DB.disconnect()
         await super().close()
 
-    async def get_context(self, msg: discord.Message, *,
-            cls=Context) -> Context:
+    async def get_context(
+            self,
+            msg: discord.Message,
+            *,
+            cls=Context,
+    ) -> Context:
         """Return command invocation context."""
         ctx: Context = await super().get_context(msg, cls=Context)
 
         # If command not found - try to find it using alias.
         if ctx.command is None and msg.guild:
-            alias = await Alias.get(msg.guild.id, ctx.invoked_with)
+            alias = await Alias.get(
+                guild_discord_id=msg.guild.id,
+                source=ctx.invoked_with,
+            )
             if alias:
                 # Replace start of the message with the alias target.
                 msg.content = re.sub(
@@ -81,6 +89,11 @@ class Bot(commands.Bot):
                 msg,
                 cls=Context,
             )
+
+        # Fetch social account for context.
+        ctx.socialaccount = await SocialAccount.get(
+            discord_user_id=str(msg.author.id),
+        )
 
         return ctx
 

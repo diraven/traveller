@@ -1,7 +1,7 @@
 """Basic cog implementation."""
 from discord.ext.commands import Cog
 
-from core import Bot
+from core.bot import Bot
 
 
 class CogBase(Cog):

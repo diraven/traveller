@@ -2,7 +2,10 @@
 from discord import Color
 from discord.ext import commands
 
-from core import CogBase, Context, EMOJI_UNICODE, Message
+from core.cogbase import CogBase
+from core.context import Context
+from core.emoji import EMOJI_UNICODE
+from core.message import Message
 
 
 class Cog(CogBase):

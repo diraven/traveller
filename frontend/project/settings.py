@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.discord',
 
     'mydiscord',
+    'theburningclaw',
 ]
 
 extra_apps = os.getenv('DJANGO_EXTRA_APPS')

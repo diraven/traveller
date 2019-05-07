@@ -1,12 +1,15 @@
 """Custom bot commands context."""
 import typing
+
 import discord
 from discord.ext import commands
 
 from core.emoji import EMOJI_UNICODE
+from core.models import SocialAccount
 
 if typing.TYPE_CHECKING:
-    from . import Bot, Message
+    from core.bot import Bot
+    from core.message import Message
 
 
 class Context(commands.Context):
@@ -20,6 +23,8 @@ class Context(commands.Context):
         self.kwargs: typing.Dict
         self.prefix: str
         self.command: commands.Command
+
+        self.socialaccount: typing.Optional[SocialAccount] = None
 
         super().__init__(**attrs)
 

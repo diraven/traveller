@@ -1,5 +1,7 @@
 """General utility checks."""
-from core import Context, DB, Message
+from discord.ext.commands import CommandError
+
+from core import Context
 
 
 # @bot.check
@@ -12,12 +14,8 @@ from core import Context, DB, Message
 #     ).modules.values_list('name', flat=True)
 
 
-async def is_registered(ctx: Context):
+async def has_socialaccount(ctx: Context):
     """Check if user is registered via discord social auth."""
-    exists = await DB.get_connection().fetchrow(
-        f'''SELECT 1 FROM socialaccount_socialaccount WHERE uid = $1;''',
-        str(ctx.author.id),
-    ) is not None
-    if not exists:
-        await ctx.post(Message(text=f'You are not registered!'))
-    return exists
+    if ctx.socialaccount:
+        return True
+    raise CommandError('User is not registered.')

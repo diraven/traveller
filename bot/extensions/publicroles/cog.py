@@ -6,14 +6,16 @@ import Levenshtein
 import discord
 from discord.ext import commands
 
-import core
-from core import utils, Message
+from core import utils
+from core.cogbase import CogBase
+from core.context import Context
+from core.message import Message
 
 MAX_EDIT_DISTANCE = 2
 
 
 async def find_public_role(
-        ctx: core.Context,
+        ctx: Context,
         term: str,
         provided_roles: typing.Optional[typing.List[discord.Role]] = None,
 ) -> typing.Optional[discord.Role]:
@@ -40,7 +42,7 @@ async def find_public_role(
 
 
 async def find_public_roles(
-        ctx: core.Context,
+        ctx: Context,
         term: typing.Optional[str] = None,
         provided_roles: typing.Optional[typing.List[discord.Role]] = None,
 ) -> typing.List[discord.Role]:
@@ -96,7 +98,7 @@ async def find_public_roles(
     return filtered_roles
 
 
-class Cog(core.CogBase):
+class Cog(CogBase):
     """Publicroles cog."""
 
     @commands.group(
@@ -104,12 +106,12 @@ class Cog(core.CogBase):
     )
     async def publicroles(
             self,
-            ctx: core.Context,
+            ctx: Context,
             *args: str,
     ) -> None:
         """Show available public roles."""
         if 'public-roles' not in [role.name for role in ctx.guild.roles]:
-            await ctx.post(core.Message.danger(
+            await ctx.post(Message.danger(
                 text='I\'m unable to find `public-roles` role.\n'
                      'Please make a role named `public-roles` and make sure '
                      'it\'s above all of the public roles like this:\n'
@@ -140,7 +142,7 @@ class Cog(core.CogBase):
     @publicroles.command()
     async def my(
             self,
-            ctx: core.Context,
+            ctx: Context,
             *args: str,
     ) -> None:
         """Output your public roles."""
@@ -158,7 +160,7 @@ class Cog(core.CogBase):
     @publicroles.command()
     async def who(
             self,
-            ctx: core.Context,
+            ctx: Context,
             *args: str,
     ) -> None:
         """Show who has this public role."""
@@ -182,7 +184,7 @@ class Cog(core.CogBase):
     @publicroles.command()
     async def join(
             self,
-            ctx: core.Context,
+            ctx: Context,
             *args: str,
     ) -> None:
         """Get yourself a public role."""
@@ -194,7 +196,7 @@ class Cog(core.CogBase):
     @publicroles.command()
     async def leave(
             self,
-            ctx: core.Context,
+            ctx: Context,
             *args: str,
     ) -> None:
         """Remove public role from yourself."""
@@ -206,7 +208,7 @@ class Cog(core.CogBase):
     @publicroles.command()
     async def top(
             self,
-            ctx: core.Context,
+            ctx: Context,
     ) -> None:
         """Show public roles stats."""
         roles = await find_public_roles(ctx)

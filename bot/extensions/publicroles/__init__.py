@@ -1,7 +1,7 @@
 """Publicroles extension package."""
 from discord.ext import commands
 
-from .cog import Cog
+from extensions.publicroles.cog import Cog
 
 
 def setup(bot: commands.Bot) -> None:

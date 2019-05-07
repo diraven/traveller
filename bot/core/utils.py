@@ -1,12 +1,13 @@
 """Bot generic utilities module."""
 import asyncio
-
 import enum
 import typing
+
 import discord
 
-import core
-from core import Context, EMOJI_ALIAS_UNICODE
+from core.context import Context
+from core.emoji import EMOJI_ALIAS_UNICODE
+from core.message import Message
 
 DEFAULT_TIMEOUT = 10
 MAX_PAGE_LEN = 1000
@@ -62,7 +63,7 @@ class Paginator:
         self._no_data_str = no_data_str
         self._posted_msg: discord.Message
 
-        self._message = core.Message(
+        self._message = Message(
             title=title,
             icon=icon,
             color=color,

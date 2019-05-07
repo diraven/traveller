@@ -5,6 +5,19 @@ from typing import Optional
 from core.db import DB, Field, Model
 
 
+class SocialAccount(Model):
+    """User social account."""
+
+    table_name = "socialaccount_socialaccount"
+
+    user_id = Field()
+
+    @classmethod
+    async def get(cls, *, discord_user_id: str) -> 'SocialAccount':
+        """Get database representation of the user socialaccount."""
+        return await cls._get_object(uid=discord_user_id)
+
+
 class Alias(Model):
     """Command alias."""
 
@@ -16,7 +29,7 @@ class Alias(Model):
 
     @classmethod
     async def get(
-            cls,
+            cls, *,
             guild_discord_id: int,
             source: str,
     ) -> Optional['Alias']:
@@ -43,6 +56,6 @@ class Guild(Model):
     trigger: typing.Union[Field, typing.Optional[str]] = Field()
 
     @classmethod
-    async def get(cls, discord_id: int) -> 'Guild':
+    async def get(cls, *, discord_id: int) -> 'Guild':
         """Get database representation of the guild."""
         return await cls._get_object(discord_id=discord_id)
