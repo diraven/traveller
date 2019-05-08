@@ -13,15 +13,13 @@ services:
 
   bot:
     image: diraven/main:crabot-bot
-#    init: true
     depends_on:
       - postgres
     env_file:
       - .env
 
   app:
-    image: diraven/main:crabot-frontend
-#    init: true
+    image: diraven/main:crabot-app
     depends_on:
       - postgres
     ports: ['8002:80']

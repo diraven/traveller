@@ -7,4 +7,4 @@ services:
 
 
   app:
-    build: frontend
+    build: app
