@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 
-from app.mydiscord.views import AliasViewSet
+from mydiscord.views import AliasViewSet
 
 router = routers.DefaultRouter()
 router.register(r'aliases', AliasViewSet)
