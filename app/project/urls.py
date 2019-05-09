@@ -16,8 +16,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework import routers
+
+from app.mydiscord.views import AliasViewSet
+
+router = routers.DefaultRouter()
+router.register(r'aliases', AliasViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
+    path('api/', include(router.urls)),
 ]

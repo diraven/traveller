@@ -20,6 +20,8 @@ psycopg2-binary = "*"
 gunicorn = "*"
 sentry-sdk = "*"
 django-allauth = "*"
+djangorestframework = "*"
+markdown = "*"
 
 [requires]
 python_version = "3.7"

@@ -14,6 +14,7 @@ logging.basicConfig(level=logging.DEBUG if DEBUG else logging.INFO)
 # Register on ready event.
 @instance.event
 async def on_ready() -> None:
+    """Notify that bot is ready."""
     logger.info('Bot is now running.')
 
 

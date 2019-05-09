@@ -26,7 +26,7 @@ SECRET_KEY = '_t$uwr8(0&hil1cehn$+ezq0&-y!&l6aq1ec^-&944t^2%*!l1'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG') == 'True'
 
-ALLOWED_HOSTS = []  # type: List[str]
+ALLOWED_HOSTS = ['app',]  # type: List[str]
 
 # Application definition
 
@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.discord',
+
+    'rest_framework',
 
     'mydiscord',
     'theburningclaw',
@@ -140,3 +142,11 @@ DATABASES = {
 SENTRY_DSN = os.getenv('SENTRY_DSN')
 
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}

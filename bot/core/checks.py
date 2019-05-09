@@ -1,7 +1,7 @@
 """General utility checks."""
-from discord.ext.commands import CommandError
+# from discord.ext.commands import CommandError
 
-from core import Context
+# from core import Context
 
 
 # @bot.check
@@ -14,8 +14,8 @@ from core import Context
 #     ).modules.values_list('name', flat=True)
 
 
-async def has_socialaccount(ctx: Context):
-    """Check if user is registered via discord social auth."""
-    if ctx.socialaccount:
-        return True
-    raise CommandError('User is not registered.')
+# async def has_socialaccount(ctx: Context):
+#     """Check if user is registered via discord social auth."""
+#     if ctx.socialaccount:
+#         return True
+#     raise CommandError('User is not registered.')
