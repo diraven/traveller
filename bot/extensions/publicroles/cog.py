@@ -1,15 +1,15 @@
 """Publicroles cog module."""
 
-import typing
-
 import Levenshtein
 import discord
+import typing
 from discord.ext import commands
 
 from core import utils
 from core.cogbase import CogBase
 from core.context import Context
 from core.message import Message
+from core.utils import escape
 
 MAX_EDIT_DISTANCE = 2
 
@@ -173,7 +173,7 @@ class Cog(CogBase):
             await utils.Paginator(
                 ctx=ctx,
                 member=ctx.author,
-                items=[member.display_name for member in members],
+                items=[escape(member.display_name) for member in members],
                 separator=', ',
                 timeout=60,
                 no_data_str='no one',

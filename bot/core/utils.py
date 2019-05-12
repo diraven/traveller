@@ -1,9 +1,10 @@
 """Bot generic utilities module."""
 import asyncio
 import enum
-import typing
 
 import discord
+import re
+import typing
 
 from core.context import Context
 from core.emoji import EMOJI_ALIAS_UNICODE
@@ -173,3 +174,10 @@ class Paginator:
                 await self._update()
         except asyncio.TimeoutError:
             await self._posted_msg.clear_reactions()
+
+
+special_symbols = re.compile(r'([_*~])')
+
+
+def escape(text: str) -> str:
+    return re.sub(special_symbols, r'\\\1', text)
