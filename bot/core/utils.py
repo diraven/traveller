@@ -180,4 +180,4 @@ special_symbols = re.compile(r'([_*~])')
 
 
 def escape(text: str) -> str:
-    return re.sub(special_symbols, r'\\\1', text)
+    return text.replace('`', '\\`')

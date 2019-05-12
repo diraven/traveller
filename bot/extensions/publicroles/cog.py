@@ -173,7 +173,9 @@ class Cog(CogBase):
             await utils.Paginator(
                 ctx=ctx,
                 member=ctx.author,
-                items=[escape(member.display_name) for member in members],
+                items=[
+                    f'`{escape(member.display_name)}`' for member in members
+                ],
                 separator=', ',
                 timeout=60,
                 no_data_str='no one',
