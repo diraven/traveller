@@ -173,7 +173,7 @@ class Cog(CogBase):
             await utils.Paginator(
                 ctx=ctx,
                 member=ctx.author,
-                items=[member.mention for member in members],
+                items=[member.display_name for member in members],
                 separator=', ',
                 timeout=60,
                 no_data_str='no one',
