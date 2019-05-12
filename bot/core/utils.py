@@ -176,8 +176,8 @@ class Paginator:
             await self._posted_msg.clear_reactions()
 
 
-special_symbols = re.compile(r'([_*~])')
+special_symbols = re.compile(r'([_*~`])')
 
 
 def escape(text: str) -> str:
-    return text.replace('`', '\\`')
+    return re.sub(special_symbols, r'\\\1', text)

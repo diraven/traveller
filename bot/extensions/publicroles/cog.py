@@ -174,7 +174,7 @@ class Cog(CogBase):
                 ctx=ctx,
                 member=ctx.author,
                 items=[
-                    f'`{escape(member.display_name)}`' for member in members
+                    escape(member.display_name) for member in members
                 ],
                 separator=', ',
                 timeout=60,
