@@ -15,9 +15,9 @@ pytest-cov = "*"
 pytest-asyncio = "*"
 
 [packages]
-discord-py = {file = "https://github.com/Rapptz/discord.py/archive/rewrite.zip"}
 python-levenshtein = "*"
 sentry-sdk = "*"
+discord-py = "*"
 
 [requires]
 python_version = "3.7"
