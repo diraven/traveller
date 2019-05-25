@@ -8,7 +8,7 @@ class Character(models.Model):
     name = models.CharField(max_length=32)
 
     def __str__(self):
-        """To string."""
+        """As string."""
         return self.name
 
 
@@ -17,7 +17,7 @@ class ThingKind(models.Model):
     name = models.CharField(max_length=64, unique=True)
 
     def __str__(self):
-        """To string."""
+        """As string."""
         return self.name
 
 
@@ -28,3 +28,7 @@ class Thing(models.Model):
         validators=(MinValueValidator(1),),
         default=1,
     )
+
+    def __str__(self):
+        """As string."""
+        return f'{self.kind} x {self.count}'
