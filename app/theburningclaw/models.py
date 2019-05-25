@@ -7,10 +7,18 @@ class Character(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=32)
 
+    def __str__(self):
+        """To string."""
+        return self.name
+
 
 class ThingKind(models.Model):
     slug = models.CharField(max_length=64, unique=True)
     name = models.CharField(max_length=64, unique=True)
+
+    def __str__(self):
+        """To string."""
+        return self.name
 
 
 class Thing(models.Model):
