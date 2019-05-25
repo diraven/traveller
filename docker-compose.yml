@@ -11,17 +11,18 @@ services:
     expose:
       - "5432"
 
-  bot:
-    image: diraven/main:crabot-bot
-    depends_on:
-      - postgres
-    env_file:
-      - .env
-
   app:
     image: diraven/main:crabot-app
     depends_on:
       - postgres
     ports: ['8002:80']
+    env_file:
+      - .env
+
+  bot:
+    image: diraven/main:crabot-bot
+    depends_on:
+      - postgres
+      - app
     env_file:
       - .env
