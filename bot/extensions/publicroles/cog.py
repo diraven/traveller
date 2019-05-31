@@ -12,6 +12,7 @@ from core.message import Message
 from core.utils import escape
 
 MAX_EDIT_DISTANCE = 2
+DEFAULT_SEPARATOR = ' **|** '
 
 
 async def find_public_role(
@@ -33,8 +34,8 @@ async def find_public_role(
         await utils.Paginator(
             ctx=ctx,
             member=ctx.author,
-            items=[role.mention for role in roles],
-            separator=', ',
+            items=[role.name for role in roles],
+            separator=DEFAULT_SEPARATOR,
             timeout=60,
             title='multiple roles found',
             color=discord.Color.blue(),
@@ -132,8 +133,8 @@ class Cog(CogBase):
         await utils.Paginator(
             ctx=ctx,
             member=ctx.author,
-            items=[role.mention for role in roles],
-            separator=', ',
+            items=[role.name for role in roles],
+            separator=DEFAULT_SEPARATOR,
             timeout=60,
             title='public roles found',
             color=discord.Color.blue(),
@@ -150,8 +151,8 @@ class Cog(CogBase):
         await utils.Paginator(
             ctx=ctx,
             member=ctx.author,
-            items=[role.mention for role in roles],
-            separator=', ',
+            items=[role.name for role in roles],
+            separator=DEFAULT_SEPARATOR,
             timeout=60,
             title=f'public roles for @{ctx.author.display_name}',
             color=discord.Color.blue(),
@@ -176,7 +177,7 @@ class Cog(CogBase):
                 items=[
                     escape(member.display_name) for member in members
                 ],
-                separator=', ',
+                separator=DEFAULT_SEPARATOR,
                 timeout=60,
                 no_data_str='no one',
                 title=f'members with "{role.name}" public role',
@@ -218,7 +219,7 @@ class Cog(CogBase):
         await utils.Paginator(
             ctx=ctx,
             member=ctx.author,
-            items=[f'{role.mention} ({len(role.members)})' for role in roles],
+            items=[f'{role.name} ({len(role.members)})' for role in roles],
             separator='\n',
             timeout=60,
             max_items_per_page=10,
