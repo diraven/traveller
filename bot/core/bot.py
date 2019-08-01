@@ -17,7 +17,7 @@ if settings.SENTRY_DSN:
 async def get_prefix(bot: commands.Bot, message: discord.Message) -> List[str]:
     """Return server prefix based on message."""
     return commands.when_mentioned_or(
-        settings.DISCORD_DEFAULT_PREFIX
+        settings.DISCORD_DEFAULT_PREFIX,
     )(bot, message)
 
 
@@ -30,10 +30,6 @@ class Bot(commands.Bot):
             command_prefix = get_prefix
 
         super().__init__(command_prefix=command_prefix, **options)
-
-    # async def close(self) -> None:
-    #     """Close db connection."""
-    #     await super().close()
 
     async def get_context(
             self,
@@ -76,17 +72,17 @@ class Bot(commands.Bot):
                 isinstance(exception.original, discord.errors.Forbidden):
             await ctx.post(
                 Message.danger(
-                    "Unable to complete operation, "
-                    f"missing necessary permissions: {exception.original}."
-                )
+                    'Unable to complete operation, '
+                    f'missing necessary permissions: {exception.original}.',
+                ),
             )
             return
 
         # Ignore other checks failures.
         if isinstance(
-                exception, commands.CheckFailure
+                exception, commands.CheckFailure,
         ) or isinstance(
-            exception, commands.CommandNotFound
+            exception, commands.CommandNotFound,
         ):
             return
 
@@ -94,9 +90,9 @@ class Bot(commands.Bot):
         if isinstance(exception, commands.MissingRequiredArgument):
             await ctx.post(
                 Message.danger(
-                    "Incorrect command usage, missing argument. "
-                    "Did you forget to add something?"
-                )
+                    'Incorrect command usage, missing argument. '
+                    'Did you forget to add something?',
+                ),
             )
             return
 

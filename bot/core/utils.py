@@ -32,11 +32,6 @@ class Button(enum.Enum):
         """Button values."""
         return [b.value for b in cls]
 
-    # @classmethod
-    # def options(cls) -> typing.Iterable['Button']:
-    #     """Buttons for options selection."""
-    #     return (getattr(cls, f'OPTION_{i + 1}') for i in range(PER_PAGE))
-
 
 class Paginator:
     """Paginates the provided iterable."""
@@ -91,7 +86,7 @@ class Paginator:
             length += delta
             count += 1
         self._pages.append(
-            self._separator.join(items[start:]) or self._no_data_str
+            self._separator.join(items[start:]) or self._no_data_str,
         )
 
     async def _update(self) -> None:
@@ -99,7 +94,7 @@ class Paginator:
 
         if len(self._pages) > 1:
             self._message.text += f'\nPage: {self._current_page_num}/' \
-                f'{len(self._pages)}'
+                                  f'{len(self._pages)}'
 
         try:
             await self._posted_msg.edit(
@@ -180,4 +175,5 @@ special_symbols = re.compile(r'([_*~`])')
 
 
 def escape(text: str) -> str:
+    """Escape special symbols for discord."""
     return re.sub(special_symbols, r'\\\1', text)

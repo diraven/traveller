@@ -28,14 +28,15 @@ class Context(commands.Context):
     async def post(
             self,
             message: 'Message',
-            with_mention: bool = False
+            with_mention: bool = False,
     ) -> discord.Message:
         """Send response as embed, or as text with mention if requested."""
         if with_mention:
             return await self.send(
-                "{}\n{}".format(
+                '{}\n{}'.format(
                     self.message.author.mention,
-                    message.as_text()),
+                    message.as_text(),
+                ),
             )
 
         return await self.send(embed=message.as_embed())

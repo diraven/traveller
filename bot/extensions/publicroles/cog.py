@@ -113,10 +113,10 @@ class Cog(CogBase):
         """Show available public roles."""
         if 'public-roles' not in [role.name for role in ctx.guild.roles]:
             await ctx.post(Message.danger(
-                text='I\'m unable to find `public-roles` role.\n'
+                text="'I am unable to find `public-roles` role.\n'"
                      'Please make a role named `public-roles` and make sure '
-                     'it\'s above all of the public roles like this:\n'
-                f'- `{ctx.bot.user.display_name}`\n'
+                     'it is above all of the public roles like this:\n'
+                     f'- `{ctx.bot.user.display_name}`\n'
                      '- `some-other-role1`\n'
                      '- `some-other-role2`\n'
                      '- ...\n'
@@ -125,11 +125,11 @@ class Cog(CogBase):
                      '- `public-role-2`\n'
                      '- `public-role-3`\n'
                      '- ...\n'
-                     '- `@everyone`\n'
+                     '- `@everyone`\n',
             ))
             return
 
-        roles = await find_public_roles(ctx, " ".join(args))
+        roles = await find_public_roles(ctx, ' '.join(args))
         await utils.Paginator(
             ctx=ctx,
             member=ctx.author,
@@ -147,7 +147,7 @@ class Cog(CogBase):
             *args: str,
     ) -> None:
         """Output your public roles."""
-        roles = await find_public_roles(ctx, " ".join(args), ctx.author.roles)
+        roles = await find_public_roles(ctx, ' '.join(args), ctx.author.roles)
         await utils.Paginator(
             ctx=ctx,
             member=ctx.author,
@@ -165,11 +165,13 @@ class Cog(CogBase):
             *args: str,
     ) -> None:
         """Show who has this public role."""
-        role = await find_public_role(ctx, " ".join(args))
+        role = await find_public_role(ctx, ' '.join(args))
         if role:
-            members = sorted([
-                member for member in ctx.guild.members if role in member.roles
-            ], key=lambda x: x.display_name)
+            members = sorted(
+                (member for member in ctx.guild.members if
+                 role in member.roles),
+                key=lambda x: x.display_name,
+            )
 
             await utils.Paginator(
                 ctx=ctx,
@@ -191,7 +193,7 @@ class Cog(CogBase):
             *args: str,
     ) -> None:
         """Get yourself a public role."""
-        role = await find_public_role(ctx, " ".join(args))
+        role = await find_public_role(ctx, ' '.join(args))
         if role:
             await ctx.author.add_roles(role)
             await ctx.ok()
@@ -203,7 +205,7 @@ class Cog(CogBase):
             *args: str,
     ) -> None:
         """Remove public role from yourself."""
-        role = await find_public_role(ctx, " ".join(args), ctx.author.roles)
+        role = await find_public_role(ctx, ' '.join(args), ctx.author.roles)
         if role:
             await ctx.author.remove_roles(role)
             await ctx.ok()
