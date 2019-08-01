@@ -8,13 +8,13 @@ from mydiscord.serializers import AliasSerializer
 
 
 class AliasViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
+    """API endpoint that allows users to be viewed or edited."""
+
     queryset = Alias.objects.all()
     serializer_class = AliasSerializer
 
     def get_queryset(self):
+        """Get alias queryset, limit results to the respective guild."""
         guild_discord_id = self.request.query_params.get(
             'guild_discord_id',
             None,

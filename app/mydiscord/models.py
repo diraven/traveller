@@ -5,7 +5,7 @@ from django.db import models
 class Module(models.Model):
     """Discord commands module."""
 
-    name = models.CharField(max_length=16, unique=True)
+    name = models.CharField(max_length=16, unique=True)  # typing: ignore
 
     def __str__(self) -> str:
         """Crabot module string representation."""
@@ -16,8 +16,8 @@ class Guild(models.Model):
     """Discord guild."""
 
     discord_id = models.BigIntegerField(unique=True)
-    trigger = models.CharField(max_length=1, default=".")
-    modules = models.ManyToManyField(Module, related_name="guilds", blank=True)
+    trigger = models.CharField(max_length=1, default='.')
+    modules = models.ManyToManyField(Module, related_name='guilds', blank=True)
 
     def __str__(self) -> str:
         """Crabot guild string representation."""
@@ -41,4 +41,4 @@ class Alias(models.Model):
 
     def __str__(self) -> str:
         """Crabot alias string representation."""
-        return "{}->{}".format(self.source, self.target)
+        return '{}->{}'.format(self.source, self.target)
