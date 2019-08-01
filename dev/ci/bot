@@ -5,4 +5,4 @@ set -o nounset
 set -o xtrace
 
 docker-compose run bot flake8 /app | sed -e "s|^/app|$(pwd)/bot|"
-docker-compose run bot mypy /app | sed -e "s|^/|$(pwd)/bot/|"
+docker-compose run bot mypy /app | sed -e "s|^|$(pwd)/bot/|"

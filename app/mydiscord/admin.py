@@ -7,9 +7,6 @@ from mydiscord.models import Guild, Alias
 admin.site.register(Guild, admin.ModelAdmin)
 
 
-# admin.site.register(Module, admin.ModelAdmin)
-
-
 class AliasAdmin(admin.ModelAdmin):
     """Command alias admin."""
 

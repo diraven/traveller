@@ -8,7 +8,7 @@ from django.apps import apps  # pragma: no cover
 class Command(BaseCommand):  # pragma: no cover
     """Migrate the whole database downwards to the zero state."""
 
-    help = 'Migrates the whole database downwards to the zero state.'
+    help = 'Migrates the whole database downwards to the zero state.'  # noqa
 
     def add_arguments(self, parser):
         """Add arguments."""
@@ -24,14 +24,14 @@ class Command(BaseCommand):  # pragma: no cover
         interactive = kwargs['interactive']
 
         if interactive:
-            confirm = input(
+            confirm = input(  # noqa: S322
                 """
 You have requested a flush of the database. This will IRREVERSIBLY DESTROY
 all data and structure currently in the database. Are you sure you want to do
 this?
 
 Type 'yes' to continue, or 'no' to cancel:
-"""
+""",
             )
         else:
             confirm = 'yes'
