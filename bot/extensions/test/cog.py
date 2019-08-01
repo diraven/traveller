@@ -21,8 +21,7 @@ class Cog(CogBase):
         """Test message-type response."""
         await ctx.post(
             Message(
-                text="text",
-                # title="title",
+                text='text',
                 icon=EMOJI_UNICODE[':crab:'],
                 color=Color.dark_green()),
         )
@@ -32,7 +31,7 @@ class Cog(CogBase):
         """Test mention-type response."""
         await ctx.post(
             Message(
-                text="text",
+                text='text',
                 icon=EMOJI_UNICODE[':crab:'],
                 color=Color.dark_green(),
             ),

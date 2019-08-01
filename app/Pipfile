@@ -5,14 +5,33 @@ verify_ssl = true
 
 [dev-packages]
 flake8 = "*"
-flake8-docstrings = "*"
 flake8-todo = "*"
+flake8-fixme = "*"
+flake8-bugbear = "*"
+flake8-commas = "*"
+flake8-quotes = "*"
+flake8-builtins = "*"
+flake8-comprehensions = "*"
+flake8-eradicate = "*"
+flake8-print = "*"
+flake8-mutable = "*"
+flake8-debugger = "*"
+flake8-type-annotations = "*"
+pep8-naming = "*"
+
+flake8-docstrings = "*"
+pydocstyle = "==3.0.0"
+
+flake8-bandit = "*"
 bandit = "*"
+
 mypy = "*"
-click = "*"
+django-stubs = "*"
+djangorestframework-stubs = "*"
+
 pytest = "*"
 pytest-cov = "*"
-pytest-django = "*"
+pytest-asyncio = "*"
 
 [packages]
 django = "*"
