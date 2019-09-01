@@ -2,24 +2,14 @@ version: '3.3'
 
 services:
 
-  postgres:
+  mongo-express:
+    image: mongo-express
+    restart: always
     ports:
-      - '5432:5432'
-
-  bot:
-    build:
-      context: bot
-      dockerfile: Dockerfile_dev
-    volumes:
-      - ./bot:/app
-      - ./.volumes/root:/root
-
+      - 80:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: crabot
+      ME_CONFIG_MONGODB_ADMINPASSWORD: JPX9Qppx9XDKrXRbNFaq3imVVNxQWV6
 
   app:
-    build:
-      context: app
-      dockerfile: Dockerfile_dev
-    ports: ['80:80']
-    volumes:
-      - ./app:/app
-      - ./.volumes/root:/root
+    build: app

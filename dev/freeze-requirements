@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -o errexit
+set -o pipefail
+set -o nounset
+set -o xtrace
+
+python -m venv .tmpvenv
+.tmpvenv/bin/pip install --no-cache-dir --requirement bot/requirements.txt
+.tmpvenv/bin/pip freeze > bot/requirements.frozen.txt
+rm -rf .tmpvenv

@@ -3,10 +3,10 @@ WORKDIR /app
 
 COPY docker-entrypoint /usr/bin/docker-entrypoint
 ENTRYPOINT ["docker-entrypoint"]
-CMD ["./manage.py", "runserver", "0.0.0.0:80"]
+CMD ["python", "main.py"]
 
-RUN apt-get update && apt-get install wait-for-it postgresql-client man vim -y
+RUN apt-get update && apt-get install wait-for-it man postgresql-client vim -y
 RUN pip install --upgrade pip pipenv
 
-COPY Pipfile Pipfile.lock ./
-RUN pipenv install --system --deploy --dev
+COPY Pipfile.lock Pipfile /opt/
+RUN cd /opt/ && pipenv install --system --deploy --dev

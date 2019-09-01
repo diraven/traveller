@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-set -o errexit
-set -o pipefail
-set -o nounset
-set -o xtrace
-
-docker-compose run app flake8 /app | sed -e "s|^/app|$(pwd)/app|"
-#docker-compose run app mypy /app | sed -e "s|^|$(pwd)/app/|"
-./manage.py makemigrations --dry-run | grep -q "No changes detected"

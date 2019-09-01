@@ -2,27 +2,20 @@ version: '3.3'
 
 services:
 
-  postgres:
-    image: postgres:11.2
+  mongo:
+    image: mongo:4.2
+    restart: always
     volumes:
-      - .volumes/postgres/:/var/lib/postgresql/data/
+      - .volumes/mongo:/data/db
     env_file:
       - .env
     expose:
-      - "5432"
+      - 27017
 
   app:
-    image: diraven/main:crabot-app
+    image: diraven/crabot:latest
     depends_on:
-      - postgres
-    ports: ['8002:80']
-    env_file:
-      - .env
-
-  bot:
-    image: diraven/main:crabot-bot
-    depends_on:
-      - postgres
-      - app
+      - mongo
+    restart: always
     env_file:
       - .env

@@ -1,1 +1,0 @@
-"""Crabot frontend package."""

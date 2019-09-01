@@ -1,1 +1,0 @@
-"""Frontend django project package."""
