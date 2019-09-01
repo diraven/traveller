@@ -1,8 +1,6 @@
 .*
 !.gitignore
 !.dockerignore
-!.gitlab-ci.yml
 *.iml
 **/__pycache__/
 docker-compose.override.yml
-dev/cd
