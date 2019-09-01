@@ -1,1 +1,0 @@
-"""Mydiscord package."""
