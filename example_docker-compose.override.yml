@@ -12,3 +12,4 @@ services:
 
   app:
     build: app
+    restart: "no"
