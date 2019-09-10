@@ -25,4 +25,4 @@ pytest-asyncio
 
 python-levenshtein
 sentry-sdk
-discord-py
+discord.py
