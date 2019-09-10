@@ -1,15 +1,14 @@
-version: '3.3'
+version: '3.7'
 
 services:
 
-  mongo-express:
+  mongoexpress:
     image: mongo-express
     restart: always
     ports:
       - 80:8081
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: crabot
-      ME_CONFIG_MONGODB_ADMINPASSWORD: JPX9Qppx9XDKrXRbNFaq3imVVNxQWV6
+    env_file:
+      - .env
 
   app:
     build: app
