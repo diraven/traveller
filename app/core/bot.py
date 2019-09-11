@@ -1,11 +1,12 @@
 """Core bot module."""
-import aiohttp
-import discord
-import re
-import sentry_sdk
-from discord.ext import commands
 from typing import List
 
+import discord
+import motor.motor_asyncio
+import sentry_sdk
+from discord.ext import commands
+
+from core.cog import Cog
 from settings import settings
 from .context import Context
 from .message import Message
@@ -30,6 +31,7 @@ class Bot(commands.Bot):
             command_prefix = get_prefix
 
         super().__init__(command_prefix=command_prefix, **options)
+        self.add_cog(Cog(self))  # load core cog
 
     async def get_context(
             self,
@@ -42,26 +44,31 @@ class Bot(commands.Bot):
 
         # If command not found - try to find it using alias.
         if ctx.command is None and msg.guild:
-            try:
-                async with aiohttp.ClientSession().get(
-                        f'http://app/api/aliases/?'
-                        f'guild_discord_id={msg.guild.id}&'
-                        f'source={ctx.invoked_with}',
-                ) as response:
-                    data = await response.json()
-                    # Replace start of the message with the alias target.
-                    msg.content = re.sub(
-                        '^{}{}'.format(ctx.prefix, data[0]['source']),
-                        '{}{}'.format(ctx.prefix, data[0]['target']),
-                        msg.content,
-                    )
-                # Try to fetch context anew.
-                ctx = await super().get_context(
-                    msg,
-                    cls=Context,
-                )
-            except IndexError:
-                pass
+            pass
+            # try:
+                # TODO: Switch to using mongodb instead.
+                #  Might need additional commands interface since there is no
+                #  django admin any more to add/delete aliases.
+
+                # async with aiohttp.ClientSession().get(
+                #         f'http://app/api/aliases/?'
+                #         f'guild_discord_id={msg.guild.id}&'
+                #         f'source={ctx.invoked_with}',
+                # ) as response:
+                #     data = await response.json()
+                #     # Replace start of the message with the alias target.
+                #     msg.content = re.sub(
+                #         '^{}{}'.format(ctx.prefix, data[0]['source']),
+                #         '{}{}'.format(ctx.prefix, data[0]['target']),
+                #         msg.content,
+                #     )
+                # # Try to fetch context anew.
+                # ctx = await super().get_context(
+                #     msg,
+                #     cls=Context,
+                # )
+            # except IndexError:
+            #     pass
 
         return ctx
 
