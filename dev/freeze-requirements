@@ -5,6 +5,6 @@ set -o nounset
 set -o xtrace
 
 python -m venv .tmpvenv
-.tmpvenv/bin/pip install --no-cache-dir --requirement bot/requirements.txt
-.tmpvenv/bin/pip freeze > bot/requirements.frozen.txt
+.tmpvenv/bin/pip install --no-cache-dir --requirement app/requirements.txt
+.tmpvenv/bin/pip freeze > app/requirements.frozen.txt
 rm -rf .tmpvenv
