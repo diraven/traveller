@@ -79,8 +79,8 @@ class Bot(commands.Bot):
                 isinstance(exception.original, discord.errors.Forbidden):
             await ctx.post(
                 Message.danger(
-                    'Unable to complete operation, '
-                    f'missing necessary permissions: {exception.original}.',
+                    f' {exception.original.response.url}.',
+                    title=f'Oops... Unable to {exception.original.response.method}: {exception.original.response.reason}',
                 ),
             )
             return
