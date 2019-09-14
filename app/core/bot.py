@@ -43,7 +43,6 @@ class Bot(commands.Bot):
         """Return command invocation context."""
         ctx: Context = await super().get_context(msg, cls=Context)
 
-        # If command not found - try to find it using alias.
         if ctx.command is None and msg.guild:
             guild, _ = await Guild.get_or_create(ctx.guild.id)
             for alias in guild.get('aliases', []):
@@ -68,7 +67,9 @@ class Bot(commands.Bot):
             await ctx.post(
                 Message.danger(
                     f' {exception.original.response.url}.',
-                    title=f'Oops... Unable to {exception.original.response.method}: {exception.original.response.reason}',
+                    title=f'Oops... Unable to '
+                          f'{exception.original.response.method}: '
+                          f'{exception.original.response.reason}',
                 ),
             )
             return
