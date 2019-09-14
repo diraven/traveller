@@ -18,7 +18,7 @@ class Guild:
 
     @staticmethod
     async def add_alias(*, guild_id: str, src: str, dst: str):
-        return await db.guilds.update_one(
+        r = await db.guilds.update_one(
             {
                 'id': guild_id,
                 'aliases.src': {'$ne': src},
@@ -28,5 +28,17 @@ class Guild:
                 'dst': dst,
             }}},
         )
+        return r.modified_count
 
-    # TODO: Del alias.
+    @staticmethod
+    async def del_alias(*, guild_id: str, src: str):
+        r = await db.guilds.update_one(
+            {
+                'id': guild_id,
+                'aliases.src': src,
+            },
+            {'$pull': {'aliases': {
+                'src': src,
+            }}},
+        )
+        return r.modified_count
