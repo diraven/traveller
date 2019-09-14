@@ -5,4 +5,4 @@ set -o nounset
 set -o xtrace
 
 docker-compose build
-dicker-compose push
+docker-compose push
