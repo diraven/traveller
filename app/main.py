@@ -20,7 +20,8 @@ async def on_ready() -> None:
 
 # Load bot extensions.
 instance.load_extension('extensions.test')
-instance.load_extension('extensions.publicroles')
+instance.load_extension('extensions.owner')
+instance.load_extension('extensions.publicrole')
 
 # Run the bot.
 instance.run(settings.DISCORD_TOKEN, bot=True, reconnect=True)

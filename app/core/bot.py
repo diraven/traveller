@@ -1,12 +1,13 @@
 """Core bot module."""
+import re
 from typing import List
 
 import discord
-import motor.motor_asyncio
 import sentry_sdk
 from discord.ext import commands
 
 from core.cog import Cog
+from core.models import Guild
 from settings import settings
 from .context import Context
 from .message import Message
@@ -44,31 +45,18 @@ class Bot(commands.Bot):
 
         # If command not found - try to find it using alias.
         if ctx.command is None and msg.guild:
-            pass
-            # try:
-                # TODO: Switch to using mongodb instead.
-                #  Might need additional commands interface since there is no
-                #  django admin any more to add/delete aliases.
-
-                # async with aiohttp.ClientSession().get(
-                #         f'http://app/api/aliases/?'
-                #         f'guild_discord_id={msg.guild.id}&'
-                #         f'source={ctx.invoked_with}',
-                # ) as response:
-                #     data = await response.json()
-                #     # Replace start of the message with the alias target.
-                #     msg.content = re.sub(
-                #         '^{}{}'.format(ctx.prefix, data[0]['source']),
-                #         '{}{}'.format(ctx.prefix, data[0]['target']),
-                #         msg.content,
-                #     )
-                # # Try to fetch context anew.
-                # ctx = await super().get_context(
-                #     msg,
-                #     cls=Context,
-                # )
-            # except IndexError:
-            #     pass
+            guild, _ = await Guild.get_or_create(ctx.guild.id)
+            for alias in guild.get('aliases', []):
+                if alias['src'] == ctx.invoked_with:
+                    msg.content = re.sub(
+                        '^{}{}'.format(ctx.prefix, alias['src']),
+                        '{}{}'.format(ctx.prefix, alias['dst']),
+                        msg.content,
+                    )
+                ctx = await super().get_context(
+                    msg,
+                    cls=Context,
+                )
 
         return ctx
 

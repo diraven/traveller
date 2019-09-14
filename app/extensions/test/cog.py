@@ -11,10 +11,10 @@ from core.message import Message
 class Cog(CogBase):
     """A set of bot testign commands."""
 
-    @commands.group(invoke_without_command=True)
+    @commands.group()
     async def test(self, ctx: Context):
-        """Simple bot responsiveness test."""
-        await ctx.message.add_reaction(EMOJI_UNICODE[':crab:'])
+        """Bot testing functions."""
+        pass
 
     @test.command()
     async def message(self, ctx: Context) -> None:
