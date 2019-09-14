@@ -13,3 +13,5 @@ services:
   app:
     build: app
     restart: "no"
+    volumes:
+      - ./app:/app
