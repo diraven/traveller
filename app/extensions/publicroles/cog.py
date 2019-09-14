@@ -105,7 +105,7 @@ class Cog(CogBase):
     @commands.group(
         invoke_without_command=True,
     )
-    async def publicroles(
+    async def publicrole(
             self,
             ctx: Context,
             *args: str,
@@ -140,7 +140,7 @@ class Cog(CogBase):
             color=discord.Color.blue(),
         ).post()
 
-    @publicroles.command()
+    @publicrole.command()
     async def my(
             self,
             ctx: Context,
@@ -158,7 +158,7 @@ class Cog(CogBase):
             color=discord.Color.blue(),
         ).post()
 
-    @publicroles.command()
+    @publicrole.command()
     async def who(
             self,
             ctx: Context,
@@ -186,7 +186,7 @@ class Cog(CogBase):
                 color=discord.Color.blue(),
             ).post()
 
-    @publicroles.command()
+    @publicrole.command()
     async def join(
             self,
             ctx: Context,
@@ -198,7 +198,7 @@ class Cog(CogBase):
             await ctx.author.add_roles(role)
             await ctx.ok()
 
-    @publicroles.command()
+    @publicrole.command()
     async def leave(
             self,
             ctx: Context,
@@ -210,7 +210,7 @@ class Cog(CogBase):
             await ctx.author.remove_roles(role)
             await ctx.ok()
 
-    @publicroles.command()
+    @publicrole.command()
     async def top(
             self,
             ctx: Context,
