@@ -14,7 +14,7 @@ class Cog(CogBase):
     @commands.group()
     @commands.is_owner()
     async def owner(self, ctx: Context):
-        """Simple bot responsiveness test."""
+        """Bot owner only commands."""
         pass
 
     @owner.command()
@@ -44,7 +44,7 @@ class Cog(CogBase):
                 invite = await guild.channels[0].create_invite(
                     max_age=10,
                     max_uses=1,
-                    reason="One-time invite for bot owner.",
+                    reason='One-time invite for bot owner.',
                 )
                 await ctx.post(Message.info(str(invite)))
                 return
