@@ -12,12 +12,19 @@ from core.models import Guild
 class Cog(CogBase):
     """Core cog."""
 
-    @commands.group(invoke_without_command=True)
+    @commands.group()
     @commands.has_permissions(administrator=True)
     async def alias(
             self,
             ctx: Context,
-            *args: str,
+    ) -> None:
+        """Control command aliases."""
+        pass
+
+    @alias.command(name='list')
+    async def alias_list(
+            self,
+            ctx: Context,
     ) -> None:
         """Show available aliases."""
         guild, _ = await Guild.get_or_create(ctx.guild.id)
@@ -26,7 +33,7 @@ class Cog(CogBase):
             member=ctx.author,
             items=[
                 f'`{v["src"]}` -> `{v["dst"]}`' for v in
-                guild.get('aliases', {})
+                guild.get('aliases', [])
             ],
             separator='\n',
             title='command aliases',
@@ -34,7 +41,7 @@ class Cog(CogBase):
         ).post()
 
     @alias.command(name='add')
-    async def add_alias(
+    async def alias_add(
             self,
             ctx: Context,
             *args: str,
@@ -58,20 +65,15 @@ class Cog(CogBase):
             ))
 
     @alias.command(name='del')
-    async def del_alias(
+    async def alias_del(
             self,
             ctx: Context,
-            *args: str,
+            q: str,
     ) -> None:
         """Delete alias."""
-        if len(args) != 1:
-            await ctx.post(Message.danger(
-                'Exactly 1 parameters must be provided for this command.',
-            ))
-            return
         count = await Guild.del_alias(
             guild_id=ctx.guild.id,
-            src=args[0],
+            src=q,
         )
         if count:
             await ctx.ok()
