@@ -19,7 +19,6 @@ async def on_ready() -> None:
 
 
 # Load bot extensions.
-instance.load_extension('extensions.test')
 instance.load_extension('extensions.owner')
 instance.load_extension('extensions.publicrole')
 
