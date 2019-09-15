@@ -12,6 +12,18 @@ from core.models import Guild
 class Cog(CogBase):
     """Core cog."""
 
+    @commands.command()
+    async def about(
+            self,
+            ctx: Context,
+    ) -> None:
+        """Show information about bot developer."""
+        await ctx.post(Message.info(
+            '**Developer:** DiRaven#0519 \n'
+            '**Sources:** https://github.com/diraven/crabot \n',
+            title='About the Bot'
+        ))
+
     @commands.group()
     @utils.is_owner_or_admin()
     async def alias(
