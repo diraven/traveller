@@ -11,7 +11,7 @@ from core.message import Message
 class Cog(CogBase):
     """A set of owner-only commands."""
 
-    @commands.group(name="!")
+    @commands.group(name='!')
     @commands.is_owner()
     async def owner(self, ctx: Context):
         """Bot owner only commands."""

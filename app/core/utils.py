@@ -1,10 +1,12 @@
 """Bot generic utilities module."""
 import asyncio
 import enum
-
-import discord
 import re
 import typing
+
+import discord
+from discord.ext import commands
+from discord.ext.commands import CheckFailure
 
 from core.context import Context
 from core.emoji import EMOJI_ALIAS_UNICODE
@@ -177,3 +179,15 @@ special_symbols = re.compile(r'([_*~`])')
 def escape(text: str) -> str:
     """Escape special symbols for discord."""
     return re.sub(special_symbols, r'\\\1', text)
+
+
+def is_owner_or_admin(*checks) -> typing.Callable:
+    """Check if user is either owner or admin."""
+    async def predicate(ctx):
+        if await ctx.bot.is_owner(ctx.author):
+            return True
+        if ctx.author.guild_permissions.administrator:
+            return True
+        raise CheckFailure('Neither owner nor admin.')
+
+    return commands.check(predicate)
