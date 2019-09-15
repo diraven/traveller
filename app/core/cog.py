@@ -13,7 +13,7 @@ class Cog(CogBase):
     """Core cog."""
 
     @commands.group()
-    @commands.has_permissions(administrator=True)
+    @utils.is_owner_or_admin()
     async def alias(
             self,
             ctx: Context,
