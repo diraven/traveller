@@ -21,7 +21,7 @@ class Cog(CogBase):
         await ctx.post(Message.info(
             '**Developer:** DiRaven#0519 \n'
             '**Sources:** https://github.com/diraven/crabot \n',
-            title='About the Bot'
+            title='About the Bot',
         ))
 
     @commands.group()
