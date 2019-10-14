@@ -2,4 +2,5 @@ env:
   - DOCKER_COMPOSE_VERSION=1.4.2
 
 script:
+  - cp example_.env .env
   - dev/ci
