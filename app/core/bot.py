@@ -7,7 +7,8 @@ import sentry_sdk
 from discord.ext import commands
 
 from core.cog import Cog
-from core.models import Guild
+from core.db import db
+from core.models import Alias
 from settings import settings
 from .context import Context
 from .message import Message
@@ -27,12 +28,35 @@ class Bot(commands.Bot):
     """Bot class."""
 
     def __init__(self, command_prefix=None, **options) -> None:
-        """Make bot instance."""
+        """Initialize bot."""
         if not command_prefix:
             command_prefix = get_prefix
 
         super().__init__(command_prefix=command_prefix, **options)
         self.add_cog(Cog(self))  # load core cog
+
+    async def on_connect(self):
+        await self.migrate()
+
+    @staticmethod
+    async def migrate():
+        # Migration.
+        async for guild in db.guilds.find():
+            for alias in guild['aliases']:
+                await db.aliases.update_one({
+                    'guild_id': guild['id'],
+                    'src': alias['src'],
+                }, {
+                    '$set': {'dst': alias['dst']},
+                }, upsert=True)
+        db.guilds.drop()
+        async for alias in db.aliases.find():
+            await db.aliases.update_one({
+                'guild_id': alias['guild_id'],
+                'src': alias['src'],
+            }, {
+                '$set': {'guild_id': int(alias['guild_id'])},
+            }, upsert=True)
 
     async def get_context(
             self,
@@ -44,14 +68,16 @@ class Bot(commands.Bot):
         ctx: Context = await super().get_context(msg, cls=Context)
 
         if ctx.command is None and msg.guild:
-            guild, _ = await Guild.get_or_create(ctx.guild.id)
-            for alias in guild.get('aliases', []):
-                if alias['src'] == ctx.invoked_with:
-                    msg.content = re.sub(
-                        '^{}{}'.format(ctx.prefix, alias['src']),
-                        '{}{}'.format(ctx.prefix, alias['dst']),
-                        msg.content,
-                    )
+            alias = await Alias.get(
+                guild_id=msg.guild.id,
+                src=ctx.invoked_with,
+            )
+            if alias:
+                msg.content = re.sub(
+                    '^{}{}'.format(ctx.prefix, alias['src']),
+                    '{}{}'.format(ctx.prefix, alias['dst']),
+                    msg.content,
+                )
                 ctx = await super().get_context(
                     msg,
                     cls=Context,

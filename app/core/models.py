@@ -1,50 +1,43 @@
 """Bot database models."""
-import typing
-
-import motor.motor_asyncio
-
-db = motor.motor_asyncio.AsyncIOMotorClient('mongo').crabot
+from core.db import db
 
 
-class Guild:
+class Alias:
     """Database guild model."""
 
-    @staticmethod
-    async def get_or_create(id_: typing.Any):
-        """Retrieve (or create and retrieve) guild from the database."""
-        created = False
-        guild = await db.guilds.find_one({'id': id_})
-        if not guild:
-            guild = {'id': id_, 'aliases': []}
-            await db.guilds.insert_one(guild)
-            created = True
-        return guild, created
+    _collection = db.aliases
 
-    @staticmethod
-    async def add_alias(*, guild_id: str, src: str, dst: str):
+    @classmethod
+    async def get(cls, *, guild_id: int, src: str):
+        """Find alias."""
+        return await cls._collection.find_one({
+            'guild_id': guild_id,
+            'src': src,
+        })
+
+    @classmethod
+    async def get_by_guild(cls, *, guild_id: int):
+        """Get all guild aliases."""
+        return await cls._collection.find({
+            'guild_id': guild_id,
+        }).to_list(100)
+
+    @classmethod
+    async def set(cls, *, guild_id: int, src: str, dst: str):
         """Add command alias."""
-        r = await db.guilds.update_one(
-            {
-                'id': guild_id,
-                'aliases.src': {'$ne': src},
-            },
-            {'$push': {'aliases': {
-                'src': src,
-                'dst': dst,
-            }}},
-        )
-        return r.modified_count
+        return await cls._collection.update_one({
+            'guild_id': guild_id,
+            'src': src,
+        }, {
+            '$set': {'dst': dst},
+        }, upsert=True)
 
-    @staticmethod
-    async def del_alias(*, guild_id: str, src: str):
+    @classmethod
+    async def delete(cls, *, guild_id: int, src: str):
         """Delete command alias."""
-        r = await db.guilds.update_one(
+        return await cls._collection.delete_many(
             {
-                'id': guild_id,
-                'aliases.src': src,
-            },
-            {'$pull': {'aliases': {
+                'guild_id': guild_id,
                 'src': src,
-            }}},
+            },
         )
-        return r.modified_count
