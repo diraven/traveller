@@ -42,32 +42,7 @@ class Bot(commands.Bot):
     @staticmethod
     async def migrate():
         """Perform DB migrations."""
-        # Migration.
-        async for guild in db.guilds.find():
-            for alias in guild['aliases']:
-                await db.aliases.update_one({
-                    'guild_id': guild['id'],
-                    'src': alias['src'],
-                }, {
-                    '$set': {'dst': alias['dst']},
-                }, upsert=True)
-        db.guilds.drop()
-        async for alias in db.aliases.find():
-            await db.aliases.update_one({
-                'guild_id': alias['guild_id'],
-                'src': alias['src'],
-            }, {
-                '$set': {'guild_id': int(alias['guild_id'])},
-            }, upsert=True)
-        async for alias in db.aliases.find():
-            await db.aliases.update_one({
-                'guild_id': alias['guild_id'],
-                'src': alias['src'],
-            }, {
-                '$set': {
-                    'dst': alias['dst'].replace('publicrole', 'publicroles'),
-                },
-            })
+        pass
 
     async def get_context(
             self,
