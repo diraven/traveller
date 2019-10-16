@@ -43,14 +43,14 @@ class Cog(CogBase):
 
     @aliases.command(name='set')
     @utils.is_owner_or_admin()
-    async def alias_set(
+    async def aliases_set(
             self,
             ctx: Context,
             src: str,
             dst: str,
     ) -> None:
         """Set alias."""
-        await Alias.set(
+        await Alias.upsert(
             guild_id=ctx.guild.id,
             src=src,
             dst=dst,
@@ -59,7 +59,7 @@ class Cog(CogBase):
 
     @aliases.command(name='del')
     @utils.is_owner_or_admin()
-    async def alias_del(
+    async def aliases_del(
             self,
             ctx: Context,
             q: str,

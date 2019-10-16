@@ -7,7 +7,7 @@ import sentry_sdk
 from discord.ext import commands
 
 from core.cog import Cog
-from core.db import db
+from core.database import db
 from core.models import Alias
 from settings import settings
 from .context import Context
@@ -36,10 +36,12 @@ class Bot(commands.Bot):
         self.add_cog(Cog(self))  # load core cog
 
     async def on_connect(self):
+        """Perform operations on successful connect."""
         await self.migrate()
 
     @staticmethod
     async def migrate():
+        """Perform DB migrations."""
         # Migration.
         async for guild in db.guilds.find():
             for alias in guild['aliases']:
@@ -62,7 +64,9 @@ class Bot(commands.Bot):
                 'guild_id': alias['guild_id'],
                 'src': alias['src'],
             }, {
-                '$set': {'dst': alias['dst'].replace('publicrole', 'publicroles')},
+                '$set': {
+                    'dst': alias['dst'].replace('publicrole', 'publicroles'),
+                },
             })
 
     async def get_context(

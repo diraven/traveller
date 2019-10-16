@@ -1,5 +1,5 @@
 """Bot database models."""
-from core.db import db
+from core.database import db
 
 
 class Alias:
@@ -23,7 +23,7 @@ class Alias:
         }).to_list(100)
 
     @classmethod
-    async def set(cls, *, guild_id: int, src: str, dst: str):
+    async def upsert(cls, *, guild_id: int, src: str, dst: str):
         """Add command alias."""
         return await cls._collection.update_one({
             'guild_id': guild_id,
