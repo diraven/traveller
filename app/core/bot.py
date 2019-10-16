@@ -57,6 +57,13 @@ class Bot(commands.Bot):
             }, {
                 '$set': {'guild_id': int(alias['guild_id'])},
             }, upsert=True)
+        async for alias in db.aliases.find():
+            await db.aliases.update_one({
+                'guild_id': alias['guild_id'],
+                'src': alias['src'],
+            }, {
+                '$set': {'dst': alias['dst'].replace('publicrole', 'publicroles')},
+            })
 
     async def get_context(
             self,
