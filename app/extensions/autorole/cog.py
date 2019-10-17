@@ -6,7 +6,7 @@ from core.cogbase import CogBase
 from core.context import Context
 from core.message import Message
 
-from extensions.administration.models import Server
+from extensions.autorole.models import Server
 
 
 class Cog(CogBase):
