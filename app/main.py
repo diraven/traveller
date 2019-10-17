@@ -20,7 +20,7 @@ async def on_ready() -> None:
 
 # Load bot extensions.
 instance.load_extension('extensions.owner')
-instance.load_extension('extensions.publicrole')
+instance.load_extension('extensions.publicroles')
 instance.load_extension('extensions.administration')
 
 # Run the bot.
