@@ -11,9 +11,9 @@ RUN apk update && \
     apk del .build-deps
 RUN apk add bash
 
-COPY . .
-
 COPY docker-entrypoint /usr/bin/docker-entrypoint
 COPY wait-for /usr/bin/wait-for
 ENTRYPOINT ["docker-entrypoint"]
 CMD ["python", "main.py"]
+
+COPY . .
