@@ -4,7 +4,7 @@ services:
 
   mongoexpress:
     image: mongo-express
-    restart: always
+    restart: "no"
     ports:
       - 80:8081
     env_file:
