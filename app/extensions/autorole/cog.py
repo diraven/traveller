@@ -1,3 +1,4 @@
+"""Autorole cog module."""
 import discord
 import asyncio
 from discord.ext import commands
@@ -5,96 +6,100 @@ from discord.ext import commands
 from core.cogbase import CogBase
 from core.context import Context
 from core.message import Message
+from core import utils
 
-from extensions.autorole.models import Server
+from extensions.autorole.models import Autorole
 
 
 class Cog(CogBase):
     """Publicroles cog."""
 
-    @commands.group(
-        invoke_without_command=True,
-    )
+    @commands.group(invoke_without_command=True)
     async def autorole(self, ctx: Context) -> None:
-        """Show autorole's comands"""
-        result, checker = await Server.get_or_create(ctx.guild.id)
+        """Show autorole's status."""
+        result = await Autorole.get(ctx.guild.id)
         embed = discord.Embed(
             title='Status of autorole function.',
             colour=discord.Colour.blue(),
         )
         role = 'Not set yet.'
-        for item in ctx.guild.roles:
-            if item.id == int(result['role']):
-                role = item.mention
-                break
-        if result['status']:
-            status = 'on'
+        delay = 'Not set yet'
+        if result:
+            delay = result['delay']
+            for item in ctx.guild.roles:
+                if item.id == int(result['role']):
+                    role = item.mention
+                    break
+            status = 'Online'
         else:
-            status = 'off'
+            status = 'Offline'
         embed.add_field(name='On/off status.', value=status, inline=False)
-        embed.add_field(name='Established role', value=role, inline=False)
+        embed.add_field(name='Established role.', value=role, inline=False)
         embed.add_field(
             name='Time delay.',
-            value=result['delay'] + 'm',
-            inline=False
+            value=str(delay) + 'm',
+            inline=False,
         )
         await ctx.channel.send(embed=embed)
 
     @autorole.command()
-    async def toggle(self, ctx: Context):
-        item, checker = await Server.get_or_create(ctx.guild.id)
-        if item['status'] is False:
-            await Server.update_status(ctx.guild.id, True)
-            await ctx.post(
-                Message(
-                    text='Autorole module has been enabled',
-                    color=discord.Colour.blue(),
-                )
-            )
-        else:
-            await Server.update_status(ctx.guild.id, False)
-            await ctx.post(
-                Message(
-                    text='Autorole module has been disabled',
-                    color=discord.Colour.blue(),
-                )
-            )
+    @utils.is_owner_or_admin()
+    async def shutdown(self, ctx: Context):
+        """Shutdown of work autorole module."""
+        await Autorole.guild_delete(ctx.guild.id)
+        await ctx.post(
+            Message(
+                text='Autorole module is offline.',
+                color=discord.Colour.blue(),
+            ),
+        )
 
     @autorole.command()
+    @utils.is_owner_or_admin()
     async def setrole(self, ctx: Context, *, arg):
-        await Server.get_or_create(ctx.guild.id)
+        """Set role for autorole module."""
         for item in ctx.guild.roles:
             if arg in item.name:
-                await Server.update_role(ctx.guild.id, item.id)
+                await Autorole.update_role(ctx.guild.id, item.id)
                 await ctx.post(
                     Message(
                         title='Role has been changed.',
-                        text=f'New role is {arg}',
-                        color=discord.Colour.blue()
-                    )
+                        text=f'New role is {arg}.',
+                        color=discord.Colour.blue(),
+                    ),
                 )
                 break
+        else:
+            await ctx.post(
+                Message(
+                    title='Error.',
+                    text='The role is set incorrectly.',
+                    color=discord.Colour.red(),
+                ),
+            )
 
     @autorole.command()
-    async def setdelay(self, ctx: Context, delay):
-        await Server.get_or_create(ctx.guild.id)
-        await Server.set_delay(ctx.guild.id, delay)
+    @utils.is_owner_or_admin()
+    async def setdelay(self, ctx: Context, delay: float):
+        """Set delay for autorole module."""
+        await Autorole.get(ctx.guild.id)
+        await Autorole.set_delay(ctx.guild.id, float(delay))
         await ctx.post(
             Message(
                 title='Delay has been changed.',
                 text=f'New delay is {delay} minute(s).',
                 color=discord.Colour.blue(),
-            )
+            ),
         )
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        role = None
-        result, checker = await Server.get_or_create(member.guild.id)
-        if checker is False and result['status'] is True:
+        """Event that occurs after the user joins."""
+        result = await Autorole.get(member.guild.id)
+        if result:
             for item in member.guild.roles:
                 if int(result['role']) == item.id:
                     role = item
+                    await asyncio.sleep(float(result['delay']) * 60)
+                    await member.add_roles(role)
                     break
-            await asyncio.sleep(float(result['delay']) * 60)
-            await member.add_roles(role)

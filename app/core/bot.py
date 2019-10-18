@@ -7,7 +7,6 @@ import sentry_sdk
 from discord.ext import commands
 
 from core.cog import Cog
-from core.database import db
 from core.models import Alias
 from settings import settings
 from .context import Context

@@ -1,45 +1,36 @@
 """Bot database models."""
-import typing
-
 from core.models import db
 
 
-class Server:
+class Autorole:
     """Database guild(server) model."""
 
-    @staticmethod
-    async def get_or_create(id_: typing.Any):
+    _collection = db.autoroles
+
+    @classmethod
+    async def get(cls, guild_id: int):
         """Retrieve (or create and retrieve) guild from the database."""
-        created = False
-        server = await db.servers.find_one({'id': id_})
-        if not server:
-            server = {
-                'id': id_,
-                'status': False,
-                'role': None,
-                'delay': 10.0
-            }
-            await db.servers.insert_one(server)
-            created = True
-        return server, created
+        return await cls._collection.find_one({'id': guild_id})
 
-    @staticmethod
-    async def update_role(id_: typing.Any, role_id: typing.Any):
-        return await db.servers.update_one(
-            {'id': id_},
-            {'$set': {'role': role_id}},
+    @classmethod
+    async def update_role(cls, guild_id: int, role_id: int):
+        """Update role in database."""
+        return await cls._collection.update_one(
+            {'id': guild_id},
+            {'$set': {'role': role_id}}, upsert=True,
         )
 
-    @staticmethod
-    async def update_status(id_: typing.Any, status: typing.Any):
-        return await db.servers.update_one(
-            {'id': id_},
-            {'$set': {'status': status}},
+    @classmethod
+    async def set_delay(cls, guild_id: int, delay: float):
+        """Update delay in database."""
+        return await cls._collection.update_one(
+            {'id': guild_id},
+            {'$set': {'delay': delay}}, upsert=True,
         )
 
-    @staticmethod
-    async def set_delay(id_: typing.Any, delay: typing.Any):
-        return await db.servers.update_one(
-            {'id': id_},
-            {'$set': {'delay': delay}}
+    @classmethod
+    async def guild_delete(cls, guild_id: int):
+        """Delete guild from database."""
+        return await cls._collection.delete_one(
+            {'id': guild_id},
         )
