@@ -181,7 +181,7 @@ def escape(text: str) -> str:
     return re.sub(special_symbols, r'\\\1', text)
 
 
-def is_owner_or_admin(*checks) -> typing.Callable:
+def is_owner_or_admin() -> typing.Callable:
     """Check if user is either owner or admin."""
     async def predicate(ctx):
         if await ctx.bot.is_owner(ctx.author):
