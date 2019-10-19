@@ -97,7 +97,7 @@ class Bot(commands.Bot):
         if isinstance(exception, (
                 commands.errors.UserInputError,
         )):
-            await ctx.post(Message.danger(f"{exception}"), )
+            await ctx.post(Message.danger(str(exception)))
             return
 
         if settings.SENTRY_DSN:
