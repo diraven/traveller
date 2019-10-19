@@ -10,4 +10,4 @@ services:
 script:
   - cp example_docker-compose.override.yml docker-compose.override.yml
   - cp example_.env .env
-  - dev/ci
+  - make ci
