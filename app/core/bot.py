@@ -93,14 +93,11 @@ class Bot(commands.Bot):
         ):
             return
 
-        # Process missing command arguments error by responding to the user.
-        if isinstance(exception, commands.MissingRequiredArgument):
-            await ctx.post(
-                Message.danger(
-                    'Incorrect command usage, missing argument. '
-                    'Did you forget to add something?',
-                ),
-            )
+        # Pass some exceptions to the user directly.
+        if isinstance(exception, (
+                commands.errors.UserInputError,
+        )):
+            await ctx.post(Message.danger(str(exception)))
             return
 
         if settings.SENTRY_DSN:
