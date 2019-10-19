@@ -8,7 +8,6 @@ from core.emoji import EMOJI_UNICODE
 
 if typing.TYPE_CHECKING:
     from core.bot import Bot
-    from core.message import Message
 
 
 class Context(commands.Context):
@@ -25,22 +24,30 @@ class Context(commands.Context):
 
         super().__init__(**attrs)
 
-    async def post(
-            self,
-            message: 'Message',
-            with_mention: bool = False,
-    ) -> discord.Message:
-        """Send response as embed, or as text with mention if requested."""
-        if with_mention:
-            return await self.send(
-                '{}\n{}'.format(
-                    self.message.author.mention,
-                    message.as_text(),
-                ),
-            )
+    async def post_info(self, text: str):
+        """Send info message."""
+        return await self.send(embed=discord.Embed(
+            description=text,
+            title=':information_source:',
+            color=discord.Color.blue(),
+        ))
 
-        return await self.send(embed=message.as_embed())
+    async def post_warning(self, text: str):
+        """Send warning message."""
+        return await self.send(embed=discord.Embed(
+            description=text,
+            title=':warning:',
+            color=discord.Color.orange(),
+        ))
 
-    async def ok(self) -> discord.Reaction:
+    async def post_error(self, text: str):
+        """Send error message."""
+        return await self.send(embed=discord.Embed(
+            description=text,
+            title=':no_entry:',
+            color=discord.Color.red(),
+        ))
+
+    async def react_ok(self) -> discord.Reaction:
         """Add ok hand reaction to the message."""
         return await self.message.add_reaction(EMOJI_UNICODE[':OK_hand:'])

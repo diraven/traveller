@@ -1,13 +1,10 @@
 """Bot testing commands module."""
-import discord
-from discord import Color
 from discord.ext import commands
 
 from core import utils
 from core.cogbase import CogBase
 from core.context import Context
 from core.emoji import EMOJI_UNICODE
-from core.message import Message
 
 
 class Cog(CogBase):
@@ -31,7 +28,6 @@ class Cog(CogBase):
             ],
             separator='\n',
             title='bot guilds',
-            color=discord.Color.blue(),
         ).post()
 
     @owner.command()
@@ -48,35 +44,20 @@ class Cog(CogBase):
                     max_uses=1,
                     reason='One-time invite for bot owner.',
                 )
-                await ctx.post(Message.info(str(invite)))
+                await ctx.post_info(str(invite))
                 return
-        await ctx.post(Message.danger('Guild not found.'))
+        await ctx.post_warning('Guild not found.')
 
     @owner.group()
     async def test(self, ctx: Context):
         """Bot testing functions."""
-        await ctx.ok()
+        await ctx.react_ok()
 
     @test.command()
     async def message(self, ctx: Context) -> None:
         """Test message-type response."""
-        await ctx.post(
-            Message(
-                text='text',
-                icon=EMOJI_UNICODE[':crab:'],
-                color=Color.dark_green()),
-        )
-
-    @test.command()
-    async def mention(self, ctx: Context) -> None:
-        """Test mention-type response."""
-        await ctx.post(
-            Message(
-                text='text',
-                icon=EMOJI_UNICODE[':crab:'],
-                color=Color.dark_green(),
-            ),
-            with_mention=True,
+        await ctx.post_info(
+            text='Test message.',
         )
 
     @test.command()

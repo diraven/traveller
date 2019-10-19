@@ -3,7 +3,6 @@ import logging
 
 from core.bot import Bot
 from settings import settings
-# Create bot instance.
 from settings.settings import DEBUG
 
 instance = Bot()

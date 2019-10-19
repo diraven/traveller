@@ -1,14 +1,14 @@
 """Moderator tools cog module."""
 
+from datetime import datetime
+
 import discord
 from discord.ext import commands
 from discord.ext.commands import has_permissions
-from datetime import datetime
 
 from core import utils
 from core.cogbase import CogBase
 from core.context import Context
-from core.message import Message
 from extensions.mod.models import UserLog, LogRecordType
 
 
@@ -38,9 +38,7 @@ class Cog(CogBase):
     ) -> None:
         """Attach note to the user."""
         if len(text) > 128:
-            await ctx.post(Message.danger(
-                'Text is too long. 128 chars max.',
-            ))
+            await ctx.post_warning('Text is too long. 128 chars max.')
             return
         await UserLog.add_record(
             guild_id=ctx.guild.id,
@@ -48,7 +46,7 @@ class Cog(CogBase):
             type_=LogRecordType.NOTE,
             text=text,
         )
-        await ctx.ok()
+        await ctx.react_ok()
 
     @mod.command()
     @has_permissions(view_audit_log=True)
@@ -67,5 +65,4 @@ class Cog(CogBase):
                    f'\n{r["text"]}' for r in records],
             separator='\n',
             title=f'{user}\'s dossier',  # noqa
-            color=discord.Color.blue(),
         ).post()

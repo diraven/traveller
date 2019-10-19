@@ -10,7 +10,6 @@ from discord.ext.commands import CheckFailure
 
 from core.context import Context
 from core.emoji import EMOJI_ALIAS_UNICODE
-from core.message import Message
 
 DEFAULT_TIMEOUT = 10
 MAX_PAGE_LEN = 1000
@@ -48,8 +47,6 @@ class Paginator:
             no_data_str: str = 'none',
             timeout: int = DEFAULT_TIMEOUT,  # seconds
             title: str = None,
-            icon: str = None,
-            color: discord.Color = None,
     ) -> None:
         """Make new paginator."""
         self._ctx = ctx
@@ -61,11 +58,10 @@ class Paginator:
         self._no_data_str = no_data_str
         self._posted_msg: discord.Message
 
-        self._message = Message(
+        self._embed = discord.Embed(
             title=title,
-            icon=icon,
-            color=color,
-            text='',
+            color=discord.Color.blue(),
+            description='',
         )
 
         self._current_page_num = 1
@@ -92,19 +88,19 @@ class Paginator:
         )
 
     async def _update(self) -> None:
-        self._message.text = self._pages[self._current_page_num - 1]
+        self._embed.description = self._pages[self._current_page_num - 1]
 
         if len(self._pages) > 1:
-            self._message.text += f'\nPage: {self._current_page_num}/' \
-                                  f'{len(self._pages)}'
+            self._embed.description += f'\nPage: {self._current_page_num}/' \
+                                       f'{len(self._pages)}'
 
         try:
             await self._posted_msg.edit(
-                embed=self._message.as_embed(),
+                embed=self._embed,
             )
         except AttributeError:
             self._posted_msg = await self._ctx.send(
-                embed=self._message.as_embed(),
+                embed=self._embed,
             )
 
         if len(self._pages) == 1:
@@ -147,9 +143,9 @@ class Paginator:
             task.cancel()
 
         for task in done:
-            self._message.text += ' **Loading...**'
+            self._embed.description += ' **Loading...**'
             await self._posted_msg.edit(
-                embed=self._message.as_embed(),
+                embed=self._embed,
             )
 
             reaction, user = task.result()
