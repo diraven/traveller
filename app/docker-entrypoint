@@ -1,4 +1,3 @@
 #!/usr/bin/env bash
 
-wait-for mongo:27017
 exec "$@"
