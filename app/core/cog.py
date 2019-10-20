@@ -1,7 +1,7 @@
 """Publicroles cog module."""
 from discord.ext import commands
 
-from core import utils
+from core import utils, paginators
 from core.cogbase import CogBase
 from core.context import Context
 from core.models import Alias
@@ -29,11 +29,9 @@ class Cog(CogBase):
     ) -> None:
         """Show configured aliases."""
         aliases = await Alias.get_by_guild(guild_id=ctx.guild.id)
-        await utils.Paginator(
+        await paginators.List(
             ctx=ctx,
-            member=ctx.author,
             items=[f'`{v["src"]}` -> `{v["dst"]}`' for v in aliases],
-            separator='\n',
             title='command aliases',
         ).post()
 

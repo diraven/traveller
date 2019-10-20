@@ -1,7 +1,7 @@
 """Bot testing commands module."""
 from discord.ext import commands
 
-from core import utils
+from core import paginators
 from core.cogbase import CogBase
 from core.context import Context
 from core.emoji import EMOJI_UNICODE
@@ -19,14 +19,12 @@ class Cog(CogBase):
     @owner.command()
     async def guilds(self, ctx: Context) -> None:
         """Test message-type response."""
-        await utils.Paginator(
+        await paginators.List(
             ctx=ctx,
-            member=ctx.author,
             items=[
                 f'`{guild.name}` (`{guild.id}`)' for guild in
                 ctx.bot.guilds
             ],
-            separator='\n',
             title='bot guilds',
         ).post()
 

@@ -6,7 +6,7 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import has_permissions
 
-from core import utils
+from core import paginators
 from core.cogbase import CogBase
 from core.context import Context
 from extensions.mod.models import UserLog, LogRecordType
@@ -57,12 +57,10 @@ class Cog(CogBase):
     ) -> None:
         """Attach note to the user."""
         records = await UserLog.get(guild_id=ctx.guild.id, user_id=user.id)
-        await utils.Paginator(
+        await paginators.List(
             ctx=ctx,
-            member=ctx.author,
             items=[f'**{r["type"]}** @ '
                    f'{datetime.utcfromtimestamp(r["created_at"])}:'
                    f'\n{r["text"]}' for r in records],
-            separator='\n',
             title=f'{user}\'s dossier',  # noqa
         ).post()
