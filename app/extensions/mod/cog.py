@@ -56,11 +56,13 @@ class Cog(CogBase):
             user: discord.User,
     ) -> None:
         """Attach note to the user."""
-        records = await UserLog.get(guild_id=ctx.guild.id, user_id=user.id)
-        await paginators.List(
+        docs = await UserLog.get(guild_id=ctx.guild.id, user_id=user.id)
+        await paginators.post_from_motor(
             ctx=ctx,
-            items=[f'**{r["type"]}** @ '
-                   f'{datetime.utcfromtimestamp(r["created_at"])}:'
-                   f'\n{r["text"]}' for r in records],
+            data=docs,
             title=f'{user}\'s dossier',  # noqa
-        ).post()
+            formatter=lambda x: f'**{x["type"]}** @ '
+                                f'{datetime.utcfromtimestamp(x["created_at"])}'
+                                f'\n'
+                                f'{x["text"]}\n',
+        )

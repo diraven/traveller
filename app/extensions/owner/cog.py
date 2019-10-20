@@ -19,14 +19,14 @@ class Cog(CogBase):
     @owner.command()
     async def guilds(self, ctx: Context) -> None:
         """Test message-type response."""
-        await paginators.List(
+        await paginators.post_from_list(
             ctx=ctx,
-            items=[
+            data=[
                 f'`{guild.name}` (`{guild.id}`)' for guild in
                 ctx.bot.guilds
             ],
             title='bot guilds',
-        ).post()
+        )
 
     @owner.command()
     async def invite(

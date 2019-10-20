@@ -28,13 +28,13 @@ async def find_public_role(
     elif len(roles) == 0:
         await ctx.post_info(text='no roles found')
     else:
-        await paginators.List(
+        await paginators.post_from_list(
             ctx=ctx,
-            items=[role.name for role in roles],
+            data=[role.name for role in roles],
             title='multiple roles found',
             separator=DEFAULT_SEPARATOR,
             timeout=DEFAULT_TIMEOUT,
-        ).post()
+        )
 
 
 async def find_public_roles(
@@ -125,13 +125,13 @@ class Cog(CogBase):
             return
 
         roles = await find_public_roles(ctx, ' '.join(args))
-        await paginators.List(
+        await paginators.post_from_list(
             ctx=ctx,
-            items=[role.name for role in roles],
+            data=[role.name for role in roles],
             title='public roles found',
             separator=DEFAULT_SEPARATOR,
             timeout=DEFAULT_TIMEOUT,
-        ).post()
+        )
 
     @publicroles.command()
     async def my(
@@ -141,13 +141,13 @@ class Cog(CogBase):
     ) -> None:
         """Output your public roles."""
         roles = await find_public_roles(ctx, ' '.join(args), ctx.author.roles)
-        await paginators.List(
+        await paginators.post_from_list(
             ctx=ctx,
-            items=[role.name for role in roles],
+            data=[role.name for role in roles],
             title=f'public roles for @{ctx.author.display_name}',
             separator=DEFAULT_SEPARATOR,
             timeout=DEFAULT_TIMEOUT,
-        ).post()
+        )
 
     @publicroles.command()
     async def who(
@@ -164,13 +164,13 @@ class Cog(CogBase):
                 key=lambda x: x.display_name,
             )
 
-            await paginators.List(
+            await paginators.post_from_list(
                 ctx=ctx,
-                items=[escape(member.display_name) for member in members],
+                data=[escape(member.display_name) for member in members],
                 title=f'members with "{role.name}" public role',
                 separator=DEFAULT_SEPARATOR,
                 timeout=DEFAULT_TIMEOUT,
-            ).post()
+            )
 
     @publicroles.command()
     async def join(
@@ -204,12 +204,12 @@ class Cog(CogBase):
         """Show public roles stats."""
         roles = await find_public_roles(ctx)
 
-        await paginators.List(
+        await paginators.post_from_list(
             ctx=ctx,
-            items=[f'{role.name} ({len(role.members)})' for role in roles],
+            data=[f'{role.name} ({len(role.members)})' for role in roles],
             title='public roles top',
             separator='\n',
             timeout=DEFAULT_TIMEOUT,
-        ).post()
+        )
 
 # Expected commands: stats

@@ -1,12 +1,16 @@
 """Paginators for different data types."""
 import abc
 import asyncio
+import math
 import typing
 
 import discord
+import pymongo
 
 from core.context import Context
 from core.utils import Button
+
+DEFAULT_SEPARATOR = '\n'
 
 
 class Base:
@@ -20,17 +24,21 @@ class Base:
         self._timeout = timeout
         self._count = 0
 
+    @abc.abstractmethod
+    async def load(self, data) -> None:
+        """Load data into the paginator."""
+
     @property
     @abc.abstractmethod
-    def _embed(self) -> discord.Embed:
+    async def _embed(self) -> discord.Embed:
         """Get current page as embed."""
 
     async def _update(self) -> None:
         try:
-            await self._posted_msg.edit(embed=self._embed)
+            await self._posted_msg.edit(embed=await self._embed)
         except AttributeError:
             self._posted_msg: discord.Message = await self._ctx.send(
-                embed=self._embed,
+                embed=await self._embed,
             )
 
         if self._count == 1:
@@ -73,7 +81,7 @@ class Base:
             task.cancel()
 
         for task in done:
-            embed = self._embed
+            embed = await self._embed
             embed.description += ' **Loading...**'
             await self._posted_msg.edit(embed=embed)
 
@@ -107,33 +115,35 @@ class List(Base):
             self,
             *,
             ctx: Context,
-            items: typing.List[str],
             title: str,
-            separator: str = '\n',
+            separator: str = DEFAULT_SEPARATOR,
             timeout: int = 10,
     ):
         """Initialize list paginator."""
         super().__init__(ctx=ctx, title=title, timeout=timeout)
+        self._separator = separator
 
         self._pages: typing.List[str] = []
 
+    async def load(self, data: typing.List) -> None:
+        """Load list into the paginator."""
         length = 0
         start = 0
-        items = [str(item) for item in items]
+        items = [str(item) for item in data]
         for i, item in enumerate(items):
-            delta = len(separator) + len(item)
+            delta = len(self._separator) + len(item)
             if length + delta > self._max_page_len:
-                self._pages.append(separator.join(items[start:i]))
+                self._pages.append(self._separator.join(items[start:i]))
                 start = i
                 length = 0
             length += delta
         self._pages.append(
-            separator.join(items[start:]) or 'None',
+            self._separator.join(items[start:]) or 'None',
         )
         self._count = len(self._pages)
 
     @property
-    def _embed(self) -> discord.Embed:
+    async def _embed(self) -> discord.Embed:
         """Get current page as embed."""
         return discord.Embed(
             title=self._title,
@@ -143,5 +153,89 @@ class List(Base):
         )
 
 
+async def post_from_list(
+        *,
+        ctx: Context,
+        data: typing.List,
+        title: str,
+        separator: str = DEFAULT_SEPARATOR,
+        timeout: int = 10,
+):
+    """Post paginator from list."""
+    paginator = List(
+        ctx=ctx,
+        title=title,
+        separator=separator,
+        timeout=timeout,
+    )
+    await paginator.load(data)
+    await paginator.post()
+
+
 class Motor(Base):
     """Paginates motor queryset."""
+
+    _per_page = 10
+
+    def __init__(
+            self,
+            *,
+            ctx: Context,
+            title: str,
+            formatter: typing.Callable = str,
+            separator: str = DEFAULT_SEPARATOR,
+            timeout: int = 10,
+    ):
+        """Initialize list paginator."""
+        super().__init__(ctx=ctx, title=title, timeout=timeout)
+        self._separator = separator
+        self._collection = None
+        self._filter = None
+        self._formatter = formatter
+
+    async def load(self, data: pymongo.cursor.Cursor) -> None:
+        """Load data from pymongo cursor."""
+        self._collection = data.collection
+        # noinspection PyProtectedMember,PyUnresolvedReferences
+        self._filter = data.delegate._Cursor__spec
+        docs_count = await self._collection.count_documents(  # type: ignore
+            self._filter,
+        )
+        self._count = math.ceil(float(docs_count) / float(self._per_page))
+
+    @property
+    async def _embed(self) -> discord.Embed:
+        """Get current page as embed."""
+        skip = (self._current - 1) * self._per_page
+        records = await self._collection.find(  # type: ignore
+            self._filter,
+        ).skip(skip).limit(self._per_page).to_list(self._per_page)
+
+        formatted_records = map(self._formatter, records)
+        return discord.Embed(
+            title=self._title,
+            color=discord.Color.blue(),
+            description=f'{self._separator.join(formatted_records)}\n'
+                        f'Page: {self._current}/{self._count}',
+        )
+
+
+async def post_from_motor(
+        *,
+        ctx: Context,
+        data: pymongo.cursor.Cursor,
+        title: str,
+        formatter: typing.Callable = str,
+        separator: str = DEFAULT_SEPARATOR,
+        timeout: int = 10,
+):
+    """Post paginator from motor cursor."""
+    paginator = Motor(
+        ctx=ctx,
+        title=title,
+        separator=separator,
+        timeout=timeout,
+        formatter=formatter,
+    )
+    await paginator.load(data)
+    await paginator.post()

@@ -28,12 +28,13 @@ class Cog(CogBase):
             ctx: Context,
     ) -> None:
         """Show configured aliases."""
-        aliases = await Alias.get_by_guild(guild_id=ctx.guild.id)
-        await paginators.List(
+        docs = await Alias.get_by_guild(guild_id=ctx.guild.id)
+        await paginators.post_from_motor(
             ctx=ctx,
-            items=[f'`{v["src"]}` -> `{v["dst"]}`' for v in aliases],
+            data=docs,
             title='command aliases',
-        ).post()
+            formatter=lambda x: f'`{x["src"]}` -> `{x["dst"]}`',
+        )
 
     @aliases.command(name='set')
     @utils.is_owner_or_admin()
