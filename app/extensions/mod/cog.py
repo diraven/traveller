@@ -32,14 +32,14 @@ class Cog(CogBase):
     async def dossier(
             self,
             ctx: Context,
-            user: discord.User,
+            member: discord.Member,
     ) -> None:
         """Attach note to the user."""
-        docs = await UserLog.get(guild_id=ctx.guild.id, user_id=user.id)
+        docs = await UserLog.get(guild_id=ctx.guild.id, user_id=member.id)
         await paginators.post_from_motor(
             ctx=ctx,
             data=docs,
-            title=f'{user}\'s dossier',  # noqa
+            title=f'{member}\'s dossier',  # noqa
             formatter=lambda x: f'**{x["type"]}** @ '
                                 f'{datetime.utcfromtimestamp(x["created_at"])}'
                                 f'\n'
@@ -51,7 +51,7 @@ class Cog(CogBase):
     async def note(
             self,
             ctx: Context,
-            user: discord.User,
+            member: discord.Member,
             *,
             text: str,
     ) -> None:
@@ -61,7 +61,7 @@ class Cog(CogBase):
             return
         await UserLog.add_record(
             guild_id=ctx.guild.id,
-            user_id=user.id,
+            user_id=member.id,
             type_=LogRecordType.NOTE,
             text=text,
         )
@@ -72,20 +72,68 @@ class Cog(CogBase):
     async def warn(
             self,
             ctx: Context,
-            user: discord.User,
+            member: discord.Member,
             *,
             text: str,
     ) -> None:
-        """Attach note to the user."""
+        """Warn user."""
         if len(text) > 128:
             await ctx.post_warning('Text is too long. 128 chars max.')
             return
         await UserLog.add_record(
             guild_id=ctx.guild.id,
-            user_id=user.id,
+            user_id=member.id,
             type_=LogRecordType.WARNING,
             text=text,
         )
         await ctx.post_warning(
-            f'{user} has got a warning:\n{text}',
+            f'{member} has got a warning:\n{text}',
+        )
+
+    @mod.command()
+    @has_permissions(kock_members=True)
+    async def kick(
+            self,
+            ctx: Context,
+            member: discord.Member,
+            *,
+            text: str,
+    ) -> None:
+        """Kick user."""
+        if len(text) > 128:
+            await ctx.post_warning('Text is too long. 128 chars max.')
+            return
+        await UserLog.add_record(
+            guild_id=ctx.guild.id,
+            user_id=member.id,
+            type_=LogRecordType.KICK,
+            text=text,
+        )
+        await member.kick(reason=text)
+        await ctx.post_warning(
+            f'{member} has been kicked:\n{text}',
+        )
+
+    @mod.command()
+    @has_permissions(ban_members=True)
+    async def ban(
+            self,
+            ctx: Context,
+            member: discord.Member,
+            *,
+            text: str,
+    ) -> None:
+        """Ban user."""
+        if len(text) > 128:
+            await ctx.post_warning('Text is too long. 128 chars max.')
+            return
+        await UserLog.add_record(
+            guild_id=ctx.guild.id,
+            user_id=member.id,
+            type_=LogRecordType.BAN,
+            text=text,
+        )
+        await member.ban(reason=text)
+        await ctx.post_warning(
+            f'{member} has been banned:\n{text}',
         )
