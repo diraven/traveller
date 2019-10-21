@@ -10,7 +10,6 @@ from core.cog import Cog
 from core.models import Alias
 from settings import settings
 from .context import Context
-from .message import Message
 
 if settings.SENTRY_DSN:
     sentry_sdk.init(settings.SENTRY_DSN)
@@ -75,13 +74,10 @@ class Bot(commands.Bot):
         """Global command errors handler."""
         if isinstance(exception, commands.errors.CommandInvokeError) and \
                 isinstance(exception.original, discord.errors.Forbidden):
-            await ctx.post(
-                Message.danger(
-                    f' {exception.original.response.url}.',
-                    title=f'Oops... Unable to '
-                          f'{exception.original.response.method}: '
-                          f'{exception.original.response.reason}',
-                ),
+            await ctx.post_error(
+                f'{exception.original.response.url}.\n'
+                f'{exception.original.response.method}: \n'
+                f'{exception.original.response.reason}',
             )
             return
 
@@ -97,7 +93,7 @@ class Bot(commands.Bot):
         if isinstance(exception, (
                 commands.errors.UserInputError,
         )):
-            await ctx.post(Message.danger(str(exception)))
+            await ctx.post_error(str(exception))
             return
 
         if settings.SENTRY_DSN:

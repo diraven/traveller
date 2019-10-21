@@ -1,11 +1,9 @@
 """Publicroles cog module."""
-import discord
 from discord.ext import commands
 
-from core import utils
+from core import utils, paginators
 from core.cogbase import CogBase
 from core.context import Context
-from core.message import Message
 from core.models import Alias
 
 
@@ -18,11 +16,10 @@ class Cog(CogBase):
             ctx: Context,
     ) -> None:
         """Show information about bot developer."""
-        await ctx.post(Message.info(
+        await ctx.post_info(
             '**Developer:** DiRaven#0519 \n'
             '**Sources:** https://github.com/diraven/crabot \n',
-            title='About the Bot',
-        ))
+        )
 
     @commands.group(invoke_without_command=True)
     @utils.is_owner_or_admin()
@@ -31,15 +28,13 @@ class Cog(CogBase):
             ctx: Context,
     ) -> None:
         """Show configured aliases."""
-        aliases = await Alias.get_by_guild(guild_id=ctx.guild.id)
-        await utils.Paginator(
+        docs = await Alias.get_by_guild(guild_id=ctx.guild.id)
+        await paginators.post_from_motor(
             ctx=ctx,
-            member=ctx.author,
-            items=[f'`{v["src"]}` -> `{v["dst"]}`' for v in aliases],
-            separator='\n',
+            data=docs,
             title='command aliases',
-            color=discord.Color.blue(),
-        ).post()
+            formatter=lambda x: f'`{x["src"]}` -> `{x["dst"]}`',
+        )
 
     @aliases.command(name='set')
     @utils.is_owner_or_admin()
@@ -55,7 +50,7 @@ class Cog(CogBase):
             src=src,
             dst=dst,
         )
-        await ctx.ok()
+        await ctx.react_ok()
 
     @aliases.command(name='del')
     @utils.is_owner_or_admin()
@@ -70,8 +65,6 @@ class Cog(CogBase):
             src=q,
         )
         if count:
-            await ctx.ok()
+            await ctx.react_ok()
         else:
-            await ctx.post(Message.danger(
-                'No such alias was found.',
-            ))
+            await ctx.post_warning('No such alias was found.')

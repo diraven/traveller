@@ -1,18 +1,19 @@
 """Publicroles cog module."""
 
+import typing
+
 import Levenshtein
 import discord
-import typing
 from discord.ext import commands
 
-from core import utils
+from core import paginators
 from core.cogbase import CogBase
 from core.context import Context
-from core.message import Message
 from core.utils import escape
 
 MAX_EDIT_DISTANCE = 2
 DEFAULT_SEPARATOR = ' **|** '
+DEFAULT_TIMEOUT = 60
 
 
 async def find_public_role(
@@ -25,21 +26,15 @@ async def find_public_role(
     if len(roles) == 1:
         return roles[0]
     elif len(roles) == 0:
-        await ctx.post(Message(
-            text='none',
-            title='roles found',
-            color=discord.Color.blue(),
-        ))
+        await ctx.post_info(text='no roles found')
     else:
-        await utils.Paginator(
+        await paginators.post_from_list(
             ctx=ctx,
-            member=ctx.author,
-            items=[role.name for role in roles],
-            separator=DEFAULT_SEPARATOR,
-            timeout=60,
+            data=[role.name for role in roles],
             title='multiple roles found',
-            color=discord.Color.blue(),
-        ).post()
+            separator=DEFAULT_SEPARATOR,
+            timeout=DEFAULT_TIMEOUT,
+        )
 
 
 async def find_public_roles(
@@ -112,7 +107,7 @@ class Cog(CogBase):
     ) -> None:
         """Show available public roles."""
         if 'public-roles' not in [role.name for role in ctx.guild.roles]:
-            await ctx.post(Message.danger(
+            await ctx.post_warning(
                 text="'I am unable to find `public-roles` role.\n'"
                      'Please make a role named `public-roles` and make sure '
                      'it is above all of the public roles like this:\n'
@@ -126,19 +121,17 @@ class Cog(CogBase):
                      '- `public-role-3`\n'
                      '- ...\n'
                      '- `@everyone`\n',
-            ))
+            )
             return
 
         roles = await find_public_roles(ctx, ' '.join(args))
-        await utils.Paginator(
+        await paginators.post_from_list(
             ctx=ctx,
-            member=ctx.author,
-            items=[role.name for role in roles],
-            separator=DEFAULT_SEPARATOR,
-            timeout=60,
+            data=[role.name for role in roles],
             title='public roles found',
-            color=discord.Color.blue(),
-        ).post()
+            separator=DEFAULT_SEPARATOR,
+            timeout=DEFAULT_TIMEOUT,
+        )
 
     @publicroles.command()
     async def my(
@@ -148,15 +141,13 @@ class Cog(CogBase):
     ) -> None:
         """Output your public roles."""
         roles = await find_public_roles(ctx, ' '.join(args), ctx.author.roles)
-        await utils.Paginator(
+        await paginators.post_from_list(
             ctx=ctx,
-            member=ctx.author,
-            items=[role.name for role in roles],
-            separator=DEFAULT_SEPARATOR,
-            timeout=60,
+            data=[role.name for role in roles],
             title=f'public roles for @{ctx.author.display_name}',
-            color=discord.Color.blue(),
-        ).post()
+            separator=DEFAULT_SEPARATOR,
+            timeout=DEFAULT_TIMEOUT,
+        )
 
     @publicroles.command()
     async def who(
@@ -173,18 +164,13 @@ class Cog(CogBase):
                 key=lambda x: x.display_name,
             )
 
-            await utils.Paginator(
+            await paginators.post_from_list(
                 ctx=ctx,
-                member=ctx.author,
-                items=[
-                    escape(member.display_name) for member in members
-                ],
-                separator=DEFAULT_SEPARATOR,
-                timeout=60,
-                no_data_str='no one',
+                data=[escape(member.display_name) for member in members],
                 title=f'members with "{role.name}" public role',
-                color=discord.Color.blue(),
-            ).post()
+                separator=DEFAULT_SEPARATOR,
+                timeout=DEFAULT_TIMEOUT,
+            )
 
     @publicroles.command()
     async def join(
@@ -196,7 +182,7 @@ class Cog(CogBase):
         role = await find_public_role(ctx, ' '.join(args))
         if role:
             await ctx.author.add_roles(role)
-            await ctx.ok()
+            await ctx.react_ok()
 
     @publicroles.command()
     async def leave(
@@ -208,7 +194,7 @@ class Cog(CogBase):
         role = await find_public_role(ctx, ' '.join(args), ctx.author.roles)
         if role:
             await ctx.author.remove_roles(role)
-            await ctx.ok()
+            await ctx.react_ok()
 
     @publicroles.command()
     async def top(
@@ -218,16 +204,12 @@ class Cog(CogBase):
         """Show public roles stats."""
         roles = await find_public_roles(ctx)
 
-        await utils.Paginator(
+        await paginators.post_from_list(
             ctx=ctx,
-            member=ctx.author,
-            items=[f'{role.name} ({len(role.members)})' for role in roles],
-            separator='\n',
-            timeout=60,
-            max_items_per_page=10,
-            no_data_str='no one',
+            data=[f'{role.name} ({len(role.members)})' for role in roles],
             title='public roles top',
-            color=discord.Color.blue(),
-        ).post()
+            separator='\n',
+            timeout=DEFAULT_TIMEOUT,
+        )
 
 # Expected commands: stats

@@ -1,4 +1,6 @@
 """Bot database models."""
+import pymongo
+
 from core.database import db
 
 
@@ -16,11 +18,11 @@ class Alias:
         })
 
     @classmethod
-    async def get_by_guild(cls, *, guild_id: int):
+    async def get_by_guild(cls, *, guild_id: int) -> pymongo.cursor.Cursor:
         """Get all guild aliases."""
-        return await cls._collection.find({
+        return cls._collection.find({
             'guild_id': guild_id,
-        }).to_list(100)
+        })
 
     @classmethod
     async def upsert(cls, *, guild_id: int, src: str, dst: str):

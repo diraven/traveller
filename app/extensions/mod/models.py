@@ -21,12 +21,12 @@ class UserLog:
     _collection = db.user_log
 
     @classmethod
-    async def get(cls, *, guild_id: int, user_id: int):
+    async def get(cls, *, guild_id: int, user_id: int, skip=0, limit=10):
         """Get user's log records."""
-        return await cls._collection.find({
+        return cls._collection.find({
             'guild_id': guild_id,
             'user_id': user_id,
-        }).sort('created_at', -1).to_list(100)
+        }).sort('created_at', -1)
 
     @classmethod
     async def add_record(
