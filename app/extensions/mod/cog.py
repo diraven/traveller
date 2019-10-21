@@ -29,6 +29,25 @@ class Cog(CogBase):
 
     @mod.command()
     @has_permissions(view_audit_log=True)
+    async def dossier(
+            self,
+            ctx: Context,
+            user: discord.User,
+    ) -> None:
+        """Attach note to the user."""
+        docs = await UserLog.get(guild_id=ctx.guild.id, user_id=user.id)
+        await paginators.post_from_motor(
+            ctx=ctx,
+            data=docs,
+            title=f'{user}\'s dossier',  # noqa
+            formatter=lambda x: f'**{x["type"]}** @ '
+                                f'{datetime.utcfromtimestamp(x["created_at"])}'
+                                f'\n'
+                                f'{x["text"]}\n',
+        )
+
+    @mod.command()
+    @has_permissions(view_audit_log=True)
     async def note(
             self,
             ctx: Context,
@@ -50,19 +69,23 @@ class Cog(CogBase):
 
     @mod.command()
     @has_permissions(view_audit_log=True)
-    async def dossier(
+    async def warn(
             self,
             ctx: Context,
             user: discord.User,
+            *,
+            text: str,
     ) -> None:
         """Attach note to the user."""
-        docs = await UserLog.get(guild_id=ctx.guild.id, user_id=user.id)
-        await paginators.post_from_motor(
-            ctx=ctx,
-            data=docs,
-            title=f'{user}\'s dossier',  # noqa
-            formatter=lambda x: f'**{x["type"]}** @ '
-                                f'{datetime.utcfromtimestamp(x["created_at"])}'
-                                f'\n'
-                                f'{x["text"]}\n',
+        if len(text) > 128:
+            await ctx.post_warning('Text is too long. 128 chars max.')
+            return
+        await UserLog.add_record(
+            guild_id=ctx.guild.id,
+            user_id=user.id,
+            type_=LogRecordType.WARNING,
+            text=text,
+        )
+        await ctx.post_warning(
+            f'{user} has got a warning:\n{text}',
         )
