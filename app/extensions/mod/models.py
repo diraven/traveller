@@ -21,7 +21,7 @@ class UserLog:
     _collection = db.user_log
 
     @classmethod
-    async def get(cls, *, guild_id: int, user_id: int, skip=0, limit=10):
+    async def get(cls, *, guild_id: int, user_id: int):
         """Get user's log records."""
         return cls._collection.find({
             'guild_id': guild_id,
@@ -33,6 +33,7 @@ class UserLog:
             cls, *,
             guild_id: int,
             user_id: int,
+            author_user_id: int,
             type_: LogRecordType,
             text: str,
     ):
@@ -41,6 +42,7 @@ class UserLog:
             'created_at': time.time(),
             'guild_id': guild_id,
             'user_id': user_id,
+            'author_user_id': author_user_id,
             'type': type_.value,
             'text': text,
         })
