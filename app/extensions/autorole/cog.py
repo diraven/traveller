@@ -23,7 +23,7 @@ class Cog(CogBase):
             try:
                 await ctx.post_info(f'{role.mention} with {delay}m delay.')
             except AttributeError:
-                await ctx.post_error('Role not found')
+                await Autorole.delete(ctx.guild.id)
         else:
             await ctx.post_info(f'Not set.')
 
@@ -31,22 +31,26 @@ class Cog(CogBase):
     @utils.is_owner_or_admin()
     async def disable(self, ctx: Context):
         """Shutdown of work autorole module."""
-        await Autorole.guild_delete(ctx.guild.id)
+        await Autorole.delete(ctx.guild.id)
         await ctx.post_info('Autorole disabled.')
 
     @autorole.command()
     @utils.is_owner_or_admin()
     async def set(self, ctx: Context, role: discord.Role, delay: float):
         """Set role for autorole module."""
-        if role:
+        if delay < 0:
+            await ctx.post_error(
+                'Delay format is incorrect.'
+            )
+        elif delay > 40:
+            await ctx.post_error(
+                'Delay is too big.'
+            )
+        else:
             await Autorole.set(ctx.guild.id, role.id, float(delay))
             await ctx.post_info(
                 f'Autorole was set to {role.mention} '
                 f'with {delay} minute(s) delay.',
-            )
-        else:
-            await ctx.post_error(
-                text='The role is set incorrectly.',
             )
 
     @commands.Cog.listener()
@@ -59,4 +63,4 @@ class Cog(CogBase):
                 await asyncio.sleep(float(result['delay']) * 60)
                 await member.add_roles(role)
             else:
-                await Autorole.guild_delete(member.guild.id)
+                await Autorole.delete(member.guild.id)

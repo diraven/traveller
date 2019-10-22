@@ -9,7 +9,7 @@ class Autorole:
 
     @classmethod
     async def get(cls, guild_id: int):
-        """Retrieve (or create and retrieve) guild from the database."""
+        """Retrieve guild from the database."""
         return await cls._collection.find_one({'guild_id': guild_id})
 
     @classmethod
@@ -21,7 +21,7 @@ class Autorole:
         )
 
     @classmethod
-    async def guild_delete(cls, guild_id: int):
+    async def delete(cls, guild_id: int):
         """Delete guild from database."""
         return await cls._collection.delete_one(
             {'guild_id': guild_id},
