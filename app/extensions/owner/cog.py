@@ -1,4 +1,5 @@
 """Bot testing commands module."""
+import discord
 from discord.ext import commands
 
 from core import paginators
@@ -37,13 +38,15 @@ class Cog(CogBase):
         """Test mention-type response."""
         for guild in ctx.bot.guilds:
             if q.lower() in guild.name.lower():
-                invite = await guild.channels[0].create_invite(
-                    max_age=10,
-                    max_uses=1,
-                    reason='One-time invite for bot owner.',
-                )
-                await ctx.post_info(str(invite))
-                return
+                for channel in guild.channels:
+                    if isinstance(channel, discord.TextChannel):
+                        invite = await channel.create_invite(
+                            max_age=10,
+                            max_uses=1,
+                            reason='One-time invite for bot owner.',
+                        )
+                        await ctx.post_info(str(invite))
+                        return
         await ctx.post_warning('Guild not found.')
 
     @owner.group()
