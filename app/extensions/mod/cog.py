@@ -40,7 +40,8 @@ class Cog(CogBase):
             ctx=ctx,
             data=docs,
             title=f'{member}\'s dossier',  # noqa
-            formatter=lambda x: f'**{x["type"]}** @ '
+            formatter=lambda x: f'**{x["type"]}** by '
+                                f'<@{x.get("author_user_id", "unknown")}> \n'
                                 f'{datetime.utcfromtimestamp(x["created_at"])}'
                                 f'\n'
                                 f'{x["text"]}\n',
@@ -62,6 +63,7 @@ class Cog(CogBase):
         await UserLog.add_record(
             guild_id=ctx.guild.id,
             user_id=member.id,
+            author_user_id=ctx.author.id,
             type_=LogRecordType.NOTE,
             text=text,
         )
@@ -83,6 +85,7 @@ class Cog(CogBase):
         await UserLog.add_record(
             guild_id=ctx.guild.id,
             user_id=member.id,
+            author_user_id=ctx.author.id,
             type_=LogRecordType.WARNING,
             text=text,
         )
@@ -106,6 +109,7 @@ class Cog(CogBase):
         await UserLog.add_record(
             guild_id=ctx.guild.id,
             user_id=member.id,
+            author_user_id=ctx.author.id,
             type_=LogRecordType.KICK,
             text=text,
         )
@@ -131,6 +135,7 @@ class Cog(CogBase):
             guild_id=ctx.guild.id,
             user_id=member.id,
             type_=LogRecordType.BAN,
+            author_user_id=ctx.author.id,
             text=text,
         )
         await member.ban(reason=text)
