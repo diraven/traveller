@@ -36,18 +36,14 @@ class Cog(CogBase):
 
     @autorole.command()
     @utils.is_owner_or_admin()
-    async def set(self, ctx: Context, role: discord.Role, delay: float):
+    async def setup(self, ctx: Context, role: discord.Role, delay: float):
         """Set role for autorole module."""
-        if delay < 0:
+        if not (0 < delay < 40):
             await ctx.post_error(
-                'Delay format is incorrect.'
-            )
-        elif delay > 40:
-            await ctx.post_error(
-                'Delay is too big.'
+                'Delay must be between 0 and 40',
             )
         else:
-            await Autorole.set(ctx.guild.id, role.id, float(delay))
+            await Autorole.add(ctx.guild.id, role.id, float(delay))
             await ctx.post_info(
                 f'Autorole was set to {role.mention} '
                 f'with {delay} minute(s) delay.',

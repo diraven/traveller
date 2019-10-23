@@ -13,7 +13,7 @@ class Autorole:
         return await cls._collection.find_one({'guild_id': guild_id})
 
     @classmethod
-    async def set(cls, guild_id: int, role_id: int, delay: float):
+    async def add(cls, guild_id: int, role_id: int, delay: float):
         """Update role and delay in database."""
         return await cls._collection.update_one(
             {'guild_id': guild_id},
