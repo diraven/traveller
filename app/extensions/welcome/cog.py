@@ -13,7 +13,7 @@ class Cog(CogBase):
 
     @commands.group(invoke_without_command=True)
     async def welcome(self, ctx: Context) -> None:
-        """Do nothing"""
+        """Do nothing."""
         pass
 
     @welcome.command()
@@ -36,7 +36,7 @@ class Cog(CogBase):
     @welcome.command()
     @utils.is_owner_or_admin()
     async def disable(self, ctx: Context):
-        """Disable welcome message module"""
+        """Disable welcome message module."""
         await Welcome.delete(ctx.guild.id)
         await ctx.post_info('Welcome module was disabled.')
 
