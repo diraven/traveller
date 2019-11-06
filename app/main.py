@@ -22,6 +22,7 @@ instance.load_extension('extensions.owner')
 instance.load_extension('extensions.publicroles')
 instance.load_extension('extensions.mod')
 instance.load_extension('extensions.autorole')
+instance.load_extension('extensions.welcome')
 
 # Run the bot.
 instance.run(settings.DISCORD_TOKEN, bot=True, reconnect=True)
