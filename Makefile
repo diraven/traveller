@@ -1,6 +1,9 @@
 pwd=$(shell pwd)
 SHELL=/bin/bash -o errexit -o pipefail -o nounset
 
+build:
+	docker-compose build --pull
+
 ci: static_analysis type_checking
 
 cd:
