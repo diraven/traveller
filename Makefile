@@ -19,6 +19,6 @@ type_checking: run
 frozen_requirements:
 	@python -m venv .tmpvenv
 	@.tmpvenv/bin/pip install -U pip setuptools
-	@.tmpvenv/bin/pip install --no-cache-dir --requirement requirements.txt
-	@.tmpvenv/bin/pip freeze > requirements.frozen.txt
+	@.tmpvenv/bin/pip install --no-cache-dir --requirement app/requirements.txt
+	@.tmpvenv/bin/pip freeze > app/requirements.frozen.txt
 	@rm -rf .tmpvenv
