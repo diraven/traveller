@@ -94,7 +94,7 @@ class Cog(CogBase):
         )
 
     @mod.command()
-    @has_permissions(kock_members=True)
+    @has_permissions(kick_members=True)
     async def kick(
             self,
             ctx: Context,
