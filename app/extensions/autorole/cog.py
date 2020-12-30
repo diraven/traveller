@@ -25,7 +25,7 @@ class Cog(CogBase):
             except AttributeError:
                 await Autorole.delete(ctx.guild.id)
         else:
-            await ctx.post_info(f'Not set.')
+            await ctx.post_info('Not set.')
 
     @autorole.command()
     @utils.is_owner_or_admin()
