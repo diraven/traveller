@@ -18,10 +18,3 @@ static_analysis: run
 
 type_checking: run
 	@docker-compose run --rm app mypy /app | sed -e "s|^|$(pwd)/app/|"
-
-frozen_requirements:
-	@python -m venv .tmpvenv
-	@.tmpvenv/bin/pip install -U pip setuptools
-	@.tmpvenv/bin/pip install --no-cache-dir --requirement app/requirements.txt
-	@.tmpvenv/bin/pip freeze > app/requirements.frozen.txt
-	@rm -rf .tmpvenv

@@ -1,18 +1,13 @@
-FROM python:3.7-alpine
+FROM python:3.9
 LABEL maintainer="oleksa.pavlenko@gmail.com"
-WORKDIR /app
+WORKDIR /app/
 
-COPY requirements.frozen.txt /opt/
-RUN apk update && \
-    apk add --no-cache --virtual .build-deps gcc musl-dev && \
-    pip install --upgrade pip && \
-    cd /opt/ && \
-    pip install --no-cache-dir --requirement requirements.frozen.txt && \
-    apk del .build-deps
-RUN apk add bash
+RUN apt update && apt upgrade -y && apt install -y docker docker-compose
 
 COPY docker-entrypoint /usr/bin/docker-entrypoint
 ENTRYPOINT ["docker-entrypoint"]
-CMD ["python", "main.py"]
 
 COPY . .
+RUN pip install --requirement requirements.txt
+
+CMD ["python", "main.py"]

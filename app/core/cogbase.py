@@ -10,6 +10,6 @@ if TYPE_CHECKING:
 class CogBase(Cog):
     """Cog base."""
 
-    def __init__(self, bot: 'Bot') -> None:
+    def __init__(self, bot: "Bot") -> None:
         """Create cog."""
         self._bot = bot

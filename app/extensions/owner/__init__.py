@@ -1,4 +1,4 @@
-"""Package with a bunch of testing commands."""
+"""Package with a bunch of testing commands."""  # pytest: disable=R0801
 from discord.ext import commands
 
 from .cog import Cog

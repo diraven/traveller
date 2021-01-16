@@ -1,0 +1,20 @@
+version: '3.7'
+services:
+  mongoexpress:
+    image: mongo-express
+    restart: "no"
+    ports:
+      - 80:8081
+    env_file:
+      - .env
+    volumes:
+      - .volumes/mongo:/data/db
+
+  app:
+    build: ../app/
+    restart: "no"
+    volumes:
+      - ..:/workspace/
+      - /var/run/docker.sock:/var/run/docker.sock
+      - .volumes/root/:/root/
+    command: /bin/sh -c "while sleep 1000; do :; done"
