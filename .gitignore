@@ -2,6 +2,7 @@
 !.gitignore
 !.dockerignore
 !.travis.yml
+!.github
 *.iml
 **/__pycache__/
 docker-compose.override.yml
