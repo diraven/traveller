@@ -23,7 +23,7 @@ class Base:
         self._current = 1
         self._timeout = timeout
         self._count = 0
-        self._posted_msg: t.Optional[discord.Message] = None
+        self._posted_msg: discord.Message = None
 
     @abc.abstractmethod
     async def load(self, data) -> None:
@@ -35,8 +35,6 @@ class Base:
         """Get current page as embed."""
 
     async def _update(self) -> None:
-        if not self._posted_msg:
-            raise RuntimeError("_posted_msg is missing.")
         try:
             await self._posted_msg.edit(embed=await self._embed)
         except AttributeError:
@@ -55,8 +53,6 @@ class Base:
             reaction: discord.Reaction,
             user: discord.User,
         ) -> bool:
-            if not self._posted_msg:
-                raise RuntimeError("_posted_msg is missing.")
             return all(
                 (
                     reaction.emoji
@@ -111,8 +107,6 @@ class Base:
 
     async def post(self) -> None:
         """Post a paginator message."""
-        if not self._posted_msg:
-            raise RuntimeError("_posted_msg is missing.")
         try:
             while True:
                 await self._update()
