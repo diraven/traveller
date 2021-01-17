@@ -10,6 +10,7 @@ services:
       - .env
     expose:
       - 27017
+
   app:
     image: diraven/crabot:latest
     depends_on:

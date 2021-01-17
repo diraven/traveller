@@ -9,7 +9,7 @@ services:
     image: mongo:4.2
     restart: always
     volumes:
-      - .volumes/mongo:/data/db
+      - mongo:/data/db
     env_file:
       - ../.env
     expose:
