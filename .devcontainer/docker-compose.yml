@@ -11,6 +11,7 @@ services:
   app:
     build: ../app/
     restart: "no"
+    env_file: "../.env"
     volumes:
       - ..:/workspace/
       - /var/run/docker.sock:/var/run/docker.sock
