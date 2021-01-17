@@ -2,10 +2,10 @@
 import asyncio
 
 import discord
-from core import utils
-from core.cogbase import CogBase
-from core.context import Context
 from discord.ext import commands
+
+from core import utils
+from core.bot import CogBase, Context
 from extensions.autorole.models import Autorole
 
 

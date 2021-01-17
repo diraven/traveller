@@ -3,8 +3,7 @@ import discord
 from discord.ext import commands
 
 from core import paginators
-from core.cogbase import CogBase
-from core.context import Context
+from core.bot import CogBase, Context
 from core.emoji import EMOJI_UNICODE
 
 

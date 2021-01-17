@@ -1,4 +1,4 @@
-"""Package with a bunch of testing commands."""  # pytest: disable=R0801
+"""Package with a bunch of testing commands."""  # pylint: disable=cyclic-import
 from discord.ext import commands
 
 from .cog import Cog

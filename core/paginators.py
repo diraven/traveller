@@ -7,8 +7,9 @@ import typing as t
 import discord
 import pymongo
 
-from core.context import Context
 from core.utils import Button
+
+from core.context import Context
 
 DEFAULT_SEPARATOR = "\n"
 

@@ -4,6 +4,6 @@ set -o pipefail
 set -o nounset
 set -o xtrace
 
-black --check /workspace/app/
-pylint /workspace/app/
-mypy -p app
+black --check /workspace/
+pylint /workspace/
+mypy /workspace/
