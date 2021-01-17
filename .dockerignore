@@ -1,4 +1,7 @@
 .*
-*.iml
-**/__pycache__
-Dockerfile*
+!.gitignore
+!.dockerignore
+!.github
+!.devcontainer
+!.pylintrc
+**/__pycache__/
