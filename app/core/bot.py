@@ -40,60 +40,60 @@ class Bot(commands.Bot):
     @staticmethod
     async def migrate():
         """Perform DB migrations."""
-        pass
 
     async def get_context(
-            self,
-            msg: discord.Message,
-            *,
-            cls=Context,
+        self,
+        message: discord.Message,
+        *,
+        cls=Context,
     ) -> Context:
         """Return command invocation context."""
-        ctx: Context = await super().get_context(msg, cls=Context)
+        ctx: Context = await super().get_context(message, cls=cls)
 
-        if ctx.command is None and msg.guild:
+        if ctx.command is None and message.guild:
             alias = await Alias.get(
-                guild_id=msg.guild.id,
+                guild_id=message.guild.id,
                 src=ctx.invoked_with,
             )
             if alias:
-                msg.content = re.sub(
-                    '^{}{}'.format(ctx.prefix, alias['src']),
-                    '{}{}'.format(ctx.prefix, alias['dst']),
-                    msg.content,
+                message.content = re.sub(
+                    "^{}{}".format(ctx.prefix, alias["src"]),
+                    "{}{}".format(ctx.prefix, alias["dst"]),
+                    message.content,
                 )
                 ctx = await super().get_context(
-                    msg,
+                    message,
                     cls=Context,
                 )
 
         return ctx
 
     # noinspection PyBroadException
-    async def on_command_error(self, ctx: Context, exception) -> None:
+    async def on_command_error(self, context: Context, exception) -> None:
         """Global command errors handler."""
-        if isinstance(exception, commands.errors.CommandInvokeError) and \
-                isinstance(exception.original, discord.errors.Forbidden):
-            await ctx.post_error(
-                f'{exception.original.response.url}.\n'
-                f'{exception.original.response.method}: \n'
-                f'{exception.original.response.reason}',
+        if isinstance(exception, commands.errors.CommandInvokeError) and isinstance(
+            exception.original, discord.errors.Forbidden
+        ):
+            await context.post_error(
+                f"{exception.original.response.url}.\n"
+                f"{exception.original.response.method}: \n"
+                f"{exception.original.response.reason}",
             )
             return
 
         # Ignore other checks failures.
         if isinstance(
-                exception, commands.CheckFailure,
-        ) or isinstance(
-            exception, commands.CommandNotFound,
+            exception,
+            (
+                commands.CheckFailure,
+                commands.CommandNotFound,
+            ),
         ):
             return
 
         # Pass some exceptions to the user directly.
-        if isinstance(exception, (
-                commands.errors.UserInputError,
-        )):
-            await ctx.post_error(str(exception))
+        if isinstance(exception, (commands.errors.UserInputError,)):
+            await context.post_error(str(exception))
             return
 
         if settings.SENTRY_DSN:
@@ -101,4 +101,4 @@ class Bot(commands.Bot):
             sentry_sdk.capture_exception(exception)
         else:
             # Raise error otherwise.
-            return await super().on_command_error(ctx, exception)
+            return await super().on_command_error(context, exception)

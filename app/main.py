@@ -14,14 +14,14 @@ logging.basicConfig(level=logging.DEBUG if DEBUG else logging.INFO)
 @instance.event
 async def on_ready() -> None:
     """Notify that bot is ready."""
-    logger.info('Bot is now running.')
+    logger.info("Bot is now running.")
 
 
 # Load bot extensions.
-instance.load_extension('extensions.owner')
-instance.load_extension('extensions.publicroles')
-instance.load_extension('extensions.mod')
-instance.load_extension('extensions.autorole')
+instance.load_extension("extensions.owner")
+instance.load_extension("extensions.publicroles")
+instance.load_extension("extensions.mod")
+instance.load_extension("extensions.autorole")
 
 # Run the bot.
 instance.run(settings.DISCORD_TOKEN, bot=True, reconnect=True)

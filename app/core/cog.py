@@ -12,37 +12,37 @@ class Cog(CogBase):
 
     @commands.command()
     async def about(
-            self,
-            ctx: Context,
+        self,
+        ctx: Context,
     ) -> None:
         """Show information about bot developer."""
         await ctx.post_info(
-            '**Developer:** DiRaven#0519 \n'
-            '**Sources:** https://github.com/diraven/crabot \n',
+            "**Developer:** DiRaven#0519 \n"
+            "**Sources:** https://github.com/diraven/crabot \n",
         )
 
     @commands.group(invoke_without_command=True)
     @utils.is_owner_or_admin()
     async def aliases(
-            self,
-            ctx: Context,
+        self,
+        ctx: Context,
     ) -> None:
         """Show configured aliases."""
         docs = await Alias.get_by_guild(guild_id=ctx.guild.id)
         await paginators.post_from_motor(
             ctx=ctx,
             data=docs,
-            title='command aliases',
+            title="command aliases",
             formatter=lambda x: f'`{x["src"]}` -> `{x["dst"]}`',
         )
 
-    @aliases.command(name='set')
+    @aliases.command(name="set")
     @utils.is_owner_or_admin()
     async def aliases_set(
-            self,
-            ctx: Context,
-            src: str,
-            dst: str,
+        self,
+        ctx: Context,
+        src: str,
+        dst: str,
     ) -> None:
         """Set alias."""
         await Alias.upsert(
@@ -52,19 +52,19 @@ class Cog(CogBase):
         )
         await ctx.react_ok()
 
-    @aliases.command(name='del')
+    @aliases.command(name="del")
     @utils.is_owner_or_admin()
     async def aliases_del(
-            self,
-            ctx: Context,
-            q: str,
+        self,
+        ctx: Context,
+        query: str,
     ) -> None:
         """Delete alias."""
         count = await Alias.delete(
             guild_id=ctx.guild.id,
-            src=q,
+            src=query,
         )
         if count:
             await ctx.react_ok()
         else:
-            await ctx.post_warning('No such alias was found.')
+            await ctx.post_warning("No such alias was found.")

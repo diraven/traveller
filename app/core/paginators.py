@@ -2,7 +2,7 @@
 import abc
 import asyncio
 import math
-import typing
+import typing as t
 
 import discord
 import pymongo
@@ -10,7 +10,7 @@ import pymongo
 from core.context import Context
 from core.utils import Button
 
-DEFAULT_SEPARATOR = '\n'
+DEFAULT_SEPARATOR = "\n"
 
 
 class Base:
@@ -23,6 +23,7 @@ class Base:
         self._current = 1
         self._timeout = timeout
         self._count = 0
+        self._posted_msg: discord.Message = None
 
     @abc.abstractmethod
     async def load(self, data) -> None:
@@ -37,7 +38,7 @@ class Base:
         try:
             await self._posted_msg.edit(embed=await self._embed)
         except AttributeError:
-            self._posted_msg: discord.Message = await self._ctx.send(
+            self._posted_msg = await self._ctx.send(
                 embed=await self._embed,
             )
 
@@ -49,29 +50,36 @@ class Base:
 
         # noinspection PyShadowingNames
         def check(
-                reaction: discord.Reaction,
-                user: discord.User,
+            reaction: discord.Reaction,
+            user: discord.User,
         ) -> bool:
-            return all((
-                reaction.emoji in (
-                    Button.ARROW_LEFT.value,
-                    Button.ARROW_RIGHT.value,
-                ),
-                reaction.message.id == self._posted_msg.id,
-                user.id == self._ctx.message.author.id,
-            ))
+            return all(
+                (
+                    reaction.emoji
+                    in (
+                        Button.ARROW_LEFT.value,
+                        Button.ARROW_RIGHT.value,
+                    ),
+                    reaction.message.id == self._posted_msg.id,
+                    user.id == self._ctx.message.author.id,
+                )
+            )
 
         done, pending = await asyncio.wait_for(
             asyncio.wait(
                 [
-                    asyncio.create_task(self._ctx.bot.wait_for(
-                        'reaction_add',
-                        check=check,
-                    )),
-                    asyncio.create_task(self._ctx.bot.wait_for(
-                        'reaction_remove',
-                        check=check,
-                    )),
+                    asyncio.create_task(
+                        self._ctx.bot.wait_for(
+                            "reaction_add",
+                            check=check,
+                        )
+                    ),
+                    asyncio.create_task(
+                        self._ctx.bot.wait_for(
+                            "reaction_remove",
+                            check=check,
+                        )
+                    ),
                 ],
                 return_when=asyncio.FIRST_COMPLETED,
             ),
@@ -82,10 +90,10 @@ class Base:
 
         for task in done:
             embed = await self._embed
-            embed.description += ' **Loading...**'
+            embed.description += " **Loading...**"
             await self._posted_msg.edit(embed=embed)
 
-            reaction, user = task.result()
+            reaction, _ = task.result()
 
             if reaction.emoji == Button.ARROW_LEFT.value:
                 if self._current > 1:
@@ -112,20 +120,20 @@ class List(Base):
     _max_page_len = 1000
 
     def __init__(
-            self,
-            *,
-            ctx: Context,
-            title: str,
-            separator: str = DEFAULT_SEPARATOR,
-            timeout: int = 10,
+        self,
+        *,
+        ctx: Context,
+        title: str,
+        separator: str = DEFAULT_SEPARATOR,
+        timeout: int = 10,
     ):
         """Initialize list paginator."""
         super().__init__(ctx=ctx, title=title, timeout=timeout)
         self._separator = separator
 
-        self._pages: typing.List[str] = []
+        self._pages: t.List[str] = []
 
-    async def load(self, data: typing.List) -> None:
+    async def load(self, data: t.List) -> None:
         """Load list into the paginator."""
         length = 0
         start = 0
@@ -138,7 +146,7 @@ class List(Base):
                 length = 0
             length += delta
         self._pages.append(
-            self._separator.join(items[start:]) or 'None',
+            self._separator.join(items[start:]) or "None",
         )
         self._count = len(self._pages)
 
@@ -148,18 +156,18 @@ class List(Base):
         return discord.Embed(
             title=self._title,
             color=discord.Color.blue(),
-            description=f'{self._pages[self._current - 1]}\n'
-                        f'Page: {self._current}/{self._count}',
+            description=f"{self._pages[self._current - 1]}\n"
+            f"Page: {self._current}/{self._count}",
         )
 
 
 async def post_from_list(
-        *,
-        ctx: Context,
-        data: typing.List,
-        title: str,
-        separator: str = DEFAULT_SEPARATOR,
-        timeout: int = 10,
+    *,
+    ctx: Context,
+    data: t.List,
+    title: str,
+    separator: str = DEFAULT_SEPARATOR,
+    timeout: int = 10,
 ):
     """Post paginator from list."""
     paginator = List(
@@ -178,13 +186,13 @@ class Motor(Base):
     _per_page = 10
 
     def __init__(
-            self,
-            *,
-            ctx: Context,
-            title: str,
-            formatter: typing.Callable = str,
-            separator: str = DEFAULT_SEPARATOR,
-            timeout: int = 10,
+        self,
+        *,
+        ctx: Context,
+        title: str,
+        formatter: t.Callable = str,
+        separator: str = DEFAULT_SEPARATOR,
+        timeout: int = 10,
     ):
         """Initialize list paginator."""
         super().__init__(ctx=ctx, title=title, timeout=timeout)
@@ -196,8 +204,7 @@ class Motor(Base):
     async def load(self, data: pymongo.cursor.Cursor) -> None:
         """Load data from pymongo cursor."""
         self._collection = data.collection
-        # noinspection PyProtectedMember,PyUnresolvedReferences
-        self._filter = data.delegate._Cursor__spec
+        self._filter = data.delegate._Cursor__spec  # pylint: disable=protected-access
         docs_count = await self._collection.count_documents(  # type: ignore
             self._filter,
         )
@@ -207,27 +214,32 @@ class Motor(Base):
     async def _embed(self) -> discord.Embed:
         """Get current page as embed."""
         skip = (self._current - 1) * self._per_page
-        records = await self._collection.find(  # type: ignore
-            self._filter,
-        ).skip(skip).limit(self._per_page).to_list(self._per_page)
+        records = (
+            await self._collection.find(  # type: ignore
+                self._filter,
+            )
+            .skip(skip)
+            .limit(self._per_page)
+            .to_list(self._per_page)
+        )
 
         formatted_records = map(self._formatter, records)
         return discord.Embed(
             title=self._title,
             color=discord.Color.blue(),
-            description=f'{self._separator.join(formatted_records)}\n'
-                        f'Page: {self._current}/{self._count}',
+            description=f"{self._separator.join(formatted_records)}\n"
+            f"Page: {self._current}/{self._count}",
         )
 
 
 async def post_from_motor(
-        *,
-        ctx: Context,
-        data: pymongo.cursor.Cursor,
-        title: str,
-        formatter: typing.Callable = str,
-        separator: str = DEFAULT_SEPARATOR,
-        timeout: int = 10,
+    *,
+    ctx: Context,
+    data: pymongo.cursor.Cursor,
+    title: str,
+    formatter: t.Callable = str,
+    separator: str = DEFAULT_SEPARATOR,
+    timeout: int = 10,
 ):
     """Post paginator from motor cursor."""
     paginator = Motor(

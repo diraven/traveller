@@ -1,12 +1,11 @@
 """Autorole cog module."""
-import discord
 import asyncio
-from discord.ext import commands
 
+import discord
+from core import utils
 from core.cogbase import CogBase
 from core.context import Context
-from core import utils
-
+from discord.ext import commands
 from extensions.autorole.models import Autorole
 
 
@@ -18,35 +17,34 @@ class Cog(CogBase):
         """Show autorole's status."""
         result = await Autorole.get(ctx.guild.id)
         if result:
-            delay = result['delay']
-            role = ctx.guild.get_role(result['role_id'])
+            delay = result["delay"]
+            role = ctx.guild.get_role(result["role_id"])
             try:
-                await ctx.post_info(f'{role.mention} with {delay}m delay.')
+                await ctx.post_info(f"{role.mention} with {delay}m delay.")
             except AttributeError:
                 await Autorole.delete(ctx.guild.id)
         else:
-            await ctx.post_info(f'Not set.')
+            await ctx.post_info("Not set.")
 
     @autorole.command()
     @utils.is_owner_or_admin()
     async def disable(self, ctx: Context):
         """Shutdown of work autorole module."""
         await Autorole.delete(ctx.guild.id)
-        await ctx.post_info('Autorole disabled.')
+        await ctx.post_info("Autorole disabled.")
 
     @autorole.command()
     @utils.is_owner_or_admin()
     async def setup(self, ctx: Context, role: discord.Role, delay: float):
         """Set role for autorole module."""
-        if not (0 < delay < 40):
+        if not 0 < delay < 40:
             await ctx.post_error(
-                'Delay must be between 0 and 40',
+                "Delay must be between 0 and 40",
             )
         else:
             await Autorole.add(ctx.guild.id, role.id, float(delay))
             await ctx.post_info(
-                f'Autorole was set to {role.mention} '
-                f'with {delay} minute(s) delay.',
+                f"Autorole was set to {role.mention} " f"with {delay} minute(s) delay.",
             )
 
     @commands.Cog.listener()
@@ -54,9 +52,9 @@ class Cog(CogBase):
         """Event that occurs after the user joins."""
         result = await Autorole.get(member.guild.id)
         if result:
-            role = member.guild.get_role(result['role_id'])
+            role = member.guild.get_role(result["role_id"])
             if role:
-                await asyncio.sleep(float(result['delay']) * 60)
+                await asyncio.sleep(float(result["delay"]) * 60)
                 await member.add_roles(role)
             else:
                 await Autorole.delete(member.guild.id)
