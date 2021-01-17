@@ -9,5 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Prepare .env
+        run: cp example_.env .env
       - name: Run CI pipeline
         run: docker-compose run app bash devops/ci.bash
