@@ -2,7 +2,7 @@ name: CI
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [master]
   workflow_dispatch:
 jobs:
   ci:
@@ -12,4 +12,4 @@ jobs:
       - name: Run CI
         run: |
           cp example_.env .env
-          docker-compose run app bash devops/ci.bash
+          docker-compose --file .devcontainer/docker-compose.yml run app bash devops/ci.bash

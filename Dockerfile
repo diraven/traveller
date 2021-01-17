@@ -7,7 +7,8 @@ RUN apt update && apt upgrade -y && apt install -y docker docker-compose
 COPY docker-entrypoint /usr/bin/docker-entrypoint
 ENTRYPOINT ["docker-entrypoint"]
 
-COPY . .
+COPY requirements.txt .
 RUN pip install --requirement requirements.txt
 
+COPY . .
 CMD ["python", "main.py"]

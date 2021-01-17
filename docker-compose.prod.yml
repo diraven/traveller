@@ -1,7 +1,6 @@
-version: '3.7'
+version: "3.8"
 
 services:
-
   mongo:
     image: mongo:4.2
     restart: always
@@ -11,7 +10,6 @@ services:
       - .env
     expose:
       - 27017
-
   app:
     image: diraven/crabot:latest
     depends_on:

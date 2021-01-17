@@ -1,21 +1,21 @@
 """Core bot module."""
 import re
-from typing import List
+import typing as t
 
 import discord
 import sentry_sdk
 from discord.ext import commands
-
-from core.cog import Cog
-from core.models import Alias
 from settings import settings
-from .context import Context
+
+from core import paginators, utils
+from core.models import Alias
+from core.context import Context
 
 if settings.SENTRY_DSN:
     sentry_sdk.init(settings.SENTRY_DSN)
 
 
-async def get_prefix(bot: commands.Bot, message: discord.Message) -> List[str]:
+async def get_prefix(bot: commands.Bot, message: discord.Message) -> t.List[str]:
     """Return server prefix based on message."""
     return commands.when_mentioned_or(
         settings.DISCORD_DEFAULT_PREFIX,
@@ -102,3 +102,74 @@ class Bot(commands.Bot):
         else:
             # Raise error otherwise.
             return await super().on_command_error(context, exception)
+
+
+class CogBase(commands.Cog):
+    """Cog base."""
+
+    def __init__(self, bot: "Bot") -> None:
+        """Create cog."""
+        self._bot = bot
+
+
+class Cog(CogBase):
+    """Core cog."""
+
+    @commands.command()
+    async def about(
+        self,
+        ctx: Context,
+    ) -> None:
+        """Show information about bot developer."""
+        await ctx.post_info(
+            "**Developer:** DiRaven#0519 \n"
+            "**Sources:** https://github.com/diraven/crabot \n",
+        )
+
+    @commands.group(invoke_without_command=True)
+    @utils.is_owner_or_admin()
+    async def aliases(
+        self,
+        ctx: Context,
+    ) -> None:
+        """Show configured aliases."""
+        docs = await Alias.get_by_guild(guild_id=ctx.guild.id)
+        await paginators.post_from_motor(
+            ctx=ctx,
+            data=docs,
+            title="command aliases",
+            formatter=lambda x: f'`{x["src"]}` -> `{x["dst"]}`',
+        )
+
+    @aliases.command(name="set")
+    @utils.is_owner_or_admin()
+    async def aliases_set(
+        self,
+        ctx: Context,
+        src: str,
+        dst: str,
+    ) -> None:
+        """Set alias."""
+        await Alias.upsert(
+            guild_id=ctx.guild.id,
+            src=src,
+            dst=dst,
+        )
+        await ctx.react_ok()
+
+    @aliases.command(name="del")
+    @utils.is_owner_or_admin()
+    async def aliases_del(
+        self,
+        ctx: Context,
+        query: str,
+    ) -> None:
+        """Delete alias."""
+        count = await Alias.delete(
+            guild_id=ctx.guild.id,
+            src=query,
+        )
+        if count:
+            await ctx.react_ok()
+        else:
+            await ctx.post_warning("No such alias was found.")

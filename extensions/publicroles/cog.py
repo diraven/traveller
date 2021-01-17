@@ -6,8 +6,8 @@ import Levenshtein
 import discord
 from discord.ext import commands
 
+from core.bot import CogBase
 from core import paginators
-from core.cogbase import CogBase
 from core.context import Context
 from core.utils import escape
 

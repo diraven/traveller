@@ -7,8 +7,7 @@ from discord.ext import commands
 from discord.ext.commands import has_permissions
 
 from core import paginators
-from core.cogbase import CogBase
-from core.context import Context
+from core.bot import CogBase, Context
 from extensions.mod.models import UserLog, LogRecordType
 
 

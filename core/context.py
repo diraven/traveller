@@ -1,28 +1,12 @@
 """Custom bot commands context."""
-import typing
-
 import discord
 from discord.ext import commands
 
 from core.emoji import EMOJI_UNICODE
 
-if typing.TYPE_CHECKING:
-    from core.bot import Bot
-
 
 class Context(commands.Context):
     """Bot command context."""
-
-    def __init__(self, **attrs: typing.Dict) -> None:
-        """Make new context."""
-        self.message: discord.message
-        self.bot: "Bot"
-        self.args: typing.List
-        self.kwargs: typing.Dict
-        self.prefix: str
-        self.command: commands.Command
-
-        super().__init__(**attrs)
 
     async def post_info(self, text: str):
         """Send info message."""
