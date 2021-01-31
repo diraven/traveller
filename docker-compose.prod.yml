@@ -12,7 +12,7 @@ services:
       - 27017
 
   app:
-    image: ghcr.io/diraven/crabot:latest
+    image: ghcr.io/diraven/crabot:master
     depends_on:
       - mongo
     init: true

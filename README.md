@@ -1,14 +1,22 @@
 # Crabot
 
-Is a discord bot that helps with the discord server management.
+Is a discord bot that helps with the discord server public roles management.
 
 ## Usage
 
 ### Development
-- `cp example_docker-compose.override.yml docker-compose.override.yml`
-- `cp example_.env .env` - adjust config variables to your liking.
-- `make run`
+- Use vscode, open project and follow prompts.
+
+or
+
+- Create `docker-compose`, see `.devcontainer/docker-compose.yml` for reference.
+- Create `.env`, see `example.env` for reference.
+- `docker-compose up`.
 
 ### Deployment
-- `cp example_.env .env` - adjust config variables to your liking.
-- `make run`
+- `docker pull ghcr.io/diraven/crabot:master`.
+- Create `docker-compose`, see `docker-compose.prod.yml` for reference.
+- Create `.env`, see `example.env` for reference.
+- `docker-compose up -d`.
+- Invite your bot to the guild.
+- Type `.ping` to verify if it works.
