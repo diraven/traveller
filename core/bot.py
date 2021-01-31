@@ -126,6 +126,14 @@ class Cog(CogBase):
             "**Sources:** https://github.com/diraven/crabot \n",
         )
 
+    @commands.command()
+    async def ping(
+        self,
+        ctx: Context,
+    ) -> None:
+        """Show information about bot developer."""
+        await ctx.post_info("Pong!")
+
     @commands.group(invoke_without_command=True)
     @utils.is_owner_or_admin()
     async def aliases(
