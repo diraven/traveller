@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   mongo:
-    image: mongo:4.2
+    image: mongo:4.4
     restart: always
     volumes:
       - .volumes/mongo:/data/db
@@ -15,6 +15,7 @@ services:
     image: ghcr.io/diraven/crabot:latest
     depends_on:
       - mongo
+    init: true
     restart: always
     env_file:
       - .env
