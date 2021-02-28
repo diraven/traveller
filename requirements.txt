@@ -1,13 +1,15 @@
-pylint
-bandit
-black
-mypy
+# Development
+bandit # common security issues detection
+black # autoformatting
+ipdb # debugging
+ipython # debugging
+mypy # typing
+pylint # linting
+pytest # testing
+pytest-cov # testing coverage
 
-pytest
-pytest-cov
-pytest-asyncio
+# Runtime
+sentry-sdk # sentry integration for exceptions reporting
 
+# App.
 python-levenshtein
-sentry-sdk
-discord.py
-motor

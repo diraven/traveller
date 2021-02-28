@@ -1,36 +1,17 @@
 version: "3.8"
 
 volumes:
-  mongo:
   root:
 
 services:
-  mongo:
-    image: mongo:4.4
-    restart: always
-    volumes:
-      - mongo:/data/db
-    env_file:
-      - ../.env
-    expose:
-      - 27017
-
-  mongoexpress:
-    image: mongo-express
-    restart: "no"
-    ports:
-      - 80:8081
-    env_file:
-      - ../.env
-
   app:
     build: ..
     restart: "no"
     init: true
     volumes:
-      - ..:/workspace/
+      - ..:/app/
       - root:/root/
       - /var/run/docker.sock:/var/run/docker.sock
-    working_dir: /workspace/
+    working_dir: /app/
     command: /bin/sh -c "while sleep 1000; do :; done"
     env_file: ../.env

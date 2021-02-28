@@ -3,9 +3,4 @@
 !.dockerignore
 !.github
 !.devcontainer
-!.pylintrc
 **/__pycache__/
-
-Dockerfile
-docker-compose*
-devops

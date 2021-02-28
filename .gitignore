@@ -3,5 +3,4 @@
 !.dockerignore
 !.github
 !.devcontainer
-!.pylintrc
 **/__pycache__/

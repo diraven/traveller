@@ -1,0 +1,16 @@
+[BASIC]
+good-names=
+    i,
+    j,
+    k
+
+[MESSAGES CONTROL]
+disable=C0330,C0326,C0114,C0115,C0116
+
+[FORMAT]
+max-line-length=88
+
+[MASTER]
+
+[SIMILARITIES]
+ignore-imports=yes
