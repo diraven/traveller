@@ -12,7 +12,7 @@ black --check .
 bandit --configfile devops/configs/bandit.yml --recursive .
 
 # Run linting.
-find . -type f -name "*.py" -not -path "./*/migrations/*" -not -path '*/\.*' | xargs pylint --rcfile devops/configs/.pylintrc
+find . -type f -name "*.py" -not -path '*/\.*' | xargs pylint --rcfile devops/configs/.pylintrc
 
 # Run typing.
 mypy --config-file devops/configs/mypy.ini .
