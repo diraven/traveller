@@ -12,4 +12,7 @@ pytest-cov # testing coverage
 sentry-sdk # sentry integration for exceptions reporting
 
 # App.
+flask
+gunicorn
+python-dotenv
 python-levenshtein

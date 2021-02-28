@@ -24,6 +24,7 @@
 		"ms-python.vscode-pylance",
 		"ms-python.python",
 		"foxundermoon.shell-format",
+		"redhat.vscode-yaml",
 	]
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],

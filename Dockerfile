@@ -11,4 +11,5 @@ RUN pip install --upgrade pip && pip install --requirement requirements.txt
 
 # Project files.
 COPY . .
-CMD ["python", "main.py"]
+ENV FLASK_APP=main.py
+CMD ["gunicorn", "main:app"]
