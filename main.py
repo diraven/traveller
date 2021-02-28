@@ -5,7 +5,12 @@ from core.bot import Bot
 from settings import settings
 from settings.settings import DEBUG
 
-instance = Bot()
+import discord
+
+intents = discord.Intents.default()
+intents.members = True
+
+instance = Bot(intents=intents)
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG if DEBUG else logging.INFO)
 

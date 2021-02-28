@@ -28,9 +28,9 @@ services:
     restart: "no"
     init: true
     volumes:
-      - ..:/workspace/
+      - ..:/app/
       - root:/root/
       - /var/run/docker.sock:/var/run/docker.sock
-    working_dir: /workspace/
+    working_dir: /app/
     command: /bin/sh -c "while sleep 1000; do :; done"
     env_file: ../.env
