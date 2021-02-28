@@ -14,5 +14,7 @@ sentry-sdk # sentry integration for exceptions reporting
 # App.
 flask
 gunicorn
+discord-interactions
 python-dotenv
 python-levenshtein
+requests
