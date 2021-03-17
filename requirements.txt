@@ -1,20 +1,17 @@
-# Development
-bandit # common security issues detection
-black # autoformatting
-ipdb # debugging
-ipython # debugging
-mypy # typing
-pylint # linting
-pytest # testing
-pytest-cov # testing coverage
+bandit
+black
+ipdb
+ipython
+mypy
+pylint
+pylint-pytest
+pytest
+pytest-cov
 
-# Runtime
-sentry-sdk # sentry integration for exceptions reporting
-
-# App.
+discord-interactions
 flask
 gunicorn
-discord-interactions
 python-dotenv
 python-levenshtein
 requests
+sentry-sdk

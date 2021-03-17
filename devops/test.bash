@@ -4,10 +4,17 @@ set -o pipefail
 set -o nounset
 #set -o xtrace
 
-# Build image.
-devops/build.bash
+# Enforce code style.
+black --check crabot
 
-# Test image.
-bash devops/utils/echo_info.bash "Test $(pwd)"
+# Enforce code style.
+bandit --configfile bandit.yml --recursive crabot
 
-docker run crabot:local devops/utils/test_container.bash
+# Run linting.
+pylint crabot
+
+# Run typing.
+mypy crabot
+
+# Run tests.
+python3 -m pytest

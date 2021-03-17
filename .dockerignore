@@ -1,6 +1,2 @@
 .*
-!.gitignore
-!.dockerignore
-!.github
-!.devcontainer
-**/__pycache__/
+__pycache__

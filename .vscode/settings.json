@@ -1,0 +1,37 @@
+// WARNING: do not edit, changes will be lost.
+{
+    // General settings.
+    "terminal.integrated.shell.linux": "zsh",
+    "telemetry.enableTelemetry": false,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true
+    },
+    // Python.
+    "python.pythonPath": "/usr/local/bin/python",
+    "python.languageServer": "Pylance",
+    // Formatting.
+    "python.formatting.provider": "black",
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
+    // Linting settings.
+    "python.linting.enabled": true,
+    "python.linting.lintOnSave": true,
+    // Pylint.
+    "python.linting.pylintEnabled": true,
+    "python.linting.pylintUseMinimalCheckers": false,
+    "python.linting.pylintArgs": [
+        "--rcfile=${workspaceFolder}/devops/configs/pylintrc.ini"
+    ],
+    // Mypy.
+    "python.linting.mypyEnabled": true,
+    "python.linting.mypyArgs": [
+        "--follow-imports=silent",
+        "--show-column-numbers"
+    ],
+    // Bandit.
+    "python.linting.banditEnabled": true,
+    "python.linting.banditArgs": [
+        "--configfile",
+        "${workspaceFolder}/devops/configs/bandit.yml"
+    ],
+}
