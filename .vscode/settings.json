@@ -1,7 +1,7 @@
 // WARNING: do not edit, changes will be lost.
 {
     // General settings.
-    "terminal.integrated.shell.linux": "zsh",
+    "terminal.integrated.shell.linux": "/usr/bin/zsh",
     "telemetry.enableTelemetry": false,
     "editor.codeActionsOnSave": {
         "source.organizeImports": true

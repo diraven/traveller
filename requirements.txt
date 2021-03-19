@@ -8,6 +8,7 @@ pylint-pytest
 pytest
 pytest-cov
 
+python-dateutil
 discord-interactions
 flask
 gunicorn
