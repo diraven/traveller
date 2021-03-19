@@ -17,5 +17,6 @@
 		"redhat.vscode-yaml",
 		"github.vscode-pull-request-github",
 		"ms-azuretools.vscode-docker",
-	]
+	],
+	"postCreateCommand": "sh -c \"$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\" \"\" --unattended"
 }

@@ -3,8 +3,7 @@ LABEL maintainer="oleksa.pavlenko@gmail.com"
 WORKDIR /app/
 
 # OS dependencoes.
-RUN apt update && apt install -y docker.io zsh && \
-    sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+RUN apt update && apt install -y docker.io zsh
 
 # Python dependencies.
 COPY requirements.txt .
