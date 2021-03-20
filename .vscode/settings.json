@@ -19,9 +19,6 @@
     // Pylint.
     "python.linting.pylintEnabled": true,
     "python.linting.pylintUseMinimalCheckers": false,
-    "python.linting.pylintArgs": [
-        "--rcfile=${workspaceFolder}/devops/configs/pylintrc.ini"
-    ],
     // Mypy.
     "python.linting.mypyEnabled": true,
     "python.linting.mypyArgs": [
@@ -32,6 +29,6 @@
     "python.linting.banditEnabled": true,
     "python.linting.banditArgs": [
         "--configfile",
-        "${workspaceFolder}/devops/configs/bandit.yml"
+        "${workspaceFolder}/bandit.yml"
     ],
 }

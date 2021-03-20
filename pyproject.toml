@@ -14,6 +14,7 @@ skip_covered = true
 
 [tool.pylint.BASIC]
 good-names = [
+  "id",
   "pk",
   "df",
   "i",

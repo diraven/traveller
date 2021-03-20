@@ -7,6 +7,7 @@ pylint
 pylint-pytest
 pytest
 pytest-cov
+responses
 
 python-dateutil
 discord-interactions
