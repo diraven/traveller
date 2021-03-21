@@ -1,10 +1,36 @@
 import typing as t
 
 import pytest
-from crabot import discord
 
 
-@pytest.fixture()
+@pytest.fixture(autouse=True)
+def patch_signature(monkeypatch):
+    def verify_key_decorator(*args, **kwargs):  # pylint: disable=unused-argument
+        def _decorator(fnc):
+            return fnc
+
+        return _decorator
+
+    monkeypatch.setattr(
+        "discord_interactions.verify_key_decorator", verify_key_decorator
+    )
+
+
+@pytest.fixture(autouse=True)
+def configure():
+    from crabot.main import app  # pylint: disable=import-outside-toplevel
+
+    app.config.update(
+        {
+            "DISCORD_BOT_TOKEN": "test_bot_token",
+            "DISCORD_CLIENT_ID": "test_client_id",
+            "DISCORD_CLIENT_PUBLIC_KEY": "test_public_key",
+            "DISCORD_GUILD_ID": "test_guild_id",
+        }
+    )
+
+
+@pytest.fixture(scope="session")
 def client():
     from crabot import main  # pylint: disable=import-outside-toplevel
 
@@ -13,8 +39,10 @@ def client():
         yield flask_client
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def interact(client):  # pylint: disable=redefined-outer-name
+    from crabot import discord  # pylint: disable=import-outside-toplevel
+
     default_interaction_type = discord.InteractionType.APPLICATION_COMMAND
 
     def fnc(  # pylint: disable=too-many-arguments
@@ -60,16 +88,3 @@ def interact(client):  # pylint: disable=redefined-outer-name
         )
 
     return fnc
-
-
-@pytest.fixture(autouse=True)
-def patch_signature(monkeypatch):
-    def verify_key_decorator(*args, **kwargs):  # pylint: disable=unused-argument
-        def _decorator(fnc):
-            return fnc
-
-        return _decorator
-
-    monkeypatch.setattr(
-        "discord_interactions.verify_key_decorator", verify_key_decorator
-    )
