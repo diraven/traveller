@@ -9,8 +9,6 @@ import flask
 import requests
 from requests.sessions import CaseInsensitiveDict
 
-from crabot.discord import ApplicationCommandOptionType as OptionType
-
 
 @enum.unique
 class ApplicationCommandOptionType(enum.Enum):
@@ -162,7 +160,7 @@ class Api:
                             {
                                 "name": "page",
                                 "description": "Сторінка",
-                                "type": OptionType.INTEGER.value,
+                                "type": ApplicationCommandOptionType.INTEGER.value,
                             }
                         ],
                     },
@@ -174,7 +172,7 @@ class Api:
                             {
                                 "name": "role",
                                 "description": "Роль",
-                                "type": OptionType.ROLE.value,
+                                "type": ApplicationCommandOptionType.ROLE.value,
                                 "required": True,
                             }
                         ],
@@ -187,7 +185,7 @@ class Api:
                             {
                                 "name": "role",
                                 "description": "Роль",
-                                "type": OptionType.ROLE.value,
+                                "type": ApplicationCommandOptionType.ROLE.value,
                                 "required": True,
                             }
                         ],
