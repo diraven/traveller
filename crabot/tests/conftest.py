@@ -4,7 +4,7 @@ import pytest
 
 
 @pytest.fixture(autouse=True)
-def patch_signature(monkeypatch):
+def disable_verification(monkeypatch):
     def verify_key_decorator(*args, **kwargs):  # pylint: disable=unused-argument
         def _decorator(fnc):
             return fnc
