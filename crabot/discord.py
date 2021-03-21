@@ -92,7 +92,7 @@ class Api:
 
         self.client = requests.session()
         self.client.headers = CaseInsensitiveDict(
-            {"Authorization": f"Bot {os.environ['DISCORD_BOT_TOKEN']}"}
+            {"Authorization": f"Bot {self.bot_token}"}
         )
 
     @staticmethod
