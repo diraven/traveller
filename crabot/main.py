@@ -24,7 +24,7 @@ api = discord.Api(
 
 
 @app.route("/interactions/", methods=["POST"])
-@discord_interactions.verify_key_decorator(app.config["PUBLIC_KEY"])
+@discord_interactions.verify_key_decorator(app.config["DISCORD_CLIENT_PUBLIC_KEY"])
 def interactions():
     request = flask.request.json
     interaction = discord.Interaction(**request)
