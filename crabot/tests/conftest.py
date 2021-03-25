@@ -1,19 +1,13 @@
 import typing as t
 
+import discord_interactions
 import pytest
+from crabot import discord
 
 
 @pytest.fixture(autouse=True)
 def disable_verification(monkeypatch):
-    def verify_key_decorator(*args, **kwargs):  # pylint: disable=unused-argument
-        def _decorator(fnc):
-            return fnc
-
-        return _decorator
-
-    monkeypatch.setattr(
-        "discord_interactions.verify_key_decorator", verify_key_decorator
-    )
+    monkeypatch.setattr(discord_interactions, "verify_key", lambda *x, **y: True)
 
 
 @pytest.fixture(autouse=True)
@@ -30,7 +24,7 @@ def configure():
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def client():
     from crabot import main  # pylint: disable=import-outside-toplevel
 
@@ -39,10 +33,8 @@ def client():
         yield flask_client
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def interact(client):  # pylint: disable=redefined-outer-name
-    from crabot import discord  # pylint: disable=import-outside-toplevel
-
     default_interaction_type = discord.InteractionType.APPLICATION_COMMAND
 
     def fnc(  # pylint: disable=too-many-arguments
@@ -57,6 +49,7 @@ def interact(client):  # pylint: disable=redefined-outer-name
             member_roles = []
         return client.post(
             "/interactions/",
+            headers={"X-Signature-Ed25519": "dummy", "X-Signature-Timestamp": "dummy"},
             json={
                 "application_id": application_id,
                 "channel_id": channel_id,

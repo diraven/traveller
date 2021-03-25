@@ -17,4 +17,4 @@ pylint crabot
 mypy crabot
 
 # Run tests.
-python3 -m pytest
+python3 -m pytest -s
