@@ -36,17 +36,17 @@ def interactions():
         if interaction.data["name"] == "games":
 
             if interaction.data["options"][0]["name"] == "list":
-                # TODO: List all public roles
-                # TODO: Make sure to paginate the list
                 try:
-                    page = interaction.data["options"][0]["options"][0]["value"]
+                    page_num = interaction.data["options"][0]["options"][0]["value"]
                 except KeyError:
-                    page = 1
-                print(
-                    api.get_page(map(lambda x: x["name"], api.get_public_roles())),
-                    page,
+                    page_num = 1
+                page_content, page_count = api.get_page(
+                    map(lambda x: x["name"], api.get_public_roles()), page_num
                 )
-                return api.new_interaction_response("Games list!")
+                return api.new_interaction_response(
+                    text=f"{page_content}",
+                    footer=f"Сторінка {min(page_num, page_count)}/{page_count}",
+                )
 
             if interaction.data["options"][0]["name"] == "join":
                 # TODO: Make sure role is public

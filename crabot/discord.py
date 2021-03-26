@@ -1,7 +1,6 @@
 import dataclasses
 import datetime
 import enum
-import os
 import typing as t
 
 import dateutil.parser
@@ -96,18 +95,62 @@ class Api:
         )
 
     @staticmethod
-    def new_interaction_response(text: str):
+    def new_interaction_response(text: str, title: str = "", footer: str = ""):
         return flask.jsonify(
             {
                 "type": InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE.value,
-                "data": {"content": text},
+                "data": {
+                    "embeds": [
+                        Api.new_embed(description=text, title=title, footer=footer)
+                    ],
+                },
             }
         )
 
     @staticmethod
-    def get_page(items: t.List[str], page_num: int = 1) -> t.Tuple[str, int]:
-        separator = "\n"
-        max_page_len = 1000
+    def new_embed(
+        description: str,
+        title: str,
+        footer: str,
+        # url,
+        # timestamp,
+        # color,
+        # footer,
+        # image,
+        # thumbnail,
+        # video,
+        # provider,
+        # author,
+        # fields,
+    ):
+        return {
+            "description": description,
+            "title": title,
+            "footer": {"text": footer, "icon_url": "", "proxy_icon_url": ""},
+            # "type": "rich",
+            # "": "",
+            # "timestamp": "",
+            # "color": "",
+            # "author": {
+            #     "name": "",
+            #     "url": "",
+            #     "icon_url": "",
+            #     "proxy_icon_url": "",
+            # },
+            # "fields": [
+            #     {
+            #         "name": "",
+            #         "value": "",
+            #         "inline": "",
+            #     }
+            # ],
+        }
+
+    @staticmethod
+    def get_page(items: t.Iterable[str], page_num: int = 1) -> t.Tuple[str, int]:
+        items = [i for i in items]
+        separator = " **|** "
+        max_page_len = 100
         pages: t.List[str] = []
 
         length = 0
@@ -122,19 +165,22 @@ class Api:
         pages.append(
             separator.join(items[start:]) or "None",
         )
-        count = len(pages)
-        return pages[page_num], count
+        try:
+            page = pages[page_num - 1]
+        except IndexError:
+            page = pages[-1]
+        return page, len(pages)
 
     def get_public_roles(self):
         response = self.client.get(f"{self.guild_api_url}/roles")
         all_roles = response.json()
-        marker_seen = False
         public_roles = []
-        for role in all_roles:
-            if marker_seen:
+        for role in sorted(all_roles, key=lambda x: x["position"]):
+            if role["name"] == "public-roles":
+                break
+            if role["name"] != "@everyone":
                 public_roles.append(role)
-                continue
-            marker_seen = role["name"] == "public-roles"
+
         return public_roles
 
     def list_commands(self):
