@@ -34,30 +34,49 @@ def interactions():
             return api.new_interaction_response("Pong!")
 
         if interaction.data["name"] == "games":
+            public_roles = api.get_public_roles()
 
+            def is_public(role_id):
+                return role_id in [role["id"] for role in public_roles]
+
+            # List public roles.
             if interaction.data["options"][0]["name"] == "list":
                 try:
                     page_num = interaction.data["options"][0]["options"][0]["value"]
                 except KeyError:
                     page_num = 1
                 page_content, page_count = api.get_page(
-                    map(lambda x: x["name"], api.get_public_roles()), page_num
+                    map(lambda x: x["name"], public_roles), page_num
                 )
-                return api.new_interaction_response(
+                return api.info(
                     text=f"{page_content}",
                     footer=f"Сторінка {min(page_num, page_count)}/{page_count}",
                 )
 
-            if interaction.data["options"][0]["name"] == "join":
-                # TODO: Make sure role is public
-                # TODO: Assign role to person asking
-                print(api.get_public_roles())
-                return api.new_interaction_response("Games list!")
+            # The rest of the commands are for public roles only.
+            role_id = interaction.data["options"][0]["options"][0]["value"]
+            if not is_public(role_id):
+                return api.error(
+                    text=f"Роль <@&{role_id}> не є публічною.",
+                )
 
+            # Get public role.
+            if interaction.data["options"][0]["name"] == "join":
+                api.member_add_role(interaction.member.user.id, role_id)
+                return api.success(
+                    text=f"Роль <@&{role_id}> додано.",
+                )
+
+            # Get rid of public role.
             if interaction.data["options"][0]["name"] == "leave":
-                # TODO: Make sure role is public
-                # TODO: Unassign role from person asking
-                print(api.get_public_roles())
-                return api.new_interaction_response("Games list!")
+                api.member_remove_role(interaction.member.user.id, role_id)
+                return api.success(
+                    text=f"Роль <@&{role_id}> знято.",
+                )
+
+            # List players.
+            if interaction.data["options"][0]["name"] == "play":
+                # TODO: List members that have given role
+                pass
 
     raise RuntimeError(f"Unknown interaction: {interaction.data}")

@@ -34,6 +34,34 @@ class InteractionResponseType(enum.Enum):
     DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE = 5
 
 
+@enum.unique
+class Color(enum.Enum):
+    DEFAULT = 0  # 000000
+    AQUA = 1752220  # 1ABC9C
+    DARK_AQUA = 1146986  # 11806A
+    GREEN = 3066993  # 2ECC71
+    DARK_GREEN = 2067276  # 1F8B4C
+    BLUE = 3447003  # 3498DB
+    DARK_BLUE = 2123412  # 206694
+    PURPLE = 10181046  # 9B59B6
+    DARK_PURPLE = 7419530  # 71368A
+    LUMINOUS_VIVID_PINK = 15277667  # E91E63
+    DARK_VIVID_PINK = 11342935  # AD1457
+    GOLD = 15844367  # F1C40F
+    DARK_GOLD = 12745742  # C27C0E
+    ORANGE = 15105570  # E67E22
+    DARK_ORANGE = 11027200  # A84300
+    RED = 15158332  # E74C3C
+    DARK_RED = 10038562  # 992D22
+    GREY = 9807270  # 95A5A6
+    DARK_GREY = 9936031  # 979C9F
+    DARKER_GREY = 8359053  # 7F8C8D
+    LIGHT_GREY = 12370112  # BCC0C0
+    NAVY = 3426654  # 34495E
+    DARK_NAVY = 2899536  # 2C3E50
+    YELLOW = 16776960  # FFFF00
+
+
 @dataclasses.dataclass
 class User:
     avatar: str
@@ -95,60 +123,72 @@ class Api:
         )
 
     @staticmethod
-    def new_interaction_response(text: str, title: str = "", footer: str = ""):
+    def new_interaction_response(
+        text: str, title: str = "", footer: str = "", color=Color.DEFAULT
+    ):
         return flask.jsonify(
             {
                 "type": InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE.value,
                 "data": {
                     "embeds": [
-                        Api.new_embed(description=text, title=title, footer=footer)
+                        {
+                            "description": text,
+                            "title": title,
+                            "footer": {
+                                "text": footer,
+                                "icon_url": "",
+                                "proxy_icon_url": "",
+                            },
+                            "color": color.value,
+                            # "type": "rich",
+                            # "": "",
+                            # "timestamp": "",
+                            # "author": {
+                            #     "name": "",
+                            #     "url": "",
+                            #     "icon_url": "",
+                            #     "proxy_icon_url": "",
+                            # },
+                            # "fields": [
+                            #     {
+                            #         "name": "",
+                            #         "value": "",
+                            #         "inline": "",
+                            #     }
+                            # ],
+                        }
                     ],
                 },
             }
         )
 
     @staticmethod
-    def new_embed(
-        description: str,
-        title: str,
-        footer: str,
-        # url,
-        # timestamp,
-        # color,
-        # footer,
-        # image,
-        # thumbnail,
-        # video,
-        # provider,
-        # author,
-        # fields,
-    ):
-        return {
-            "description": description,
-            "title": title,
-            "footer": {"text": footer, "icon_url": "", "proxy_icon_url": ""},
-            # "type": "rich",
-            # "": "",
-            # "timestamp": "",
-            # "color": "",
-            # "author": {
-            #     "name": "",
-            #     "url": "",
-            #     "icon_url": "",
-            #     "proxy_icon_url": "",
-            # },
-            # "fields": [
-            #     {
-            #         "name": "",
-            #         "value": "",
-            #         "inline": "",
-            #     }
-            # ],
-        }
+    def success(text: str, title: str = "", footer: str = ""):
+        if not title:
+            title = "Успіх"
+        return Api.new_interaction_response(text, title, footer, Color.GREEN)
+
+    @staticmethod
+    def info(text: str, title: str = "", footer: str = ""):
+        if not title:
+            title = "Інформація"
+        return Api.new_interaction_response(text, title, footer, Color.BLUE)
+
+    @staticmethod
+    def warning(text: str, title: str = "", footer: str = ""):
+        if not title:
+            title = "Попередження"
+        return Api.new_interaction_response(text, title, footer, Color.ORANGE)
+
+    @staticmethod
+    def error(text: str, title: str = "", footer: str = ""):
+        if not title:
+            title = "Помилка"
+        return Api.new_interaction_response(text, title, footer, Color.RED)
 
     @staticmethod
     def get_page(items: t.Iterable[str], page_num: int = 1) -> t.Tuple[str, int]:
-        items = [i for i in items]
+        items = list(items)
         separator = " **|** "
         max_page_len = 100
         pages: t.List[str] = []
@@ -253,3 +293,15 @@ class Api:
             )
             responses.append(response)
         return responses
+
+    def member_add_role(self, user_id, role_id):
+        response = self.client.put(
+            f"{self.guild_api_url}/members/{user_id}/roles/{role_id}"
+        )
+        return response.status_code
+
+    def member_remove_role(self, user_id, role_id):
+        response = self.client.delete(
+            f"{self.guild_api_url}/members/{user_id}/roles/{role_id}"
+        )
+        return response.status_code
