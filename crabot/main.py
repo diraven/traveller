@@ -3,7 +3,7 @@ import os
 import discord_interactions
 import flask
 
-from . import discord
+from .api import Api
 
 app = flask.Flask(__name__)
 
@@ -17,7 +17,7 @@ if not app.config["TESTING"]:
         }
     )
 
-api = discord.Api(
+api = Api(
     guild_id=app.config["DISCORD_GUILD_ID"],
     bot_token=app.config["DISCORD_BOT_TOKEN"],
 )
@@ -27,26 +27,23 @@ api = discord.Api(
 @discord_interactions.verify_key_decorator(app.config["DISCORD_CLIENT_PUBLIC_KEY"])
 def interactions():
     request = flask.request.json
-    interaction = discord.Interaction(**request)
-    if interaction.type == discord.InteractionType.APPLICATION_COMMAND:
+    interaction = api.parse_interaction(request)
+    if interaction.type == interaction.Type.APPLICATION_COMMAND:
 
         if interaction.data["name"] == "ping":
-            return api.new_interaction_response("Pong!")
+            return api.info("Pong!")
 
         if interaction.data["name"] == "games":
-            public_roles = api.get_public_roles()
-
-            def is_public(role_id):
-                return role_id in [role["id"] for role in public_roles]
-
             # List public roles.
             if interaction.data["options"][0]["name"] == "list":
                 try:
                     page_num = interaction.data["options"][0]["options"][0]["value"]
                 except KeyError:
                     page_num = 1
+                if page_num < 1:
+                    page_num = 1
                 page_content, page_count = api.get_page(
-                    map(lambda x: x["name"], public_roles), page_num
+                    map(lambda x: x.name, api.public_roles), page_num
                 )
                 return api.info(
                     text=f"{page_content}",
@@ -55,28 +52,40 @@ def interactions():
 
             # The rest of the commands are for public roles only.
             role_id = interaction.data["options"][0]["options"][0]["value"]
-            if not is_public(role_id):
+            try:
+                role = api.get_public_role(role_id)
+            except StopIteration:
                 return api.error(
                     text=f"Роль <@&{role_id}> не є публічною.",
                 )
 
             # Get public role.
             if interaction.data["options"][0]["name"] == "join":
-                api.member_add_role(interaction.member.user.id, role_id)
+                api.member_add_role(interaction.member, role)
                 return api.success(
-                    text=f"Роль <@&{role_id}> додано.",
+                    text=f"Роль {role} додано.",
                 )
 
             # Get rid of public role.
             if interaction.data["options"][0]["name"] == "leave":
-                api.member_remove_role(interaction.member.user.id, role_id)
+                api.member_remove_role(interaction.member, role)
                 return api.success(
-                    text=f"Роль <@&{role_id}> знято.",
+                    text=f"Роль {role} знято.",
                 )
 
             # List players.
             if interaction.data["options"][0]["name"] == "play":
-                # TODO: List members that have given role
-                pass
+                playing_members = filter(
+                    lambda member: role.id in member.roles, api.guild_members
+                )
+                page_content, page_count = api.get_page(
+                    [str(member) for member in playing_members]
+                )
+                return api.success(
+                    title=f"Грають в {role.name}",
+                    text=page_content or "Ніхто"
+                    if page_count == 1
+                    else f"{page_content} та інші...",
+                )
 
     raise RuntimeError(f"Unknown interaction: {interaction.data}")

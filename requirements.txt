@@ -9,10 +9,11 @@ pytest
 pytest-cov
 responses
 
-python-dateutil
+cached-property
 discord-interactions
 flask
 gunicorn
+python-dateutil
 python-dotenv
 python-levenshtein
 requests
