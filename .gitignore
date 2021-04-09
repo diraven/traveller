@@ -4,6 +4,7 @@
 !.devcontainer
 !.vscode
 !.coveragerc
+!.github
 
 *.py[cod]
 **/__pycache__
