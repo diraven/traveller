@@ -12,4 +12,4 @@ RUN pip install --upgrade pip && pip install --requirement requirements.txt
 # Project files.
 COPY . .
 ENV FLASK_APP=crabot/main.py
-CMD ["gunicorn", "--bind", "0.0.0.0" "crabot.main:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0", "crabot.main:app"]
