@@ -9,7 +9,6 @@ pytest
 pytest-cov
 responses
 
-cached-property
 discord-interactions
 flask
 gunicorn

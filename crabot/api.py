@@ -1,38 +1,56 @@
 import os
 import typing as t
+from datetime import datetime, timedelta
+from functools import lru_cache, wraps
 
 import flask
 import requests
-from cached_property import cached_property_with_ttl
 from requests.sessions import CaseInsensitiveDict
 
 from .models import ApplicationCommandOptionType, Color, Interaction, Member, Role
 
 
+def timed_lru_cache(seconds: int):
+    def wrapper_cache(func):
+        func = lru_cache()(func)
+        func.lifetime = timedelta(seconds=seconds)
+        func.expiration = datetime.utcnow() + func.lifetime
+
+        @wraps(func)
+        def wrapped_func(*args, **kwargs):
+            if datetime.utcnow() >= func.expiration:
+                func.cache_clear()
+                func.expiration = datetime.utcnow() + func.lifetime
+
+            return func(*args, **kwargs)
+
+        return wrapped_func
+
+    return wrapper_cache
+
+
 class Api:
-    def __init__(self, guild_id: str, bot_token: str, version="8"):
+    def __init__(self, bot_token: str, version="8"):
         self.base_api_url = "https://discord.com/api"
 
         self.application_id = os.environ["DISCORD_CLIENT_ID"]
 
         self.version = version
-        self.guild_id = guild_id
         self.bot_token = bot_token
 
         self.api_url = f"{self.base_api_url}/v{self.version}"
-        self.guild_api_url = f"{self.api_url}/guilds/{guild_id}"
 
         self.client = requests.session()
         self.client.headers = CaseInsensitiveDict(
             {"Authorization": f"Bot {self.bot_token}"}
         )
 
-    def _list_commands(self):
-        response = self.client.get(f"{self.guild_api_url}/commands")
+    def _list_commands(self, guild_id: str):
+        response = self.client.get(f"{self.api_url}/guilds/{guild_id}/commands")
         return response.json()
 
-    def _register_commands(self):
-        responses = []
+    def _register_commands(self, guild_id: str):
+        responses: t.List[requests.Response] = []
         for definition in [
             {
                 "name": "ping",
@@ -93,22 +111,28 @@ class Api:
                             }
                         ],
                     },
+                    {
+                        "name": "my",
+                        "description": "Мої ігри",
+                        "type": 1,
+                        "options": [],
+                    },
                 ],
             },
         ]:
             response = self.client.post(
                 f"{self.api_url}/applications/{self.application_id}"
-                f"/guilds/{self.guild_id}/commands",
+                f"/guilds/{guild_id}/commands",
                 json=definition,
             )
             response.raise_for_status()
         return responses
 
-    def _unregister_commands(self):
+    def _unregister_commands(self, guild_id: str):
         responses = []
-        for command in self._list_commands():
+        for command in self._list_commands(guild_id):
             response = self.client.delete(
-                f"{self.guild_api_url}/commands/{command['id']}"
+                f"{self.api_url}/guilds/{guild_id}/commands/{command['id']}"
             )
             responses.append(response)
         return responses
@@ -206,16 +230,16 @@ class Api:
     def parse_interaction(data: t.Dict) -> Interaction:
         return Interaction(**data)
 
-    @cached_property_with_ttl(ttl=5)
-    def guild_roles(self) -> t.List[Role]:
-        response = self.client.get(f"{self.guild_api_url}/roles")
+    @timed_lru_cache(60)
+    def get_guild_roles(self, guild_id: str) -> t.List[Role]:
+        response = self.client.get(f"{self.api_url}/guilds/{guild_id}/roles")
         response.raise_for_status()
         return [Role(**data) for data in response.json()]
 
-    @property
-    def public_roles(self) -> t.List[Role]:
+    @timed_lru_cache(60)
+    def get_public_roles(self, guild_id: str) -> t.List[Role]:
         public_roles = []
-        for role in sorted(self.guild_roles, key=lambda x: x.position):
+        for role in sorted(self.get_guild_roles(guild_id), key=lambda x: x.position):
             if role.name == "public-roles":
                 break
             if role.name != "@everyone":
@@ -223,26 +247,26 @@ class Api:
 
         return public_roles
 
-    def member_add_role(self, member: Member, role: Role) -> None:
+    def member_add_role(self, guild_id: str, member: Member, role: Role) -> None:
         response = self.client.put(
-            f"{self.guild_api_url}/members/{member.user.id}/roles/{role.id}"
+            f"{self.api_url}/guilds/{guild_id}/members/{member.user.id}/roles/{role.id}"
         )
         response.raise_for_status()
 
-    def member_remove_role(self, member: Member, role: Role) -> None:
+    def member_remove_role(self, guild_id: str, member: Member, role: Role) -> None:
         response = self.client.delete(
-            f"{self.guild_api_url}/members/{member.user.id}/roles/{role.id}"
+            f"{self.api_url}/guilds/{guild_id}/members/{member.user.id}/roles/{role.id}"
         )
         response.raise_for_status()
 
-    @cached_property_with_ttl(ttl=60)
-    def guild_members(self) -> t.List[Member]:
+    @timed_lru_cache(60)
+    def get_guild_members(self, guild_id) -> t.List[Member]:
         has_more = True
         members = []
         after = ""
         while has_more:
             response = self.client.get(
-                f"{self.guild_api_url}/members?limit=1000{after}",
+                f"{self.api_url}/guilds/{guild_id}/members?limit=1000{after}",
             )
             response.raise_for_status()
             members += [Member(**data) for data in response.json()]
@@ -251,8 +275,19 @@ class Api:
                 after = f"&after={members[-1].user.id}"
         return members
 
-    def get_role(self, role_id: str) -> Role:
-        return next(filter(lambda role: role.id == role_id, self.guild_roles))
+    def get_member(self, guild_id: str, user_id) -> Member:
+        response = self.client.get(
+            f"{self.api_url}/guilds/{guild_id}/members/{user_id}",
+        )
+        response.raise_for_status()
+        return Member(**response.json())
 
-    def get_public_role(self, role_id: str) -> Role:
-        return next(filter(lambda role: role.id == role_id, self.public_roles))
+    def get_role(self, guild_id: str, role_id: str) -> Role:
+        return next(
+            filter(lambda role: role.id == role_id, self.get_guild_roles(guild_id))
+        )
+
+    def get_public_role(self, guild_id: str, role_id: str) -> Role:
+        return next(
+            filter(lambda role: role.id == role_id, self.get_public_roles(guild_id))
+        )
