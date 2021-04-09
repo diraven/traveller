@@ -17,4 +17,4 @@ python-dateutil
 python-dotenv
 python-levenshtein
 requests
-sentry-sdk
+sentry-sdk[flask]
