@@ -1,7 +1,10 @@
 .*
 !.gitignore
 !.dockerignore
-!.github
 !.devcontainer
-!.pylintrc
-**/__pycache__/
+!.vscode
+!.coveragerc
+
+*.py[cod]
+**/__pycache__
+*.egg-info

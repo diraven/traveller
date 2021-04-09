@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  app:
+    build: "."
+    restart: "no"
+    init: true
+    volumes:
+      - ".:/app"
+      - "~/.volumes/crabot/root:/root"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    ports:
+      - "80:80"
+    working_dir: "/app"
+    command: "sleep infinity"
+    env_file:
+      - ".env"

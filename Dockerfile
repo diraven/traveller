@@ -2,13 +2,14 @@ FROM python:3.9
 LABEL maintainer="oleksa.pavlenko@gmail.com"
 WORKDIR /app/
 
-RUN apt update && apt upgrade -y && apt install -y docker docker-compose
+# OS dependencoes.
+RUN apt update && apt install -y docker.io zsh
 
-COPY docker-entrypoint /usr/bin/docker-entrypoint
-ENTRYPOINT ["docker-entrypoint"]
-
+# Python dependencies.
 COPY requirements.txt .
-RUN pip install --requirement requirements.txt
+RUN pip install --upgrade pip && pip install --requirement requirements.txt
 
+# Project files.
 COPY . .
-CMD ["python", "main.py"]
+ENV FLASK_APP=crabot/main.py
+CMD ["gunicorn", "crabot.main:app"]

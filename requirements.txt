@@ -1,13 +1,20 @@
-pylint
 bandit
 black
+ipdb
+ipython
 mypy
-
+pylint
+pylint-pytest
 pytest
 pytest-cov
-pytest-asyncio
+responses
 
+cached-property
+discord-interactions
+flask
+gunicorn
+python-dateutil
+python-dotenv
 python-levenshtein
+requests
 sentry-sdk
-discord.py
-motor

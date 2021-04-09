@@ -1,11 +1,2 @@
 .*
-!.gitignore
-!.dockerignore
-!.github
-!.devcontainer
-!.pylintrc
-**/__pycache__/
-
-Dockerfile
-docker-compose*
-devops
+__pycache__
