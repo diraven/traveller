@@ -260,7 +260,7 @@ class Api:
         )
         response.raise_for_status()
 
-    # @timed_lru_cache(1 * 60 * 60 * 24)
+    @timed_lru_cache(60)
     def get_guild_members(self, guild_id) -> t.List[Member]:
         has_more = True
         members = []
