@@ -2,7 +2,8 @@ import typing as t
 
 import discord_interactions
 import pytest
-from crabot import discord
+
+from .. import api
 
 
 @pytest.fixture(autouse=True)
@@ -19,7 +20,6 @@ def configure():
             "DISCORD_BOT_TOKEN": "test_bot_token",
             "DISCORD_CLIENT_ID": "test_client_id",
             "DISCORD_CLIENT_PUBLIC_KEY": "test_public_key",
-            "DISCORD_GUILD_ID": "test_guild_id",
         }
     )
 
@@ -35,7 +35,7 @@ def client():
 
 @pytest.fixture()
 def interact(client):  # pylint: disable=redefined-outer-name
-    default_interaction_type = discord.InteractionType.APPLICATION_COMMAND
+    default_interaction_type = api.Interaction.Type.APPLICATION_COMMAND
 
     def fnc(  # pylint: disable=too-many-arguments
         data: t.Dict[str, str],
@@ -43,7 +43,7 @@ def interact(client):  # pylint: disable=redefined-outer-name
         channel_id: str = "1234567890",
         guild_id: str = "1234567890",
         member_roles: t.List[str] = None,
-        interaction_type: discord.InteractionType = default_interaction_type,
+        interaction_type: api.Interaction.Type = default_interaction_type,
     ):
         if not member_roles:
             member_roles = []

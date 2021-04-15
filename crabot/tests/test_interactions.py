@@ -1,4 +1,4 @@
-from crabot import discord
+from .. import api
 
 
 def test_wrong_http_term(client):
@@ -7,7 +7,7 @@ def test_wrong_http_term(client):
 
 
 def test_ping(interact):
-    resp = interact({}, interaction_type=discord.InteractionType.PING)
+    resp = interact({}, interaction_type=api.Interaction.Type.PING)
     assert resp.status_code == 200
     assert resp.json["type"] == 1
 

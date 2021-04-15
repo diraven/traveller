@@ -7,11 +7,13 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 
 from .api import Api
 
-sentry_sdk.init(
-    dsn=os.environ["SENTRY_DSN"],
-    integrations=[FlaskIntegration()],
-    traces_sample_rate=1.0,
-)
+sentry_dsn = os.getenv("SENTRY_DSN")
+if sentry_dsn:
+    sentry_sdk.init(
+        dsn=sentry_dsn,
+        integrations=[FlaskIntegration()],
+        traces_sample_rate=1.0,
+    )
 
 app = flask.Flask(__name__)
 
