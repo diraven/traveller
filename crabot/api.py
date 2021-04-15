@@ -1,4 +1,5 @@
 import os
+import time
 import typing as t
 from datetime import datetime, timedelta
 from functools import lru_cache, wraps
@@ -259,7 +260,7 @@ class Api:
         )
         response.raise_for_status()
 
-    @timed_lru_cache(60)
+    # @timed_lru_cache(1 * 60 * 60 * 24)
     def get_guild_members(self, guild_id) -> t.List[Member]:
         has_more = True
         members = []
@@ -273,6 +274,10 @@ class Api:
             has_more = len(response.json()) > 0
             if has_more:
                 after = f"&after={members[-1].user.id}"
+                if int(response.headers["x-ratelimit-remaining"]) == 0:
+                    time.sleep(
+                        float(response.headers["x-ratelimit-reset"]) - time.time()
+                    )
         return members
 
     def get_member(self, guild_id: str, user_id) -> Member:
