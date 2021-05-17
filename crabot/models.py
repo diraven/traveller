@@ -68,6 +68,7 @@ class Member:  # pylint: disable=too-many-instance-attributes
     user: dataclasses.InitVar[User]
     permissions: str = ""
     premium_since: str = ""
+    avatar: str = ""
 
     def __post_init__(self, joined_at, user):
         self.user = User(**user)
