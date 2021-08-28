@@ -116,6 +116,7 @@ class Role:  # pylint: disable=too-many-instance-attributes
     permissions: str
     managed: bool
     mentionable: bool
+    icon: str
     tags: t.Optional[t.List] = None
 
     def __str__(self) -> str:
