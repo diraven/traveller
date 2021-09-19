@@ -1,5 +1,8 @@
 bandit
 black
+discord-interactions
+flask
+gunicorn
 ipdb
 ipython
 mypy
@@ -7,13 +10,11 @@ pylint
 pylint-pytest
 pytest
 pytest-cov
-responses
-
-discord-interactions
-flask
-gunicorn
 python-dateutil
 python-dotenv
 python-levenshtein
 requests
+responses
 sentry-sdk[flask]
+types-python-dateutil
+types-requests

@@ -9,7 +9,7 @@ from .api import Api
 
 sentry_dsn = os.getenv("SENTRY_DSN")
 if sentry_dsn:
-    sentry_sdk.init(
+    sentry_sdk.init(  # pylint: disable=abstract-class-instantiated
         dsn=sentry_dsn,
         integrations=[FlaskIntegration()],
         traces_sample_rate=1.0,
@@ -33,7 +33,7 @@ api = Api(
 
 @app.route("/interactions/", methods=["POST"])
 @discord_interactions.verify_key_decorator(app.config["DISCORD_CLIENT_PUBLIC_KEY"])
-def interactions():
+def interactions():  # pylint: disable=too-many-return-statements,too-many-branches
     request = flask.request.json
     interaction = api.parse_interaction(request)
     if interaction.type == interaction.Type.APPLICATION_COMMAND:
@@ -48,8 +48,7 @@ def interactions():
                     page_num = interaction.data["options"][0]["options"][0]["value"]
                 except KeyError:
                     page_num = 1
-                if page_num < 1:
-                    page_num = 1
+                page_num = max(1, page_num)
                 page_content, page_count = api.get_page(
                     map(lambda x: x.name, api.get_public_roles(interaction.guild_id)),
                     page_num,

@@ -1,14 +1,11 @@
 // WARNING: do not edit, changes will be lost.
 {
     // General settings.
-    "terminal.integrated.shell.linux": "/usr/bin/zsh",
-    "telemetry.enableTelemetry": false,
+    "terminal.integrated.defaultProfile.linux": "zsh",
+    "redhat.telemetry.enabled": false,
     "editor.codeActionsOnSave": {
         "source.organizeImports": true
     },
-    // Python.
-    "python.pythonPath": "/usr/local/bin/python",
-    "python.languageServer": "Pylance",
     // Formatting.
     "python.formatting.provider": "black",
     "editor.formatOnSave": true,
