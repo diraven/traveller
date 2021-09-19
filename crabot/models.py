@@ -116,6 +116,7 @@ class Role:  # pylint: disable=too-many-instance-attributes
     permissions: str
     managed: bool
     mentionable: bool
+    unicode_emoji: str
     icon: str
     tags: t.Optional[t.List] = None
 
