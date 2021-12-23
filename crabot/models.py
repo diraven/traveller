@@ -102,6 +102,7 @@ class Interaction:  # pylint: disable=too-many-instance-attributes
     type: dataclasses.InitVar[Type]
     version: str
     guild_locale: str
+    locale: str
 
     def __post_init__(self, member, type_):
         self.member = Member(**member)
