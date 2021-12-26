@@ -246,7 +246,8 @@ class Api:
             if role.name != "@everyone":
                 public_roles.append(role)
 
-        return reversed(public_roles)
+        public_roles.reverse()
+        return public_roles
 
     def member_add_role(self, guild_id: str, member: Member, role: Role) -> None:
         response = self.client.put(
