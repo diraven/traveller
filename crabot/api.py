@@ -240,7 +240,7 @@ class Api:
     @timed_lru_cache(60)
     def get_public_roles(self, guild_id: str) -> t.List[Role]:
         public_roles = []
-        for role in sorted(self.get_guild_roles(guild_id), key=lambda x: x.position):
+        for role in reversed(sorted(self.get_guild_roles(guild_id), key=lambda x: x.position)):
             if role.name == "public-roles":
                 break
             if role.name != "@everyone":
