@@ -70,6 +70,7 @@ class Member:  # pylint: disable=too-many-instance-attributes
     premium_since: str = ""
     avatar: str = ""
     communication_disabled_until: str = ""
+    flags: str = ""
 
     def __post_init__(self, joined_at, user):
         self.user = User(**user)
