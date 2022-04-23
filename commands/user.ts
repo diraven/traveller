@@ -5,7 +5,7 @@ import { Command } from "../types/command";
 export const cmd: Command = {
   data: new SlashCommandBuilder()
     .setName("user")
-    .setDescription("Replies with Pong!"),
+    .setDescription("Replies with User Data!"),
   execute: async function execute(interaction: CommandInteraction) {
     await interaction.reply(
       `Your tag: ${interaction.user.tag}

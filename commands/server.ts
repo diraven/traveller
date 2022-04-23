@@ -5,7 +5,7 @@ import { Command } from "../types/command";
 export const cmd: Command = {
   data: new SlashCommandBuilder()
     .setName("server")
-    .setDescription("Replies with Pong!"),
+    .setDescription("Replies with Server Data!"),
   execute: async function execute(interaction: CommandInteraction) {
     await interaction.reply(
       `Server name: ${interaction.guild.name}
