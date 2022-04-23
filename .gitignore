@@ -1,11 +1,10 @@
 .*
-!.gitignore
 !.dockerignore
-!.devcontainer
-!.vscode
-!.coveragerc
 !.github
+!.gitignore
+!.eslintrc.json
+*.js.map
+*.js
 
-*.py[cod]
-**/__pycache__
-*.egg-info
+node_modules
+yarn-error.log
