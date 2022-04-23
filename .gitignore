@@ -3,6 +3,8 @@
 !.github
 !.gitignore
 !.eslintrc.json
+!.vscode
+
 *.js.map
 *.js
 
