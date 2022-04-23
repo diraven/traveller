@@ -53,6 +53,7 @@ class User:
     id: str
     public_flags: int
     username: str
+    avatar_decoration: str
     bot: bool = False
 
 
