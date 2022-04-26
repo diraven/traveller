@@ -1,5 +1,9 @@
 import { roleMention, SlashCommandBuilder } from "@discordjs/builders";
-import { arrayToPages } from "../pager";
+import { itemsArrayToPages } from "../pager";
+import { v4 as uuidv4 } from "uuid";
+
+import * as paginationEmbed from "discordjs-button-pagination";
+
 import {
   Collection,
   CommandInteraction,
@@ -13,33 +17,11 @@ import {
   Role,
   RoleManager,
   MessageEmbed,
+  Client,
 } from "discord.js";
 import { Command } from "../types/command";
-
-// return new MessageEmbed()
-// .setColor(embedTypeColor[this.type])
-// .setTitle("Some title")
-// .setURL("https://discord.js.org/")
-// .setAuthor({
-//   name: "Some name",
-//   iconURL: "https://i.imgur.com/AfFp7pu.png",
-//   url: "https://discord.js.org",
-// })
-// .setDescription("Some description here")
-// .setThumbnail("https://i.imgur.com/AfFp7pu.png")
-// .addFields(
-//   { name: "Regular field title", value: "Some value here" },
-//   { name: "\u200B", value: "\u200B" },
-//   { name: "Inline field title", value: "Some value here", inline: true },
-//   { name: "Inline field title", value: "Some value here", inline: true }
-// )
-// .addField("Inline field title", "Some value here", true)
-// .setImage("https://i.imgur.com/AfFp7pu.png")
-// .setTimestamp()
-// .setFooter({
-//   text: "Some footer text here",
-//   iconURL: "https://i.imgur.com/AfFp7pu.png",
-// });
+import { idText } from "typescript";
+import { APIRole } from "discord-api-types/v10";
 
 enum EmbedColor {
   Primary = "#007bff",
@@ -56,7 +38,7 @@ function filterPublicRoles(
   return roles.filter((role) => roleIsPublic(interaction, role));
 }
 
-function roleIsPublic(interaction: Interaction, role: Role): boolean {
+function roleIsPublic(interaction: Interaction, role: Role | APIRole): boolean {
   const bot_role = interaction.guild.members.resolve(interaction.applicationId)
     .roles.botRole;
 
@@ -70,170 +52,139 @@ function getRolesNames(roles: Collection<string, Role>): Array<string> {
   return roles.map((role) => role.name);
 }
 
-export const cmd: Command = {
-  data: new SlashCommandBuilder()
-    .setName("games")
-    .setDescription("Ігри")
-    // List.
-    .addSubcommand((subcommand) =>
-      subcommand.setName("list").setDescription("Список ігор")
-    )
+export let builder = new SlashCommandBuilder()
+  .setName("roles")
+  .setDescription("Публічні ролі")
+  // List.
+  .addSubcommand((subcommand) =>
+    subcommand.setName("list").setDescription("Список публічних ролей")
+  )
 
-    // My.
-    .addSubcommand((subcommand) =>
-      subcommand.setName("my").setDescription("Мої ігри")
-    )
+  // My.
+  .addSubcommand((subcommand) =>
+    subcommand.setName("my").setDescription("Мої публічні ролі")
+  )
 
-    // Who.
-    .addSubcommand((subcommand) =>
-      subcommand
-        .setName("play")
-        .setDescription("Хто грає")
-        .addRoleOption((option) =>
-          option.setName("game").setDescription("Оберіть гру").setRequired(true)
-        )
-    )
+  // Who.
+  .addSubcommand((subcommand) =>
+    subcommand
+      .setName("who")
+      .setDescription("Хто має")
+      .addRoleOption((option) =>
+        option.setName("role").setDescription("Оберіть роль").setRequired(true)
+      )
+  )
 
-    // Join.
-    .addSubcommand((subcommand) =>
-      subcommand
-        .setName("join")
-        .setDescription("Долучитися")
-        .addRoleOption((option) =>
-          option.setName("role").setDescription("Оберіть гру").setRequired(true)
-        )
-    )
+  // Join.
+  .addSubcommand((subcommand) =>
+    subcommand
+      .setName("join")
+      .setDescription("Долучитися")
+      .addRoleOption((option) =>
+        option.setName("role").setDescription("Оберіть роль").setRequired(true)
+      )
+  )
 
-    // Leave.
-    .addSubcommand((subcommand) =>
-      subcommand
-        .setName("leave")
-        .setDescription("Покинути гру")
-        .addRoleOption((option) =>
-          option.setName("role").setDescription("Оберіть гру").setRequired(true)
-        )
-    ),
+  // Leave.
+  .addSubcommand((subcommand) =>
+    subcommand
+      .setName("leave")
+      .setDescription("Покинути роль")
+      .addRoleOption((option) =>
+        option.setName("role").setDescription("Оберіть роль").setRequired(true)
+      )
+  );
 
-  execute: async function execute(interaction: CommandInteraction) {
-    // List.
-    if (interaction.options.getSubcommand() === "list") {
-      console.log(
-        arrayToPages(
+async function sendPages(interaction, items: Array<string>, title: string) {
+  const paginationButtons = [
+    new MessageButton()
+      .setCustomId("previousbtn")
+      .setLabel("<")
+      .setStyle("PRIMARY"),
+    new MessageButton()
+      .setCustomId("nextbtn")
+      .setLabel(">")
+      .setStyle("PRIMARY"),
+  ];
+  const paginationTimeout = 60000;
+
+  let pages = itemsArrayToPages(items, title);
+
+  if (pages.length > 0) {
+    paginationEmbed(interaction, pages, paginationButtons, paginationTimeout);
+  } else {
+    console.log("no pages");
+    // TODO:
+  }
+}
+
+export function init(client: Client) {
+  client.on("interactionCreate", async (interaction) => {
+    // Command.
+    if (interaction.isCommand()) {
+      // List.
+      if (interaction.options.getSubcommand() === "list") {
+        sendPages(
+          interaction,
           getRolesNames(
             filterPublicRoles(
               interaction,
               await interaction.guild.roles.fetch()
             )
-          )
-        )
-      );
+          ).sort(),
+          "Публічні ролі"
+        );
+      }
 
-      interaction.reply({
-        ephemeral: true,
-        embeds: [
-          new MessageEmbed()
-            .setColor(EmbedColor.Primary)
-            .setTitle("Ігрові ролі")
-            .setURL("https://github.com/diraven/traveller")
-            .setDescription("Some description here")
-            .setTimestamp(),
-        ],
-      });
+      // My.
+      if (interaction.options.getSubcommand() === "my") {
+        sendPages(
+          interaction,
+          getRolesNames(
+            filterPublicRoles(
+              interaction,
+              (interaction.member.roles as GuildMemberRoleManager).cache
+            )
+          ).sort(),
+          "Твої публічні ролі"
+        );
+      }
+
+      // Who.
+      if (interaction.options.getSubcommand() === "who") {
+        let role = interaction.options.getRole("role");
+        if (roleIsPublic(interaction, role)) {
+          let members = (interaction.options.getRole("role") as Role).members;
+          console.log(members);
+          sendPages(
+            interaction,
+            members.map(
+              (member) => `${member.user.username}#${member.user.discriminator}`
+            ),
+            `Хто долучився до ${role.name}`
+          );
+        }
+      }
+
+      // Join.
+      if (interaction.options.getSubcommand() === "join") {
+        let role = interaction.options.getRole("role") as Role;
+        if (roleIsPublic(interaction, role)) {
+          // TODO: add role.
+        } else {
+          // TODO: raise error.
+        }
+      }
+
+      // Leave.
+      if (interaction.options.getSubcommand() === "leave") {
+        let role = interaction.options.getRole("role") as Role;
+        if (roleIsPublic(interaction, role)) {
+          // TODO: remove role.
+        } else {
+          // TODO: raise error.
+        }
+      }
     }
-
-    // My.
-
-    // Who.
-
-    // Join.
-
-    // Leave.
-
-    // My Games.
-    // if (interaction.options.getSubcommand() === "my") {
-    //   console.log(
-    //     getRolesNames(
-    //       filterPublicRoles(
-    //         interaction,
-    //         (interaction.member.roles as GuildMemberRoleManager).cache
-    //       )
-    //     )
-    //   );
-    // }
-
-    // // Who Plays.
-    // if (interaction.options.getSubcommand() === "play") {
-    //   let role = interaction.options.getRole("role") as Role;
-    //   if (roleIsPublic(interaction, role)) {
-    //     let members = (interaction.options.getRole("role") as Role).members;
-    //     console.log(members.map((member) => `<@${member.user.id}>`));
-    //   } else {
-    //     // TODO: raise error
-    //   }
-    // }
-
-    // // Join Game.
-    // if (interaction.options.getSubcommand() === "join") {
-    //   let role = interaction.options.getRole("role") as Role;
-    //   if (roleIsPublic(interaction, role)) {
-    //     // TODO: add role.
-    //   } else {
-    //     // TODO: raise error.
-    //   }
-    // }
-
-    // // Leave Game.
-    // if (interaction.options.getSubcommand() === "leave") {
-    //   let role = interaction.options.getRole("role") as Role;
-    //   if (roleIsPublic(interaction, role)) {
-    //     // TODO: remove role.
-    //   } else {
-    //     // TODO: raise error.
-    //   }
-    // }
-
-    // console.log(interaction.options.get("my"));
-
-    // const options = [];
-    // for (const x of Array(100).keys()) {
-    //   options.push({
-    //     label: `Select me ${x}`,
-    //     description: "This is a description",
-    //     value: `option_${x}`,
-    //   });
-    // }
-
-    // await interaction.reply({
-    //   content: "Pong11!",
-    //   components: [
-    //     new MessageActionRow().addComponents([
-    //       new MessageButton()
-    //         .setCustomId("primary")
-    //         .setLabel("Primary")
-    //         .setStyle("PRIMARY"),
-    //       //   new MessageSelectMenu()
-    //       //     .setCustomId("select")
-    //       //     .setPlaceholder("Шо по русні?")
-    //       //     .addOptions([
-    //       //       {
-    //       //         label: "Не всьо так однозначно.",
-    //       //         value: "not_ok1",
-    //       //       },
-    //       //       {
-    //       //         label: "Я вне палітікі!.",
-    //       //         value: "not_ok2",
-    //       //       },
-    //       //       {
-    //       //         label: "Какаяразніца!",
-    //       //         value: "not_ok3",
-    //       //       },
-    //       //       {
-    //       //         label: "Русні пизда!",
-    //       //         value: "ok",
-    //       //       },
-    //       //     ]),
-    //     ]),
-    //   ],
-    // });
-  },
-};
+  });
+}
