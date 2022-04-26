@@ -1,4 +1,10 @@
 {
+  "scripts": {
+    "prepare": "husky install",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --check './**/*.ts'",
+    "audit": "yarn audit --groups dependencies"
+  },
   "dependencies": {
     "@discordjs/builders": "^0.13.0",
     "@discordjs/rest": "^0.4.1",
@@ -11,9 +17,12 @@
   },
   "devDependencies": {
     "@types/uuid": "^8.3.4",
+    "@typescript-eslint/parser": "^5.21.0",
     "commitizen": "^4.2.4",
     "cz-conventional-changelog": "3.3.0",
     "eslint": "^8.13.0",
+    "husky": "^7.0.0",
+    "lint-staged": "^12.4.1",
     "prettier": "^2.6.2"
   },
   "config": {

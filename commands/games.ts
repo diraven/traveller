@@ -1,39 +1,31 @@
-import { roleMention, SlashCommandBuilder } from "@discordjs/builders";
-import { itemsArrayToPages } from "../pager";
-import { v4 as uuidv4 } from "uuid";
+import { SlashCommandBuilder } from '@discordjs/builders';
+import { itemsArrayToPages } from '../pager';
 
-import * as paginationEmbed from "discordjs-button-pagination";
+import * as paginationEmbed from 'discordjs-button-pagination';
 
 import {
   Collection,
   CommandInteraction,
-  Guild,
   GuildMemberRoleManager,
   Interaction,
-  MessageActionRow,
   MessageButton,
-  MessageSelectMenu,
-  Options,
   Role,
-  RoleManager,
   MessageEmbed,
   Client,
-} from "discord.js";
-import { Command } from "../types/command";
-import { idText } from "typescript";
-import { APIRole } from "discord-api-types/v10";
+} from 'discord.js';
+import { APIRole } from 'discord-api-types/v10';
 
-enum EmbedColor {
-  Primary = "#007bff",
-  Info = "#17a2b8",
-  Success = "#28a745",
-  Warning = "#ffc107",
-  Danger = "#dc3545",
-}
+// enum EmbedColor {
+//   Primary = "#007bff",
+//   Info = "#17a2b8",
+//   Success = "#28a745",
+//   Warning = "#ffc107",
+//   Danger = "#dc3545",
+// }
 
 function filterPublicRoles(
   interaction: Interaction,
-  roles: Collection<string, Role>
+  roles: Collection<string, Role>,
 ): Collection<string, Role> {
   return roles.filter((role) => roleIsPublic(interaction, role));
 }
@@ -52,68 +44,68 @@ function getRolesNames(roles: Collection<string, Role>): Array<string> {
   return roles.map((role) => role.name);
 }
 
-export let builder = new SlashCommandBuilder()
-  .setName("roles")
-  .setDescription("Публічні ролі")
+export const builder = new SlashCommandBuilder()
+  .setName('roles')
+  .setDescription('Публічні ролі')
   // List.
   .addSubcommand((subcommand) =>
-    subcommand.setName("list").setDescription("Список публічних ролей")
+    subcommand.setName('list').setDescription('Список публічних ролей'),
   )
 
   // My.
   .addSubcommand((subcommand) =>
-    subcommand.setName("my").setDescription("Мої публічні ролі")
+    subcommand.setName('my').setDescription('Мої публічні ролі'),
   )
 
   // Who.
   .addSubcommand((subcommand) =>
     subcommand
-      .setName("who")
-      .setDescription("Хто має публічну роль")
+      .setName('who')
+      .setDescription('Хто має публічну роль')
       .addRoleOption((option) =>
-        option.setName("role").setDescription("Оберіть роль").setRequired(true)
-      )
+        option.setName('role').setDescription('Оберіть роль').setRequired(true),
+      ),
   )
 
   // Join.
   .addSubcommand((subcommand) =>
     subcommand
-      .setName("join")
-      .setDescription("Долучитися")
+      .setName('join')
+      .setDescription('Долучитися')
       .addRoleOption((option) =>
-        option.setName("role").setDescription("Оберіть роль").setRequired(true)
-      )
+        option.setName('role').setDescription('Оберіть роль').setRequired(true),
+      ),
   )
 
   // Leave.
   .addSubcommand((subcommand) =>
     subcommand
-      .setName("leave")
-      .setDescription("Покинути роль")
+      .setName('leave')
+      .setDescription('Покинути роль')
       .addRoleOption((option) =>
-        option.setName("role").setDescription("Оберіть роль").setRequired(true)
-      )
+        option.setName('role').setDescription('Оберіть роль').setRequired(true),
+      ),
   );
 
 async function sendPages(
   interaction: CommandInteraction,
   items: Array<string>,
   title: string,
-  titleEmpty: string = "Немає даних"
+  titleEmpty: string = 'Немає даних',
 ) {
   const paginationButtons = [
     new MessageButton()
-      .setCustomId("previousbtn")
-      .setLabel("<")
-      .setStyle("PRIMARY"),
+      .setCustomId('previousbtn')
+      .setLabel('<')
+      .setStyle('PRIMARY'),
     new MessageButton()
-      .setCustomId("nextbtn")
-      .setLabel(">")
-      .setStyle("PRIMARY"),
+      .setCustomId('nextbtn')
+      .setLabel('>')
+      .setStyle('PRIMARY'),
   ];
   const paginationTimeout = 60000;
 
-  let pages = itemsArrayToPages(items, title);
+  const pages = itemsArrayToPages(items, title);
 
   if (pages.length > 0) {
     paginationEmbed(interaction, pages, paginationButtons, paginationTimeout);
@@ -125,59 +117,60 @@ async function sendPages(
 }
 
 export function init(client: Client) {
-  client.on("interactionCreate", async (interaction) => {
+  client.on('interactionCreate', async (interaction) => {
     // Command.
     if (interaction.isCommand()) {
       // List.
-      if (interaction.options.getSubcommand() === "list") {
+      if (interaction.options.getSubcommand() === 'list') {
         sendPages(
           interaction,
           getRolesNames(
             filterPublicRoles(
               interaction,
-              await interaction.guild.roles.fetch()
-            )
+              await interaction.guild.roles.fetch(),
+            ),
           ).sort(),
-          "Публічні ролі",
-          "Нема публічних ролей"
+          'Публічні ролі',
+          'Нема публічних ролей',
         );
       }
 
       // My.
-      if (interaction.options.getSubcommand() === "my") {
+      if (interaction.options.getSubcommand() === 'my') {
         sendPages(
           interaction,
           getRolesNames(
             filterPublicRoles(
               interaction,
-              (interaction.member.roles as GuildMemberRoleManager).cache
-            )
+              (interaction.member.roles as GuildMemberRoleManager).cache,
+            ),
           ).sort(),
-          "Твої публічні ролі",
-          "Не маєш публічних ролей"
+          'Твої публічні ролі',
+          'Не маєш публічних ролей',
         );
       }
 
       // Who.
-      if (interaction.options.getSubcommand() === "who") {
-        let role = interaction.options.getRole("role");
+      if (interaction.options.getSubcommand() === 'who') {
+        const role = interaction.options.getRole('role');
         if (roleIsPublic(interaction, role)) {
-          let members = (interaction.options.getRole("role") as Role).members;
+          const members = (interaction.options.getRole('role') as Role).members;
           console.log(members);
           sendPages(
             interaction,
             members.map(
-              (member) => `${member.user.username}#${member.user.discriminator}`
+              (member) =>
+                `${member.user.username}#${member.user.discriminator}`,
             ),
             `Хто долучився до ${role.name}`,
-            `Ніхто не долучився до ${role.name}`
+            `Ніхто не долучився до ${role.name}`,
           );
         }
       }
 
       // Join.
-      if (interaction.options.getSubcommand() === "join") {
-        let role = interaction.options.getRole("role") as Role;
+      if (interaction.options.getSubcommand() === 'join') {
+        const role = interaction.options.getRole('role') as Role;
         if (roleIsPublic(interaction, role)) {
           (interaction.member.roles as GuildMemberRoleManager).add(role).then(
             async () =>
@@ -185,13 +178,13 @@ export function init(client: Client) {
                 embeds: [
                   new MessageEmbed().setTitle(`Тепер маєш роль ${role.name}.`),
                 ],
-              })
+              }),
           );
         } else {
           await interaction.reply({
             embeds: [
               new MessageEmbed().setTitle(
-                `Дія неможлива: роль ${role.name} не є публічною.`
+                `Дія неможлива: роль ${role.name} не є публічною.`,
               ),
             ],
           });
@@ -199,8 +192,8 @@ export function init(client: Client) {
       }
 
       // Leave.
-      if (interaction.options.getSubcommand() === "leave") {
-        let role = interaction.options.getRole("role") as Role;
+      if (interaction.options.getSubcommand() === 'leave') {
+        const role = interaction.options.getRole('role') as Role;
         if (roleIsPublic(interaction, role)) {
           (interaction.member.roles as GuildMemberRoleManager)
             .remove(role)
@@ -209,16 +202,16 @@ export function init(client: Client) {
                 await interaction.reply({
                   embeds: [
                     new MessageEmbed().setTitle(
-                      `Більше не маєш ролі ${role.name}.`
+                      `Більше не маєш ролі ${role.name}.`,
                     ),
                   ],
-                })
+                }),
             );
         } else {
           await interaction.reply({
             embeds: [
               new MessageEmbed().setTitle(
-                `Дія неможлива: роль ${role.name} не є публічною.`
+                `Дія неможлива: роль ${role.name} не є публічною.`,
               ),
             ],
           });

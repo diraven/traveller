@@ -4,6 +4,8 @@
 !.gitignore
 !.eslintrc.json
 !.vscode
+!.husky
+!.prettierrc.json
 
 *.js.map
 *.js
