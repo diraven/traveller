@@ -69,7 +69,7 @@ export let builder = new SlashCommandBuilder()
   .addSubcommand((subcommand) =>
     subcommand
       .setName("who")
-      .setDescription("Хто має")
+      .setDescription("Хто має публічну роль")
       .addRoleOption((option) =>
         option.setName("role").setDescription("Оберіть роль").setRequired(true)
       )
@@ -179,9 +179,22 @@ export function init(client: Client) {
       if (interaction.options.getSubcommand() === "join") {
         let role = interaction.options.getRole("role") as Role;
         if (roleIsPublic(interaction, role)) {
-          // TODO: add role.
+          (interaction.member.roles as GuildMemberRoleManager).add(role).then(
+            async () =>
+              await interaction.reply({
+                embeds: [
+                  new MessageEmbed().setTitle(`Тепер маєш роль ${role.name}.`),
+                ],
+              })
+          );
         } else {
-          // TODO: raise error.
+          await interaction.reply({
+            embeds: [
+              new MessageEmbed().setTitle(
+                `Дія неможлива: роль ${role.name} не є публічною.`
+              ),
+            ],
+          });
         }
       }
 
@@ -189,9 +202,26 @@ export function init(client: Client) {
       if (interaction.options.getSubcommand() === "leave") {
         let role = interaction.options.getRole("role") as Role;
         if (roleIsPublic(interaction, role)) {
-          // TODO: remove role.
+          (interaction.member.roles as GuildMemberRoleManager)
+            .remove(role)
+            .then(
+              async () =>
+                await interaction.reply({
+                  embeds: [
+                    new MessageEmbed().setTitle(
+                      `Більше не маєш ролі ${role.name}.`
+                    ),
+                  ],
+                })
+            );
         } else {
-          // TODO: raise error.
+          await interaction.reply({
+            embeds: [
+              new MessageEmbed().setTitle(
+                `Дія неможлива: роль ${role.name} не є публічною.`
+              ),
+            ],
+          });
         }
       }
     }
