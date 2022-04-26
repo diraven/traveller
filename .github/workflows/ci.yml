@@ -20,6 +20,6 @@ jobs:
       - name: Test
         run: bash ./.husky/pre-commit
       - name: Build
-        run:
+        run: |
           - cp example.env .env
           - docker-compose build
