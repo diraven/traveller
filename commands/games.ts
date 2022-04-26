@@ -95,7 +95,12 @@ export let builder = new SlashCommandBuilder()
       )
   );
 
-async function sendPages(interaction, items: Array<string>, title: string) {
+async function sendPages(
+  interaction: CommandInteraction,
+  items: Array<string>,
+  title: string,
+  titleEmpty: string = "Немає даних"
+) {
   const paginationButtons = [
     new MessageButton()
       .setCustomId("previousbtn")
@@ -113,8 +118,9 @@ async function sendPages(interaction, items: Array<string>, title: string) {
   if (pages.length > 0) {
     paginationEmbed(interaction, pages, paginationButtons, paginationTimeout);
   } else {
-    console.log("no pages");
-    // TODO:
+    await interaction.reply({
+      embeds: [new MessageEmbed().setTitle(titleEmpty)],
+    });
   }
 }
 
@@ -132,7 +138,8 @@ export function init(client: Client) {
               await interaction.guild.roles.fetch()
             )
           ).sort(),
-          "Публічні ролі"
+          "Публічні ролі",
+          "Нема публічних ролей"
         );
       }
 
@@ -146,7 +153,8 @@ export function init(client: Client) {
               (interaction.member.roles as GuildMemberRoleManager).cache
             )
           ).sort(),
-          "Твої публічні ролі"
+          "Твої публічні ролі",
+          "Не маєш публічних ролей"
         );
       }
 
@@ -161,7 +169,8 @@ export function init(client: Client) {
             members.map(
               (member) => `${member.user.username}#${member.user.discriminator}`
             ),
-            `Хто долучився до ${role.name}`
+            `Хто долучився до ${role.name}`,
+            `Ніхто не долучився до ${role.name}`
           );
         }
       }
