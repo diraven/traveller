@@ -21,5 +21,5 @@ jobs:
         run: bash ./.husky/pre-commit
       - name: Build
         run: |
-          - cp example.env .env
-          - docker-compose build
+          cp example.env .env
+          docker-compose build
