@@ -1,18 +1,28 @@
-name: CI
-on: pull_request
+name: CI-Workflow
+on:
+  pull_request:
+    branches:
+      - do-not-exist
 jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Cache Docker layers
-        uses: actions/cache@v2
+      # Check out repository.
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      # Setup node.
+      - uses: actions/setup-node@v2
         with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-      - name: CI Pipeline
-        run: |
-          cp example_.env .env
-          docker-compose --file .devcontainer/docker-compose.yml run app bash devops/test.bash
+          node-version: '18'
+          cache: 'yarn'
+
+      # Test & Build Project
+      - name: Install Dependencies
+        run: yarn
+      - name: Test
+        run: bash ./.husky/pre-commit
+      - name: Build
+        run:
+          - cp example.env .env
+          - docker-compose build
