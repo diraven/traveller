@@ -12,7 +12,7 @@ jobs:
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v1
         with:
-          images: ghcr.io/diraven/crabot
+          images: ghcr.io/diraven/traveller
           tag-sha: true
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
