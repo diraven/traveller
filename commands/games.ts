@@ -119,7 +119,7 @@ async function sendPages(
 export function init(client: Client) {
   client.on('interactionCreate', async (interaction) => {
     // Command.
-    if (interaction.isCommand()) {
+    if (interaction.isCommand() && interaction.commandName === builder.name) {
       // List.
       if (interaction.options.getSubcommand() === 'list') {
         sendPages(
