@@ -55,6 +55,6 @@ jobs:
 
       - name: Deploy
         run: |
-          ssh diraven@$SERVER_SSH_HOST 'cd services/traveller && docker-compose down && docker-compose pull && docker-compose up -d'
+          ssh diraven@$SERVER_SSH_HOST 'cd services/traveller && docker-compose down && docker-compose pull && docker-compose up -d && docker-compose run --rm app node deploy-commands.js'
         env:
           SERVER_SSH_HOST: ${{secrets.SERVER_SSH_HOST}}
