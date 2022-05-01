@@ -2,7 +2,7 @@ import { MessageEmbed } from 'discord.js';
 
 export const items = [
   {
-    keyword: 'arma',
+    keywords: ['arma'],
     embed: new MessageEmbed()
       .setTitle(`Arma 3 Ukraine`)
       .setDescription(
