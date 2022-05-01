@@ -1,7 +1,9 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { itemsArrayToPages } from '../pager';
+import { itemsArrayToPages } from '../../pager';
 
 import * as paginationEmbed from 'discordjs-button-pagination';
+
+import * as notes from './notes';
 
 import {
   Collection,
@@ -172,14 +174,24 @@ export function init(client: Client) {
       if (interaction.options.getSubcommand() === 'join') {
         const role = interaction.options.getRole('role') as Role;
         if (roleIsPublic(interaction, role)) {
-          (interaction.member.roles as GuildMemberRoleManager).add(role).then(
-            async () =>
+          (interaction.member.roles as GuildMemberRoleManager)
+            .add(role)
+            .then(async () => {
+              let description = '';
+
+              description = description.trim();
               await interaction.reply({
                 embeds: [
-                  new MessageEmbed().setTitle(`Тепер маєш роль ${role.name}.`),
-                ],
-              }),
-          );
+                  new MessageEmbed()
+                    .setTitle(`Тепер маєш роль ${role.name}.`)
+                    .setDescription(description.trim()),
+                ].concat(
+                  notes.items
+                    .filter((item) => role.name.includes(item.keyword))
+                    .map((item) => item.embed),
+                ),
+              });
+            });
         } else {
           await interaction.reply({
             embeds: [
