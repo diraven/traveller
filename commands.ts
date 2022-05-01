@@ -1,4 +1,5 @@
-import * as games from './commands/games';
+import * as aftermath from './aftermath/index';
 import * as faq from './commands/faq';
+import * as games from './commands/roles';
 
-export const commands = [games, faq];
+export const commands = [games, faq, aftermath];
