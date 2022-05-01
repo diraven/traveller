@@ -64,7 +64,7 @@ const items = [
 
 export const builder = new SlashCommandBuilder()
   .setName('faq')
-  .setDescription('ЧаПи');
+  .setDescription('ЧаПи.');
 
 items.forEach((record) =>
   builder.addSubcommand((subcommand) =>
