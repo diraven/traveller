@@ -187,7 +187,11 @@ export function init(client: Client) {
                     .setDescription(description.trim()),
                 ].concat(
                   notes.items
-                    .filter((item) => role.name.includes(item.keyword))
+                    .filter((item) =>
+                      role.name
+                        .toLowerCase()
+                        .includes(item.keyword.toLowerCase()),
+                    )
                     .map((item) => item.embed),
                 ),
               });
