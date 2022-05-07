@@ -60,6 +60,19 @@ const items = [
         `,
       ),
   },
+  {
+    name: 'lfg',
+    description: 'Як знайти гравців для гри разом?',
+    embed: new MessageEmbed().setTitle('Пошук гравців:').setDescription(
+      `
+        Оберіть канал #looking_for_party, а в ньому гілку відповідної гри. В гілці і шукайте однодумців. Якщо гілки вашої гри не існує - зверніться до хелперів серверу для її створення.
+
+        Гіфка нижче показує як шукати гілки.
+        
+        https://support.discord.com/hc/article_attachments/4405266120471/thread_popout_demo.gif
+        `,
+    ),
+  },
 ];
 
 export const builder = new SlashCommandBuilder()
