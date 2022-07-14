@@ -92,6 +92,17 @@ const items = [
       `,
     ),
   },
+  {
+    name: 'language',
+    description: 'Мова спілкування',
+    embed: new MessageEmbed().setTitle('Спойлер на тілібоні').setDescription(
+      `
+      Мови спілкування на сервері - українська та англійська.
+
+      Це та інші правила можна прочитати в каналі <#285181241140051968>.
+      `,
+    ),
+  },
 ];
 
 export const builder = new SlashCommandBuilder()
