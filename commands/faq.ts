@@ -63,21 +63,26 @@ const items = [
   {
     name: 'lfg',
     description: 'Як знайти гравців для гри разом?',
-    embed: new MessageEmbed().setTitle('Пошук гравців:').setDescription(
-      `
+    embed: new MessageEmbed()
+      .setTitle('Пошук гравців:')
+      .setDescription(
+        `
         Оберіть канал <#243720639226183680>, а в ньому гілку відповідної гри. В гілці і шукайте однодумців. Якщо гілки вашої гри не існує - зверніться до людей з роллю <@&285029616035299328> для її створення.
 
-        Гіфка нижче показує як шукати гілки.
-        
-        https://support.discord.com/hc/article_attachments/4405266120471/thread_popout_demo.gif
+        Гіфка нижче показує як шукати гілки (наведи курсор миші або клікни на неї).
         `,
-    ),
+      )
+      .setImage(
+        'https://support.discord.com/hc/article_attachments/4405266120471/thread_popout_demo.gif',
+      ),
   },
   {
     name: 'spoiler',
     description: 'Як сховати фото на тілібоні під спойлер',
-    embed: new MessageEmbed().setTitle('Спойлер на тілібоні').setDescription(
-      `
+    embed: new MessageEmbed()
+      .setTitle('Спойлер на тілібоні')
+      .setDescription(
+        `
       1. Після того як ви обрали фото, тицьніть кніпку назад на тілібоні, щоб закрити вікно з галереєю (рис. 1).
 
       2. Тицьніть на обране фото на вікні вкладень ще раз (рис. 2).
@@ -85,21 +90,20 @@ const items = [
       3. Тицьніть на позначку "позначити як спойлер" (рис. 3).
       
       Вуаля, спойлер на тілібоні. Не так вже й складно, е?
-
-      https://cdn.discordapp.com/attachments/233896169309339649/983009206015787068/IMG_20220605_170655.jpg
-      https://cdn.discordapp.com/attachments/233896169309339649/983009206384877588/IMG_20220605_170712.jpg
-      https://cdn.discordapp.com/attachments/233896169309339649/983009206724599858/IMG_20220605_170728.jpg
       `,
-    ),
+      )
+      .setImage(
+        'https://cdn.discordapp.com/attachments/997173042662887514/997174604856565841/spoiler.png',
+      ),
   },
   {
     name: 'language',
-    description: 'Мова спілкування',
+    description: 'Мова спілкування?',
     embed: new MessageEmbed().setTitle('Спойлер на тілібоні').setDescription(
       `
       Мови спілкування на сервері - українська та англійська.
 
-      Це та інші правила можна прочитати в каналі <#285181241140051968>.
+      Перегляньте, будь ласка, це та інші правила в каналі <#285181241140051968>.
       `,
     ),
   },
@@ -109,11 +113,14 @@ export const builder = new SlashCommandBuilder()
   .setName('faq')
   .setDescription('ЧаПи.');
 
-items.forEach((record) =>
+items.forEach((record) => {
+  record.embed.setThumbnail(
+    'https://cdn.discordapp.com/icons/205691838760353792/1a391c3d59857d9a6d211d6e750f914e.webp?size=96',
+  );
   builder.addSubcommand((subcommand) =>
     subcommand.setName(record.name).setDescription(record.description),
-  ),
-);
+  );
+});
 
 export function init(client: Client) {
   client.on('interactionCreate', async (interaction) => {
