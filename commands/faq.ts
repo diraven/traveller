@@ -99,11 +99,15 @@ const items = [
   {
     name: 'language',
     description: 'Мова спілкування?',
-    embed: new MessageEmbed().setTitle('Спойлер на тілібоні').setDescription(
+    embed: new MessageEmbed().setTitle('Мова спілкування').setDescription(
       `
       Мови спілкування на сервері - українська та англійська.
 
       Перегляньте, будь ласка, це та інші правила в каналі <#285181241140051968>.
+
+      Server languages: Ukrainian and English.
+
+      Please, see this and other rules in <#285181241140051968> channel.
       `,
     ),
   },
