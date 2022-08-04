@@ -1,6 +1,4 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
-
-import { MessageEmbed, Client } from 'discord.js';
+import { SlashCommandBuilder, EmbedBuilder, Client } from 'discord.js';
 
 // enum EmbedColor {
 //   Primary = "#007bff",
@@ -14,7 +12,7 @@ const items = [
   {
     name: 'ua-interface',
     description: 'Чому інтерфейс українською - це важливо?',
-    embed: new MessageEmbed()
+    embed: new EmbedBuilder()
       .setTitle('Інтерфейс українською - це важливо! І ось чому:')
       .setDescription(
         `
@@ -33,7 +31,7 @@ const items = [
   {
     name: 'apolitical',
     description: 'Поза політикою?',
-    embed: new MessageEmbed()
+    embed: new EmbedBuilder()
       .setTitle('"Поза політикою" не буває, і ось чому:')
       .setDescription(
         `
@@ -48,7 +46,7 @@ const items = [
   {
     name: 'svc',
     description: 'Що таке СВЦ?',
-    embed: new MessageEmbed()
+    embed: new EmbedBuilder()
       .setTitle('СВЦ, Синдром Великого Цабе:')
       .setDescription(
         `
@@ -63,7 +61,7 @@ const items = [
   {
     name: 'lfg',
     description: 'Як знайти гравців для гри разом?',
-    embed: new MessageEmbed()
+    embed: new EmbedBuilder()
       .setTitle('Пошук гравців:')
       .setDescription(
         `
@@ -79,7 +77,7 @@ const items = [
   {
     name: 'spoiler',
     description: 'Як сховати фото на тілібоні під спойлер',
-    embed: new MessageEmbed()
+    embed: new EmbedBuilder()
       .setTitle('Спойлер на тілібоні')
       .setDescription(
         `
@@ -99,7 +97,7 @@ const items = [
   {
     name: 'language',
     description: 'Мова спілкування?',
-    embed: new MessageEmbed().setTitle('Мова спілкування').setDescription(
+    embed: new EmbedBuilder().setTitle('Мова спілкування').setDescription(
       `
       Мови спілкування на сервері - українська та англійська.
 
@@ -113,7 +111,7 @@ const items = [
   },
 ];
 
-export const builder = new SlashCommandBuilder()
+export const command = new SlashCommandBuilder()
   .setName('faq')
   .setDescription('ЧаПи.');
 
@@ -121,7 +119,7 @@ items.forEach((record) => {
   record.embed.setThumbnail(
     'https://cdn.discordapp.com/icons/205691838760353792/1a391c3d59857d9a6d211d6e750f914e.webp?size=96',
   );
-  builder.addSubcommand((subcommand) =>
+  command.addSubcommand((subcommand) =>
     subcommand.setName(record.name).setDescription(record.description),
   );
 });
@@ -129,7 +127,10 @@ items.forEach((record) => {
 export function init(client: Client) {
   client.on('interactionCreate', async (interaction) => {
     // Command.
-    if (interaction.isCommand() && interaction.commandName === builder.name) {
+    if (
+      interaction.isChatInputCommand() &&
+      interaction.commandName === command.name
+    ) {
       const embed = items.find(
         (item) => item.name === interaction.options.getSubcommand(),
       ).embed;

@@ -15,7 +15,7 @@ rest
       DISCORD_APPLICATION_ID,
       DISCORD_BOT_GUILD_ID,
     ),
-    { body: commands.map((cmd) => cmd.builder.toJSON()) },
+    { body: commands.map((cmd) => cmd.command.toJSON()) },
   )
   .then(() => console.log('Successfully registered application commands.'))
   .catch(console.error);
