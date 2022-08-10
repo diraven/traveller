@@ -116,9 +116,9 @@ export const command = new SlashCommandBuilder()
   .setDescription('ЧаПи.');
 
 items.forEach((record) => {
-  record.embed.setThumbnail(
-    'https://cdn.discordapp.com/icons/205691838760353792/1a391c3d59857d9a6d211d6e750f914e.webp?size=96',
-  );
+  // record.embed.setThumbnail(
+  //   'https://cdn.discordapp.com/icons/205691838760353792/1a391c3d59857d9a6d211d6e750f914e.webp?size=96',
+  // );
   command.addSubcommand((subcommand) =>
     subcommand.setName(record.name).setDescription(record.description),
   );
