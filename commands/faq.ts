@@ -59,22 +59,6 @@ const items = [
       ),
   },
   {
-    name: 'lfg',
-    description: 'Як знайти гравців для гри разом?',
-    embed: new EmbedBuilder()
-      .setTitle('Пошук гравців:')
-      .setDescription(
-        `
-        Оберіть канал <#243720639226183680>, а в ньому гілку відповідної гри. В гілці і шукайте однодумців. Якщо гілки вашої гри не існує - зверніться до людей з роллю <@&285029616035299328> для її створення.
-
-        Гіфка нижче показує як шукати гілки (наведи курсор миші або клікни на неї).
-        `,
-      )
-      .setImage(
-        'https://support.discord.com/hc/article_attachments/4405266120471/thread_popout_demo.gif',
-      ),
-  },
-  {
     name: 'spoiler',
     description: 'Як сховати фото на тілібоні під спойлер',
     embed: new EmbedBuilder()
@@ -101,11 +85,11 @@ const items = [
       `
       Мови спілкування на сервері - українська та англійська.
 
-      Перегляньте, будь ласка, це та інші правила в каналі <#285181241140051968>.
+      Перегляньте, будь ласка, це та інші правила в відповідному каналі.
 
       Server languages: Ukrainian and English.
 
-      Please, see this and other rules in <#285181241140051968> channel.
+      Please, see this and other rules in the respective channel.
       `,
     ),
   },
