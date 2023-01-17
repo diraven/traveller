@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"syscall"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/diraven/traveller/commands"
@@ -40,7 +41,7 @@ func main() {
 
 	// Wait for os.Interrupt.
 	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt, os.Kill)
+	signal.Notify(stop, os.Interrupt, os.Kill, syscall.SIGTERM, syscall.SIGINT)
 	log.Println("Press Ctrl+C to exit.")
 	<-stop
 	log.Println("Gracefully shutting down.")

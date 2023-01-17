@@ -20,7 +20,9 @@ func Init(s *discordgo.Session, state *state.State) {
 
 func DeInit(s *discordgo.Session, state *state.State) {
 	for _, cmd := range commands {
-		cmd.DeInit(s, state)
+		if cmd.DeInit != nil {
+			cmd.DeInit(s, state)
+		}
 	}
 
 	// Delete all commands for all guilds.
@@ -36,4 +38,16 @@ func DeInit(s *discordgo.Session, state *state.State) {
 			}
 		}
 	}
+	// Delete global commands.
+	registeredCommands, err := s.ApplicationCommands(s.State.User.ID, "")
+	if err != nil {
+		log.Fatalf("Could not fetch registered commands: %v", err)
+	}
+	for _, v := range registeredCommands {
+		err := s.ApplicationCommandDelete(s.State.User.ID, "", v.ID)
+		if err != nil {
+			log.Panicf("Cannot delete '%v' command: %v", v.Name, err)
+		}
+	}
+
 }
