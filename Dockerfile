@@ -5,13 +5,13 @@ COPY go.mod ./
 COPY go.sum ./
 RUN go mod download
 COPY . ./
-RUN go build -o /traveller
+RUN go build -o traveller
 
 ## Deploy
 FROM gcr.io/distroless/base-debian10
 
-WORKDIR /
-COPY --from=build /traveller /traveller
+WORKDIR /app
+COPY --from=build /app/traveller traveller
 
 USER nonroot:nonroot
-ENTRYPOINT ["/traveller"]
+ENTRYPOINT ["traveller"]
