@@ -14,25 +14,28 @@ var commands = []*Command{
 
 func Init(s *discordgo.Session, state *state.State) {
 	for _, cmd := range commands {
-		cmd.Init(s, state)
+		// Register command for all the guilds.
+		for guildId, guild := range state.Guilds {
+			log.Printf("Initializing command '" + cmd.Definition.Name + "' for server '" + guild.Name + "'")
+			_, err := s.ApplicationCommandCreate(s.State.User.ID, guildId, definition)
+			if err != nil {
+				log.Panicf("Cannot create '%v' command: %v", definition.Name, err)
+			}
+		}
+		// Add handler.
+		s.AddHandler(cmd.Handler)
 	}
 }
 
 func DeInit(s *discordgo.Session, state *state.State) {
-	for _, cmd := range commands {
-		if cmd.DeInit != nil {
-			cmd.DeInit(s, state)
-		}
-	}
-
 	// Delete all commands for all guilds.
-	for GuildID := range state.Guilds {
-		registeredCommands, err := s.ApplicationCommands(s.State.User.ID, GuildID)
+	for guildId := range state.Guilds {
+		registeredCommands, err := s.ApplicationCommands(s.State.User.ID, guildId)
 		if err != nil {
 			log.Fatalf("Could not fetch registered commands: %v", err)
 		}
 		for _, v := range registeredCommands {
-			err := s.ApplicationCommandDelete(s.State.User.ID, GuildID, v.ID)
+			err := s.ApplicationCommandDelete(s.State.User.ID, guildId, v.ID)
 			if err != nil {
 				log.Panicf("Cannot delete '%v' command: %v", v.Name, err)
 			}

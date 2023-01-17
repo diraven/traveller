@@ -11,7 +11,9 @@ type State struct {
 	Guilds map[string]Guild `json:"guilds"`
 }
 
-type Guild struct{}
+type Guild struct {
+	Name string `json:"name"`
+}
 
 func Load() *State {
 	jsonFile, err := os.Open("state.json")

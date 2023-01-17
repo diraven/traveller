@@ -1,10 +1,7 @@
 package commands
 
 import (
-	"log"
-
 	"github.com/bwmarrin/discordgo"
-	"github.com/diraven/traveller/state"
 )
 
 type faqEntry struct {
@@ -73,51 +70,42 @@ Server languages: Ukrainian and English. Please, see this and other rules in the
 	},
 }
 
+func generateDefinition() *discordgo.ApplicationCommand {
+	options := make([]*discordgo.ApplicationCommandOption, len(faqEntries))
+	i := 0
+	for name, entry := range faqEntries {
+		options[i] = &discordgo.ApplicationCommandOption{
+			Name:        name,
+			Description: entry.Title,
+			Type:        discordgo.ApplicationCommandOptionSubCommand,
+		}
+		i++
+
+	}
+
+	return &discordgo.ApplicationCommand{
+		Name:        "faq",
+		Description: "ЧаПи",
+		Options:     options,
+	}
+}
+
+var definition = generateDefinition()
+
 var cmdFaq = &Command{
-
-	Init: func(s *discordgo.Session, state *state.State) error {
-		// Register command.
-		options := make([]*discordgo.ApplicationCommandOption, len(faqEntries))
-		i := 0
-		for name, entry := range faqEntries {
-			options[i] = &discordgo.ApplicationCommandOption{
-				Name:        name,
-				Description: entry.Title,
-				Type:        discordgo.ApplicationCommandOptionSubCommand,
-			}
-			i++
-
+	Definition: definition,
+	Handler: func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		if i.ApplicationCommandData().Name != definition.Name {
+			return
 		}
 
-		definition := &discordgo.ApplicationCommand{
-			Name:        "faq",
-			Description: "ЧаПи",
-			Options:     options,
-		}
-		for GuildID := range state.Guilds {
-			log.Printf("Initializing command '" + definition.Name + "' for server " + GuildID)
-			_, err := s.ApplicationCommandCreate(s.State.User.ID, GuildID, definition)
-			if err != nil {
-				log.Panicf("Cannot create '%v' command: %v", definition.Name, err)
-			}
-		}
-
-		// Add handler.
-		s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			if i.ApplicationCommandData().Name != definition.Name {
-				return
-			}
-
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Embeds: []*discordgo.MessageEmbed{
-						faqEntries[i.ApplicationCommandData().Options[0].Name],
-					},
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Embeds: []*discordgo.MessageEmbed{
+					faqEntries[i.ApplicationCommandData().Options[0].Name],
 				},
-			})
+			},
 		})
-
-		return nil
 	},
 }
