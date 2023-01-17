@@ -1,14 +1,7 @@
 .*
-!.dockerignore
 !.github
 !.gitignore
-!.eslintrc.json
-!.vscode
-!.husky
-!.prettierrc.json
 
-*.js.map
-*.js
-
-node_modules
-yarn-error.log
+state.json
+traveller
+__debug_bin

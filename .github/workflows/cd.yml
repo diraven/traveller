@@ -24,7 +24,6 @@ jobs:
       - name: Push image
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
-
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           # Strip git ref prefix from version
@@ -37,7 +36,6 @@ jobs:
           echo VERSION=$VERSION
           docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
-
       - name: Set up SSH key
         uses: webfactory/ssh-agent@v0.5.4
         with:
@@ -55,6 +53,6 @@ jobs:
 
       - name: Deploy
         run: |
-          ssh diraven@$SERVER_SSH_HOST 'cd services/traveller && docker-compose down && docker-compose pull && docker-compose up -d && docker-compose run --rm app node deploy-commands.js'
+          ssh diraven@$SERVER_SSH_HOST 'cd services/traveller && docker-compose down && docker-compose pull && docker-compose up -d'
         env:
           SERVER_SSH_HOST: ${{secrets.SERVER_SSH_HOST}}

@@ -1,11 +1,17 @@
-FROM node:18
+FROM golang:1.19-alpine as build
 
 WORKDIR /app
+COPY go.mod ./
+COPY go.sum ./
+RUN go mod download
+COPY . ./
+RUN go build -o /traveller
 
-COPY package.json yarn.lock ./
-RUN yarn
+## Deploy
+FROM gcr.io/distroless/base-debian10
 
-COPY . .
-RUN npx tsc
+WORKDIR /
+COPY --from=build /traveller /traveller
 
-CMD ["node", "index.js"]
+USER nonroot:nonroot
+ENTRYPOINT ["/traveller"]
