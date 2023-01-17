@@ -8,11 +8,11 @@ import (
 )
 
 var commands = []*Command{
-	cmdTest,
+	// cmdTest,
+	cmdFaq,
 }
 
 func Init(s *discordgo.Session, state *state.State) {
-
 	for _, cmd := range commands {
 		cmd.Init(s, state)
 	}
@@ -23,6 +23,7 @@ func DeInit(s *discordgo.Session, state *state.State) {
 		cmd.DeInit(s, state)
 	}
 
+	// Delete all commands for all guilds.
 	for GuildID := range state.Guilds {
 		registeredCommands, err := s.ApplicationCommands(s.State.User.ID, GuildID)
 		if err != nil {
