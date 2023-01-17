@@ -1,0 +1,29 @@
+name: Continuous Integration
+on: pull_request
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      # Check out repository.
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      # Setup node.
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '1.19'
+          cache: true
+
+      # Test & Build Project
+      # - name: Test
+      #   run: bash ./.husky/pre-commit
+      - name: Format
+        run: test -z $(gofmt -l .)
+      - name: Test
+        run: go test
+      - name: Build
+        run: go build
+      - name: Build Docker Image
+        run: |
+          cp example.env .env
+          docker-compose build

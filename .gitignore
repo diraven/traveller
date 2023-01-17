@@ -1,0 +1,7 @@
+.*
+!.github
+!.gitignore
+
+state.json
+traveller
+__debug_bin
