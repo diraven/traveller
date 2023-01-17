@@ -95,6 +95,7 @@ var cmdFaq = &Command{
 			Options:     options,
 		}
 		for GuildID := range state.Guilds {
+			log.Printf("Initializing command '" + definition.Name + "' for server " + GuildID)
 			_, err := s.ApplicationCommandCreate(s.State.User.ID, GuildID, definition)
 			if err != nil {
 				log.Panicf("Cannot create '%v' command: %v", definition.Name, err)
