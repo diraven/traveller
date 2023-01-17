@@ -8,10 +8,9 @@ COPY . ./
 RUN go build -o traveller
 
 ## Deploy
-FROM gcr.io/distroless/base-debian10
+FROM alpine
 
 WORKDIR /app
 COPY --from=build /app/traveller traveller
 
-USER nonroot:nonroot
-ENTRYPOINT ["traveller"]
+CMD ["/app/traveller"]
