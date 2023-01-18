@@ -12,6 +12,7 @@ var commands = []*Command{
 	cmdFaq,
 	cmdGBanUid,
 	cmdSlap,
+	cmdRusniPizda,
 }
 
 func Init(s *discordgo.Session) {
