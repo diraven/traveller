@@ -7,22 +7,23 @@ import (
 	"os"
 )
 
-type State struct {
-	Guilds map[string]Guild `json:"guilds"`
+type state struct {
+	Guilds map[string]guild `json:"guilds"`
+	Owners []string         `json:"owners"`
 }
 
-type Guild struct {
+type guild struct {
 	Name string `json:"name"`
 }
 
-func Load() *State {
+var State = &state{}
+
+func init() {
 	jsonFile, err := os.Open("state.json")
 	defer jsonFile.Close()
 	if err != nil {
 		fmt.Println(err)
 	}
 	byteValue, _ := ioutil.ReadAll(jsonFile)
-	var state *State = &State{}
-	json.Unmarshal([]byte(byteValue), state)
-	return state
+	json.Unmarshal([]byte(byteValue), State)
 }

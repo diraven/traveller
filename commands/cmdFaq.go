@@ -95,10 +95,6 @@ var definition = generateDefinition()
 var cmdFaq = &Command{
 	Definition: definition,
 	Handler: func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		if i.ApplicationCommandData().Name != definition.Name {
-			return
-		}
-
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{

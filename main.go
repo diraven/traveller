@@ -8,7 +8,6 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/diraven/traveller/commands"
-	"github.com/diraven/traveller/state"
 )
 
 var s *discordgo.Session
@@ -32,12 +31,9 @@ func main() {
 	}
 	defer s.Close()
 
-	// Load state.
-	var state = state.Load()
-
 	// Initialize commands.
-	commands.Init(s, state)
-	defer commands.DeInit(s, state)
+	commands.Init(s)
+	defer commands.DeInit(s)
 
 	// Wait for os.Interrupt.
 	stop := make(chan os.Signal, 1)
