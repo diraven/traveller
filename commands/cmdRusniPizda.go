@@ -78,7 +78,7 @@ var cmdRusniPizda = &Command{
 							{Name: "Крилаті ракети", Value: strconv.Itoa(rupi.Data.Stats.CruiseMissiles) + " (+" + strconv.Itoa(rupi.Data.Increase.CruiseMissiles) + ")"},
 							{Name: "БПЛА", Value: strconv.Itoa(rupi.Data.Stats.UavSystems) + " (+" + strconv.Itoa(rupi.Data.Increase.UavSystems) + ")"},
 							{Name: "Спец. техніка", Value: strconv.Itoa(rupi.Data.Stats.SpecialMilitaryEquip) + " (+" + strconv.Itoa(rupi.Data.Increase.SpecialMilitaryEquip) + ")"},
-							{Name: "Особовий склад", Value: strconv.Itoa(rupi.Data.Stats.AtgmSrbmSystems) + " (+" + strconv.Itoa(rupi.Data.Increase.AtgmSrbmSystems) + ")"},
+							{Name: "Протитанкові засоби, балістичні ракети", Value: strconv.Itoa(rupi.Data.Stats.AtgmSrbmSystems) + " (+" + strconv.Itoa(rupi.Data.Increase.AtgmSrbmSystems) + ")"},
 						},
 						URL:       rupi.Data.Resource,
 						Thumbnail: &discordgo.MessageEmbedThumbnail{URL: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Emblem_of_the_Ukrainian_Armed_Forces.svg/1024px-Emblem_of_the_Ukrainian_Armed_Forces.svg.png"},
