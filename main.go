@@ -2,9 +2,11 @@ package main
 
 import (
 	"log"
+	"math/rand"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/diraven/traveller/commands"
@@ -13,6 +15,7 @@ import (
 var s *discordgo.Session
 
 func main() {
+	rand.Seed(time.Now().Unix())
 	var err error
 
 	// Create session.

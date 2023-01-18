@@ -3,7 +3,6 @@ package commands
 import (
 	"fmt"
 	"math/rand"
-	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -38,7 +37,6 @@ var cmdSlap = &Command{
 		}
 
 		// Respond.
-		rand.Seed(time.Now().Unix())
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
