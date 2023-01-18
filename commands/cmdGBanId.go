@@ -5,6 +5,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/diraven/traveller/state"
+	"golang.org/x/exp/slices"
 )
 
 var cmdGBanUid = &Command{
@@ -28,6 +29,19 @@ var cmdGBanUid = &Command{
 	},
 	Handler: func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		// Owners only.
+		if !slices.Contains(state.State.Owners, i.Member.User.ID) {
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Embeds: []*discordgo.MessageEmbed{
+						{
+							Title:       "Ніт",
+							Description: "Доступ заборонено.",
+						},
+					},
+				},
+			})
+		}
 
 		// Convert options to map.
 		options := i.ApplicationCommandData().Options
@@ -51,7 +65,7 @@ var cmdGBanUid = &Command{
 			Data: &discordgo.InteractionResponseData{
 				Embeds: []*discordgo.MessageEmbed{
 					{
-						Title:       "Глобальний бан: " + optionMap["user_id"].StringValue(),
+						Title:       "Глобальний бан користувача по ідентифікатору: " + optionMap["user_id"].StringValue(),
 						Description: strings.Join(errors, "\n"),
 					},
 				},
