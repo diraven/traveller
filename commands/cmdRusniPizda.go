@@ -63,7 +63,7 @@ var cmdRusniPizda = &Command{
 			Data: &discordgo.InteractionResponseData{
 				Embeds: []*discordgo.MessageEmbed{
 					{
-						Title: "Втрати ворога станом на " + rupi.Data.Date,
+						Title: "Втрати ворога",
 						Fields: []*discordgo.MessageEmbedField{
 							{Name: "Особовий склад", Value: strconv.Itoa(rupi.Data.Stats.PersonnelUnits) + " (+" + strconv.Itoa(rupi.Data.Increase.PersonnelUnits) + ")", Inline: true},
 							{Name: "Танки", Value: strconv.Itoa(rupi.Data.Stats.Tanks) + " (+" + strconv.Itoa(rupi.Data.Increase.Tanks) + ")", Inline: true},
@@ -82,6 +82,7 @@ var cmdRusniPizda = &Command{
 						},
 						URL:       rupi.Data.Resource,
 						Thumbnail: &discordgo.MessageEmbedThumbnail{URL: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Emblem_of_the_Ukrainian_Armed_Forces.svg/1024px-Emblem_of_the_Ukrainian_Armed_Forces.svg.png"},
+						Footer:    &discordgo.MessageEmbedFooter{Text: "Станом на " + rupi.Data.Date},
 					},
 				},
 			},
