@@ -63,7 +63,7 @@ var cmdRusniPizda = &Command{
 			Data: &discordgo.InteractionResponseData{
 				Embeds: []*discordgo.MessageEmbed{
 					{
-						Description: "[Втрати ворога](" + rupi.Data.Resource + ") станом на " + rupi.Data.Date,
+						Title: "Втрати ворога станом на " + rupi.Data.Date,
 						Fields: []*discordgo.MessageEmbedField{
 							{Name: "Особовий склад", Value: strconv.Itoa(rupi.Data.Stats.PersonnelUnits) + " (+" + strconv.Itoa(rupi.Data.Increase.PersonnelUnits) + ")", Inline: true},
 							{Name: "Танки", Value: strconv.Itoa(rupi.Data.Stats.Tanks) + " (+" + strconv.Itoa(rupi.Data.Increase.Tanks) + ")", Inline: true},
