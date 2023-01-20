@@ -71,7 +71,7 @@ var cmdGBanUid = &Command{
 		if err != nil {
 			userName = err.Error()
 		} else {
-			userName = user.Username + "#" + user.Discriminator + "(" + user.Mention() + ")"
+			userName = user.Username + "#" + user.Discriminator + " (" + user.Mention() + ")"
 		}
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
