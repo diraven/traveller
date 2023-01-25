@@ -75,9 +75,9 @@ func generateDefinition() *discordgo.ApplicationCommand {
 	i := 0
 	for name, entry := range faqEntries {
 		options[i] = &discordgo.ApplicationCommandOption{
+			Type:        discordgo.ApplicationCommandOptionSubCommand,
 			Name:        name,
 			Description: entry.Title,
-			Type:        discordgo.ApplicationCommandOptionSubCommand,
 		}
 		i++
 

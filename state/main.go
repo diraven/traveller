@@ -17,7 +17,8 @@ type guild struct {
 }
 
 type user struct {
-	IsOwner bool `json:"is_owner"`
+	Name    string `json:"name"`
+	IsOwner bool   `json:"is_owner"`
 }
 
 var State = &state{}
@@ -33,7 +34,7 @@ func (s *state) Load() {
 }
 
 func (s *state) Save() {
-	file, err := json.MarshalIndent(s, "", "  ")
+	file, err := json.MarshalIndent(s, "", "    ")
 	if err != nil {
 		log.Panic(err)
 	}
