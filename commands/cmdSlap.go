@@ -38,6 +38,7 @@ var templates = []string{
 	"%s пропонує %s розкрутитися.",
 	"%s slaps %s around with small 50Lbs Linux manual.",
 	"%s пропонує %s зупинитися і послухати.",
+	"%s просить %s покликати його мішок з м'ясом.",
 }
 
 var cmdSlap = &Command{
