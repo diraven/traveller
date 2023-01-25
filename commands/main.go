@@ -14,6 +14,7 @@ var commands = []*Command{
 	cmdSlap,
 	cmdRusniPizda,
 	cmdState,
+	cmdTraveller,
 }
 
 func Init(s *discordgo.Session) {

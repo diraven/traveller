@@ -5,20 +5,33 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+
+	"github.com/bwmarrin/discordgo"
 )
 
 type state struct {
-	Guilds map[string]guild `json:"guilds"`
-	Users  map[string]user  `json:"users"`
+	Guilds map[string]*guild `json:"guilds"`
+	Users  map[string]*user  `json:"users"`
 }
 
 type guild struct {
-	Name string `json:"name"`
+	Name string  `json:"name"`
+	T    *tGuild `json:"t"`
 }
 
 type user struct {
 	Name    string `json:"name"`
 	IsOwner bool   `json:"is_owner"`
+	T       *tUser `json:"t"`
+}
+
+type tGuild struct {
+	Hp   float32 `json:"hp"`
+	Food int     `json:"food"`
+}
+
+type tUser struct {
+	Action string `json:"action"`
 }
 
 var State = &state{}
@@ -43,6 +56,29 @@ func (s *state) Save() {
 	if err != nil {
 		log.Panic(err)
 	}
+}
+
+func (s *state) GetUser(discordUser *discordgo.User) *user {
+	// Search for user in state.
+	userState, ok := s.Users[discordUser.ID]
+	if !ok {
+		userState = &user{
+			Name: discordUser.Username + "#" + discordUser.Discriminator,
+		}
+	}
+
+	// Set name if not exists.
+	if userState.Name == "" {
+		userState.Name = discordUser.Username + "#" + discordUser.Discriminator
+	}
+
+	// Initialize T if not exists.
+	if userState.T == nil {
+		userState.T = &tUser{}
+	}
+
+	// User not found in state.
+	return userState
 }
 
 func (s *state) IsOwner(userId string) bool {
