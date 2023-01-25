@@ -10,6 +10,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/diraven/traveller/commands"
+	"github.com/diraven/traveller/state"
 )
 
 var s *discordgo.Session
@@ -23,6 +24,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("Invalid bot parameters: %v", err)
 	}
+
+	// Handle state.
+	defer state.State.Save()
 
 	// Open session.
 	s.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
