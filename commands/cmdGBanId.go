@@ -63,10 +63,10 @@ var cmdGBanUid = &Command{
 			Title:       "Глобальний бан",
 			Description: "",
 			Fields: []*discordgo.MessageEmbedField{
-				{Name: "Модератор", Value: i.Member.Mention()},
-				{Name: "Користувач", Value: userName},
-				{Name: "Ідентифікатор користувача", Value: optionMap["user_id"].StringValue()},
-				{Name: "Причина", Value: optionMap["reason"].StringValue()},
+				{Name: "Модератор", Value: i.Member.Mention(), Inline: true},
+				{Name: "Користувач", Value: userName, Inline: true},
+				{Name: "Ідентифікатор користувача", Value: optionMap["user_id"].StringValue(), Inline: true},
+				{Name: "Причина", Value: optionMap["reason"].StringValue(), Inline: true},
 			},
 		}
 
