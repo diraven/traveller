@@ -28,6 +28,18 @@ func main() {
 	// Handle state.
 	defer state.State.Save()
 
+	// Process guilds.
+	s.AddHandler(func(s *discordgo.Session, r *discordgo.GuildCreate) {
+		log.Printf("Joined guild: %v %v", r.Guild.ID, r.Guild.Name)
+		_, ok := state.State.Guilds[r.Guild.ID]
+		if ok {
+			state.State.Guilds[r.Guild.ID].Name = r.Guild.Name
+			state.State.Guilds[r.Guild.ID].IsActive = true
+		} else {
+			state.State.Guilds[r.Guild.ID] = &state.Guild{Name: r.Guild.Name, IsActive: true}
+		}
+	})
+
 	// Open session.
 	s.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
 		log.Printf("Logged in as: %v#%v", s.State.User.Username, s.State.User.Discriminator)

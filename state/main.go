@@ -10,27 +10,29 @@ import (
 )
 
 type state struct {
-	Guilds map[string]*guild `json:"guilds"`
-	Users  map[string]*user  `json:"users"`
+	Guilds map[string]*Guild `json:"guilds"`
+	Users  map[string]*User  `json:"users"`
 }
 
-type guild struct {
-	Name string  `json:"name"`
-	T    *tGuild `json:"t"`
+type Guild struct {
+	Name         string  `json:"name"`
+	IsActive     bool    `json:"is_active"`
+	LogChannelId string  `json:"log_channel_id"`
+	T            *TGuild `json:"t"`
 }
 
-type user struct {
+type User struct {
 	Name    string `json:"name"`
 	IsOwner bool   `json:"is_owner"`
-	T       *tUser `json:"t"`
+	T       *TUser `json:"t"`
 }
 
-type tGuild struct {
+type TGuild struct {
 	Hp   float32 `json:"hp"`
 	Food int     `json:"food"`
 }
 
-type tUser struct {
+type TUser struct {
 	Action string `json:"action"`
 }
 
@@ -58,11 +60,11 @@ func (s *state) Save() {
 	}
 }
 
-func (s *state) GetUser(discordUser *discordgo.User) *user {
+func (s *state) GetUser(discordUser *discordgo.User) *User {
 	// Search for user in state.
 	userState, ok := s.Users[discordUser.ID]
 	if !ok {
-		userState = &user{
+		userState = &User{
 			Name: discordUser.Username + "#" + discordUser.Discriminator,
 		}
 	}
@@ -74,7 +76,7 @@ func (s *state) GetUser(discordUser *discordgo.User) *user {
 
 	// Initialize T if not exists.
 	if userState.T == nil {
-		userState.T = &tUser{}
+		userState.T = &TUser{}
 	}
 
 	// User not found in state.
@@ -88,6 +90,14 @@ func (s *state) IsOwner(userId string) bool {
 		}
 	}
 	return false
+}
+
+func (s *state) ActiveGuilds() map[string]*Guild {
+	guilds := make(map[string]*Guild, 0)
+	for guildId, guild := range s.Guilds {
+		guilds[guildId] = guild
+	}
+	return guilds
 }
 
 func init() {

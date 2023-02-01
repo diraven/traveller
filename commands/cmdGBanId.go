@@ -1,7 +1,8 @@
 package commands
 
 import (
-	"strings"
+	"fmt"
+	"log"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/diraven/traveller/state"
@@ -50,22 +51,7 @@ var cmdGBanUid = &Command{
 			optionMap[opt.Name] = opt
 		}
 
-		// Collect ban messages if any.
-		messages := []string{}
-		for guildId := range state.State.Guilds {
-			guild, err := s.State.Guild(guildId)
-			if err != nil {
-				messages = append(messages, "Не можу знайти сервер: "+guildId)
-			}
-			err = s.GuildBanCreateWithReason(guildId, optionMap["user_id"].StringValue(), optionMap["reason"].StringValue(), 1)
-			if err != nil {
-				messages = append(messages, "**"+guild.Name+"**: "+err.Error())
-			} else {
-				messages = append(messages, "**"+guild.Name+"**: ✅")
-			}
-		}
-
-		// Respond.
+		// Prepare embed.
 		user, err := s.User(optionMap["user_id"].StringValue())
 		userName := ""
 		if err != nil {
@@ -73,19 +59,53 @@ var cmdGBanUid = &Command{
 		} else {
 			userName = user.Username + "#" + user.Discriminator + " (" + user.Mention() + ")"
 		}
+		embed := &discordgo.MessageEmbed{
+			Title:       "Глобальний бан",
+			Description: "",
+			Fields: []*discordgo.MessageEmbedField{
+				{Name: "Модератор", Value: i.Member.Mention()},
+				{Name: "Користувач", Value: userName},
+				{Name: "Ідентифікатор користувача", Value: optionMap["user_id"].StringValue()},
+				{Name: "Причина", Value: optionMap["reason"].StringValue()},
+			},
+		}
+
+		// Respond to interaction.
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{
-					{
-						Title:       "Глобальний бан",
-						Description: strings.Join(messages, "\n"),
-						Fields: []*discordgo.MessageEmbedField{
-							{Name: "Користувач", Value: userName},
-							{Name: "Ідентифікатор користувача", Value: optionMap["user_id"].StringValue()},
-							{Name: "Причина", Value: optionMap["reason"].StringValue()},
-						},
-					},
+				Content: "✅",
+			},
+		})
+
+		// Distribute bans.
+		successes := 0
+		total := 0
+		for guildId, tGuild := range state.State.ActiveGuilds() {
+			total++
+			_, err := s.State.Guild(guildId)
+			if err != nil {
+				log.Printf("%v (%v) %v", guildId, tGuild.Name, err)
+				continue
+			}
+			err = s.GuildBanCreateWithReason(guildId, optionMap["user_id"].StringValue(), optionMap["reason"].StringValue(), 1)
+			if err != nil {
+				embed.Description = "**Помилка**: " + err.Error()
+			} else {
+				embed.Description = "**Статус**: видано"
+				successes++
+			}
+			if tGuild.LogChannelId != "" {
+				s.ChannelMessageSendEmbed(tGuild.LogChannelId, embed)
+			}
+		}
+
+		// Respond to interaction.
+		s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
+			Embeds: []*discordgo.MessageEmbed{
+				{
+					Title:       "Глобальний бан",
+					Description: fmt.Sprintf("Видано на %d серверах з %d.", successes, total),
 				},
 			},
 		})
