@@ -10,6 +10,7 @@ import (
 var commands = []*Command{
 	// cmdTest,
 	cmdFaq,
+	cmdSetLogChannel,
 	cmdGBanUid,
 	cmdSlap,
 	cmdRusniPizda,
