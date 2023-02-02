@@ -9,14 +9,15 @@ import (
 
 var commands = []*Command{
 	// cmdTest,
-	// cmdFaq,
-	// cmdSetLogChannel,
-	// cmdGBanUid,
-	// cmdSlap,
-	// cmdRusniPizda,
-	// cmdState,
-	// cmdTraveller,
+	cmdFaq,
+	cmdSetLogChannel,
+	cmdGBanUid,
+	cmdSlap,
+	cmdRusniPizda,
+	cmdState,
+	cmdTraveller,
 	cmdSum,
+	cmdSum20,
 }
 
 func Init(s *discordgo.Session) {

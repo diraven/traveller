@@ -1,18 +1,25 @@
 package commands
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/bwmarrin/discordgo"
 )
 
-var cmdSum = &Command{
+type sum20Response struct {
+	Entry string `json:"entry"`
+}
+
+var cmdSum20 = &Command{
 	Definition: &discordgo.ApplicationCommand{
-		Name:        "sum",
-		Description: "Пошук слова в словнику української мови",
+		Name:        "sum20",
+		Description: "Пошук слова в сучаснішому словнику української мови",
 		Options: []*discordgo.ApplicationCommandOption{
 			{
 				Type:        discordgo.ApplicationCommandOptionString,
@@ -30,8 +37,7 @@ var cmdSum = &Command{
 			optionMap[opt.Name] = opt
 		}
 
-		// Perform http request.
-		resp, err := http.Get(fmt.Sprintf("http://sum.in.ua/?swrd=%s", optionMap["word"].StringValue()))
+		resp, err := http.Get(fmt.Sprintf("https://sum20ua.com/api/DictEntry/searchEntry/%s", optionMap["word"].StringValue()))
 		if err != nil {
 			log.Printf("%v", err)
 			return
@@ -41,8 +47,19 @@ var cmdSum = &Command{
 			log.Fatalf("status code error: %d %s", resp.StatusCode, resp.Status)
 		}
 
-		// Load the HTML document
-		doc, err := goquery.NewDocumentFromReader(resp.Body)
+		// Load JSON.
+		response := &sum20Response{}
+		data, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			log.Printf("%v", err)
+		}
+		err = json.Unmarshal(data, response)
+		if err != nil {
+			log.Printf("%v", err)
+		}
+
+		// Load HTML.
+		doc, err := goquery.NewDocumentFromReader(strings.NewReader(response.Entry))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -50,38 +67,23 @@ var cmdSum = &Command{
 		// Prepare embed.
 		embed := &discordgo.MessageEmbed{
 			Title:  optionMap["word"].StringValue(),
-			URL:    fmt.Sprintf("http://sum.in.ua/?swrd=%s", optionMap["word"].StringValue()),
-			Author: &discordgo.MessageEmbedAuthor{Name: "sum.in.ua", URL: "http://sum.in.ua/"},
+			URL:    "https://sum20ua.com/",
+			Author: &discordgo.MessageEmbedAuthor{Name: "sum20.in.ua", URL: "https://sum20ua.com/"},
+			Footer: &discordgo.MessageEmbedFooter{Text: "СЛОВНИК УКРАЇНСЬКОЇ МОВИ ONLINE. ТОМИ 1-12."},
 		}
 		if len(embed.Title) > 253 {
 			embed.Title = embed.Title[:253] + "..."
 		}
 
-		// Find all the articles.
-		articles := doc.Find("div[itemtype='http://schema.org/ScholarlyArticle']")
-
-		// No articles found.
-		if articles.Length() == 0 {
-			embed.Description = fmt.Sprintf("Слово не знайдено. Що в біса таке %s?", embed.Title)
-		}
-
-		// One article found.
-		if articles.Length() > 0 {
-			s := articles.First()
-			embed.Description = s.Find("div[itemprop='articleBody']").Text()
+		if doc.Find(".WORD").Text() != "ПІДКУ́РЮВАЧ" {
+			// Word found.
+			embed.Description = doc.Text()
 			if len(embed.Description) > 2048 {
 				embed.Description = embed.Description[:2048] + "..."
 			}
-
-			embed.Footer = &discordgo.MessageEmbedFooter{Text: s.Find("p.tom").Text()}
-			if len(embed.Footer.Text) > 1024 {
-				embed.Footer.Text = embed.Footer.Text[:1024] + "..."
-			}
-		}
-
-		// Multiple articles found.
-		if articles.Length() > 1 {
-			embed.Description = embed.Description + fmt.Sprintf("\n\n Слово має [більше одного значення](%s).", embed.URL)
+		} else {
+			// Word not found.
+			embed.Description = fmt.Sprintf("Слово не знайдено. Що в біса таке %s?", embed.Title)
 		}
 
 		// Respond.
