@@ -84,8 +84,8 @@ func (s *state) GetUser(discordUser *discordgo.User) *User {
 }
 
 func (s *state) IsOwner(userId string) bool {
-	for userId, user := range s.Users {
-		if userId == userId && user.IsOwner {
+	for stateUserId, user := range s.Users {
+		if userId == stateUserId && user.IsOwner {
 			return true
 		}
 	}
