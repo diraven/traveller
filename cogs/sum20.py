@@ -24,10 +24,12 @@ class Sum20Cog(commands.Cog):
                 data = await resp.json()
                 soup = BeautifulSoup(data["entry"], "html.parser")
                 text = soup.text
+                embed = discord.Embed(
+                    title=word,
+                    description=text[:2000] if len(text) > 2000 else text,
+                )
+                embed.set_author(name="sum20ua.com", url="https://sum20ua.com")
 
                 await interaction.response.send_message(
-                    embed=discord.Embed(
-                        title=word,
-                        description=text[:2000] if len(text) > 2000 else text,
-                    ),
+                    embed=embed,
                 )
