@@ -4,26 +4,24 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-      # Check out repository.
       - name: Check out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      # Setup node.
-      - uses: actions/setup-go@v3
+      - name: Setup python
+        uses: actions/setup-python@v4
         with:
-          go-version: '1.19'
-          cache: true
-
-      # Test & Build Project
-      # - name: Test
-      #   run: bash ./.husky/pre-commit
-      - name: Format
-        run: test -z $(gofmt -l .)
-      - name: Test
-        run: go test
-      - name: Build
-        run: go build
-      - name: Build Docker Image
+          python-version: "3.11"
+          cache: "poetry"
+      - name: Setup python dependencies
         run: |
-          cp example.env .env
-          docker-compose build
+          python -m pip install poetry
+          python -m poetry config virtualenvs.in-project true
+          python -m poetry install
+
+      - name: Run hooks
+        run: python -m poetry run pre-commit run --all-files
+
+      # - name: Build docker image
+      #   run: |
+      #     cp example.env .env
+      #     docker-compose build

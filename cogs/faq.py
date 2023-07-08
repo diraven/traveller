@@ -1,10 +1,9 @@
-import typing as t
-
 import discord
 from discord.ext import commands
 
 import settings
 
+# pylint: disable=line-too-long
 ENTRIES = {
     "ru-interface": {
         "title": "Російськомовний інтерфейс.",
@@ -33,7 +32,7 @@ ENTRIES = {
     "svc": {
         "title": "СВЦ - Синдром Великого Цабе.",
         "description": """Морально-психологічний стан, що характеризується надмірним почуттям власної важливості.
-        
+
 **Групи ризику:** лідери думок, публічні люди, люди що мають певну владу.
 **Ускладнення:**  гостра форма має тенденцію до переходу в хронічну з плином часу, що, в свою чергу, може призвести до егоцентризму та нарцисизму. Наявний егоцентризм та/або нарцисизм ускладнює перебіг синдрому та прискорює перехід синдрому в хронічну форму.
 **Лікування:** зняти корону. Можливе симптоматичне лікування фейспалмами. У випадку рецидивів: призначити підтримуючу терапію - суспільно корисні роботи.
@@ -44,7 +43,7 @@ ENTRIES = {
         "description": """1. Після того як ви обрали фото, тицьніть кніпку назад на тілібоні, щоб закрити вікно з галереєю (рис. 1).
 2. Тицьніть на обране фото на вікні вкладень ще раз (рис. 2).
 3. Тицьніть на позначку "позначити як спойлер" (рис. 3).
-		
+
 Вуаля, спойлер на тілібоні. Не так вже й складно, е?
 		""",
         "image": "https://cdn.discordapp.com/attachments/997173042662887514/997174604856565841/spoiler.png",
@@ -75,6 +74,7 @@ Server languages: Ukrainian and English. Please, see this and other rules in the
 Тобто, робиш грі вміст, рекламу і прибуток навіть не вносячи грошей напряму. І, тим самим, спонсоруєш ті ракети які потім летять по українських містах.""",
     },
 }
+# pylint: enable=line-too-long
 
 
 class Cog(commands.Cog):
@@ -83,10 +83,13 @@ class Cog(commands.Cog):
     )
 
     for name, entry in ENTRIES.items():
-
-        @root_command.command(name=name, description=entry["title"])
+        # pylint: disable=cell-var-from-loop
+        @root_command.command(name=name, description=entry["title"])  # type: ignore
+        # pylint: enable=cell-var-from-loop
         @discord.app_commands.guild_only()
-        async def cmd(self, interaction: discord.Interaction) -> None:
+        async def cmd(self, interaction: discord.Interaction[commands.Bot]) -> None:
+            if not interaction.command:
+                return
             entry = ENTRIES[interaction.command.name]
             embed = discord.Embed(
                 title=entry["title"],
@@ -96,3 +99,7 @@ class Cog(commands.Cog):
             await interaction.response.send_message(
                 embed=embed,
             )
+
+    def __init__(self, bot: commands.Bot) -> None:
+        self._bot = bot
+        super().__init__()

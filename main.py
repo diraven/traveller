@@ -8,7 +8,7 @@ bot = commands.Bot("!", intents=settings.intents)
 
 
 @bot.event
-async def on_ready():
+async def on_ready() -> None:
     await bot.add_cog(faq.Cog(bot))
 
     synced = await bot.tree.sync(guild=discord.Object(id=settings.GUILD_ID))
