@@ -5,7 +5,6 @@ from discord.ext import commands
 
 import settings
 
-# pylint: disable=line-too-long
 TEMPLATES = (
     "{} прикладає {} по спині величезним сомом.",
     "{} демонструє {} щорічну заяву Арестовича на звільнення.",
