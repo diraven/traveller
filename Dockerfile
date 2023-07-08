@@ -1,16 +1,12 @@
-FROM golang:1.19-alpine as build
+FROM python:3.11
 
 WORKDIR /app
-COPY go.mod ./
-COPY go.sum ./
-RUN go mod download
-COPY . ./
-RUN go build -o traveller
+RUN pip install poetry
 
-## Deploy
-FROM alpine
+COPY pyproject.toml poetry.lock ./
 
-WORKDIR /app
-COPY --from=build /app/traveller traveller
+RUN python -m poetry config virtualenvs.in-project true && \
+    poetry install --only main
 
-CMD ["/app/traveller"]
+COPY . .
+CMD [".venv/bin/python", "./main.py"]

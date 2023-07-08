@@ -6,5 +6,5 @@ services:
     init: true
     env_file:
       - .env
-    volumes:
-      - ./state.json:/app/state.json
+    # volumes:
+    #   - ./state.json:/app/state.json
