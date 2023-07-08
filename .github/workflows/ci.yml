@@ -7,12 +7,15 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v3
 
+      - name: Setup poetry # so that cache works
+        run: |
+          python -m pip install poetry
       - name: Setup python
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
           cache: "poetry"
-      - name: Setup python dependencies
+      - name: Setup python dependencies # with the proper python version now
         run: |
           python -m pip install poetry
           python -m poetry config virtualenvs.in-project true
