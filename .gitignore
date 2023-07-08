@@ -1,6 +1,6 @@
 .*
 !.github
 !.gitignore
-!.pre-commit-config.yml
+!.pre-commit-config.yaml
 
 __pycache__
