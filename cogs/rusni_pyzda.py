@@ -40,6 +40,11 @@ class RusniPyzdaCog(commands.Cog):
                     embed.set_footer(
                         text=f"Станом на {data['date']}, {data['day']}й день війни"
                     )
+                    embed.set_thumbnail(
+                        url="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/"
+                        "Emblem_of_the_Ukrainian_Armed_Forces.svg/"
+                        "1024px-Emblem_of_the_Ukrainian_Armed_Forces.svg.png"
+                    )
 
                 await interaction.response.send_message(
                     embed=embed,
