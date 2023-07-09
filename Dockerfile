@@ -9,4 +9,6 @@ RUN python -m poetry config virtualenvs.in-project true && \
     poetry install --only main
 
 COPY . .
+
+ENTRYPOINT ["/app/entrypoint.sh"]
 CMD [".venv/bin/python", "./main.py"]

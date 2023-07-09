@@ -1,7 +1,4 @@
 .*
-!.github
-!.gitignore
 !.pre-commit-config.yaml
-!.dockerignore
 
 __pycache__
