@@ -1,6 +1,5 @@
 import logging
 import typing as t
-from typing import Optional
 
 import discord
 import sqlalchemy as sa
@@ -18,7 +17,7 @@ BAN_REASON_FIELD_NAME = "Причина бану"
 
 class BanView(discord.ui.View):
     def __init__(self, *, timeout: float | None = 180):
-        self.message: Optional[discord.Message] = None
+        self.message: t.Optional[discord.Message] = None
         super().__init__(timeout=timeout)
 
     async def on_timeout(self) -> None:
@@ -207,6 +206,7 @@ async def setup(bot: commands.Bot) -> None:
                                 )
                                 continue
                             except discord.errors.NotFound:
+                                # Ban not found, we can proceed with notification.
                                 pass
 
                             ban_view = BanView()
