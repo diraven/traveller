@@ -10,7 +10,7 @@ async def setup(bot: commands.Bot) -> None:
             self._bot = bot
             super().__init__()
 
-        @discord.app_commands.command(description="Йой!")  # type: ignore
+        @discord.app_commands.command(description="Словник української мови (sum20ua.com)")  # type: ignore
         @discord.app_commands.guilds(*bot.guilds)
         @discord.app_commands.guild_only()
         async def sum20(
@@ -24,8 +24,7 @@ async def setup(bot: commands.Bot) -> None:
                     soup = BeautifulSoup(data["entry"], "html.parser")
                     text = soup.text
                 embed = discord.Embed(
-                    title=word,
-                    description=text[:2000] if len(text) > 2000 else text,
+                    description=text if len(text) < 2000 else f"{text[:2000]}...",
                 )
                 embed.set_author(name="sum20ua.com", url="https://sum20ua.com")
 

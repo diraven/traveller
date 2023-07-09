@@ -1,17 +1,21 @@
 from discord.ext import commands
 
 import settings
-from cogs import faq, rusni_pyzda, slap, sum20
+from cogs import faq, rusni_pyzda, slap, sum20, sum_
 
 bot = commands.Bot("!", intents=settings.intents)
 
 
 @bot.event
 async def on_ready() -> None:
-    await faq.setup(bot)
-    await rusni_pyzda.setup(bot)
-    await slap.setup(bot)
-    await sum20.setup(bot)
+    for module in [
+        faq,
+        rusni_pyzda,
+        slap,
+        sum20,
+        sum_,
+    ]:
+        await module.setup(bot)
 
     for guild in bot.guilds:
         synced = await bot.tree.sync(guild=guild)
