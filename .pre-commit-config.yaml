@@ -1,0 +1,43 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-executables-have-shebangs
+      - id: check-json
+        exclude: ".*(\\.vscode).*"
+      - id: detect-private-key
+      - id: trailing-whitespace
+  - repo: https://github.com/psf/black
+    rev: 23.3.0
+    hooks:
+      - id: black
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: 3.5.2
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        entry: mypy main.py
+        language: system
+        pass_filenames: false
+        always_run: true
+  - repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: pylint --score no
+        language: system
+        files: ".*\\.py"
+        exclude: ^alembic/
