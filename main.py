@@ -6,6 +6,17 @@ import models
 import settings
 from cogs import configuration, faq, rusni_pyzda, slap, sum20, sum_
 
+if settings.SENTRY_DSN:
+    import sentry_sdk
+
+    sentry_sdk.init(
+        dsn=settings.SENTRY_DSN,
+        max_breadcrumbs=50,
+        debug=settings.DEBUG,
+        traces_sample_rate=1.0,
+        release="0.0.1",
+    )
+
 bot = commands.Bot("!", intents=settings.intents)
 
 
