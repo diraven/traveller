@@ -3,8 +3,6 @@ import random
 import discord
 from discord.ext import commands
 
-import settings
-
 TEMPLATES = (
     "{} прикладає {} по спині величезним сомом.",
     "{} демонструє {} щорічну заяву Арестовича на звільнення.",
@@ -40,25 +38,28 @@ TEMPLATES = (
 )
 
 
-class SlapCog(commands.Cog):
-    def __init__(self, bot: commands.Bot) -> None:
-        self._bot = bot
-        super().__init__()
+async def setup(bot: commands.Bot) -> None:
+    class SlapCog(commands.Cog):
+        def __init__(self) -> None:
+            self._bot = bot
+            super().__init__()
 
-    @discord.app_commands.command(description="Йой!")  # type: ignore
-    @discord.app_commands.guilds(discord.Object(id=settings.GUILD_ID))
-    @discord.app_commands.guild_only()
-    async def slap(
-        self, interaction: discord.Interaction[commands.Bot], member: discord.Member
-    ) -> None:
-        embed = discord.Embed(
-            title="Йой!",
-            description=random.choice(TEMPLATES).format(  # nosec
-                interaction.user.mention, member.mention
-            ),
-            color=discord.Color.blue(),
-        )
+        @discord.app_commands.command(description="Йой!")  # type: ignore
+        @discord.app_commands.guilds(*bot.guilds)
+        @discord.app_commands.guild_only()
+        async def slap(
+            self, interaction: discord.Interaction[commands.Bot], member: discord.Member
+        ) -> None:
+            embed = discord.Embed(
+                title="Йой!",
+                description=random.choice(TEMPLATES).format(  # nosec
+                    interaction.user.mention, member.mention
+                ),
+                color=discord.Color.blue(),
+            )
 
-        await interaction.response.send_message(
-            embed=embed,
-        )
+            await interaction.response.send_message(
+                embed=embed,
+            )
+
+    await bot.add_cog(SlapCog())

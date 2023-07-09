@@ -1,8 +1,6 @@
 import discord
 from discord.ext import commands
 
-import settings
-
 # pylint: disable=line-too-long
 ENTRIES = {
     "ru_interface": {
@@ -77,29 +75,32 @@ Server languages: Ukrainian and English. Please, see this and other rules in the
 # pylint: enable=line-too-long
 
 
-class FaqCog(commands.Cog):
-    root_command = discord.app_commands.Group(
-        name="faq", description="ЧаПи", guild_ids=[settings.GUILD_ID]
-    )
+async def setup(bot: commands.Bot) -> None:
+    class FaqCog(commands.Cog):
+        root_command = discord.app_commands.Group(
+            name="faq", description="ЧаПи", guild_ids=[guild.id for guild in bot.guilds]
+        )
 
-    for name, entry in ENTRIES.items():
-        # pylint: disable=cell-var-from-loop
-        @root_command.command(name=name, description=entry["title"])  # type: ignore
-        # pylint: enable=cell-var-from-loop
-        @discord.app_commands.guild_only()
-        async def cmd(self, interaction: discord.Interaction[commands.Bot]) -> None:
-            if not interaction.command:
-                return
-            entry = ENTRIES[interaction.command.name]
-            embed = discord.Embed(
-                title=entry["title"],
-                description=entry["description"],
-            )
-            embed.set_image(url=entry.get("image"))
-            await interaction.response.send_message(
-                embed=embed,
-            )
+        for name, entry in ENTRIES.items():
+            # pylint: disable=cell-var-from-loop
+            @root_command.command(name=name, description=entry["title"])  # type: ignore
+            # pylint: enable=cell-var-from-loop
+            @discord.app_commands.guild_only()
+            async def cmd(self, interaction: discord.Interaction[commands.Bot]) -> None:
+                if not interaction.command:
+                    return
+                entry = ENTRIES[interaction.command.name]
+                embed = discord.Embed(
+                    title=entry["title"],
+                    description=entry["description"],
+                )
+                embed.set_image(url=entry.get("image"))
+                await interaction.response.send_message(
+                    embed=embed,
+                )
 
-    def __init__(self, bot: commands.Bot) -> None:
-        self._bot = bot
-        super().__init__()
+        def __init__(self) -> None:
+            self._bot = bot
+            super().__init__()
+
+    await bot.add_cog(FaqCog())
