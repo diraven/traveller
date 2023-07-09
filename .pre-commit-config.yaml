@@ -40,3 +40,4 @@ repos:
         entry: pylint --score no
         language: system
         files: ".*\\.py"
+        exclude: ^alembic/
