@@ -1,6 +1,9 @@
+import logging
 import os
 
 import discord
+
+logging.getLogger().setLevel(logging.INFO)
 
 intents = discord.Intents.default()
 intents.members = True
