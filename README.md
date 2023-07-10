@@ -30,7 +30,7 @@ docker-compose up -d
 
 - Запросити бота на свій сервер: https://discord.com/oauth2/authorize?client_id=966727208586584135&permissions=18560&scope=bot%20applications.commands
 - Налаштувати канал сповіщень за допомогою `/config log_channel`.
-- Перевірити що все налаштовано правильно за допомогою `/config check`.
+- Перевірити що все налаштовано правильно за допомогою `/config check_bans_sharing`.
 
 ## ЧаПи
 
