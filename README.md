@@ -17,6 +17,7 @@ A simplistic discord both developed for select Ukrainian discord communitites.
 ```sh
 cp example.env .env
 vi .env # add your credentials
+touch .data.sqlite
 docker-compose build
 docker-compose up -d
 ```
