@@ -40,6 +40,15 @@ async def error_handler(
 
 
 @bot.event
+async def on_guild_join(guild: discord.Guild) -> None:
+    # Add new guild to database.
+    with sa_orm.Session(models.engine) as session, session.begin():
+        session.add(models.Guild(id=guild.id, name=guild.name))
+        # Sync commands.
+        await bot.tree.sync(guild=guild)
+
+
+@bot.event
 async def on_guild_remove(guild: discord.Guild) -> None:
     with sa_orm.Session(models.engine) as session, session.begin():
         session.query(models.Guild).filter(models.Guild.id == guild.id).delete()
@@ -60,13 +69,14 @@ async def on_ready() -> None:
 
     with sa_orm.Session(models.engine) as session, session.begin():
         # Add guilds that bot is a member of.
+        # We still need this in case if guild was added while bot was offline.
         for guild in bot.guilds:
             session.merge(models.Guild(id=guild.id, name=guild.name))
             # Sync commands.
-            synced = await bot.tree.sync(guild=guild)
-            print(f"{guild.name}: {len(synced)} cmds synced")
+            await bot.tree.sync(guild=guild)
 
         # Remove guilds bot is not a member of any more.
+        # We still need this in case if guild was removed while bot was offline.
         for stored_guild in session.query(models.Guild):
             if not bot.get_guild(stored_guild.id):
                 session.delete(stored_guild)
