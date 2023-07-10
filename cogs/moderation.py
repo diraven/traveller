@@ -44,7 +44,7 @@ async def setup(bot: commands.Bot) -> None:
                 # Get channels we'll be sending notifications into.
                 # Getting all that are set except for originating server.
                 log_channels_ids = session.execute(
-                    sa.select(models.Guild.id, models.Guild.log_channel_id).filter(
+                    sa.select(models.Guild.log_channel_id).filter(
                         models.Guild.log_channel_id.is_not(None),
                         models.Guild.id != guild.id,
                     )
@@ -52,11 +52,7 @@ async def setup(bot: commands.Bot) -> None:
 
                 # Get actual guild and channel objects for further use.
                 log_channels = [
-                    (
-                        t.cast(discord.Guild, bot.get_guild(guild_id)),
-                        bot.get_channel(channel_id),
-                    )
-                    for (guild_id, channel_id) in log_channels_ids
+                    bot.get_channel(channel_id) for (channel_id,) in log_channels_ids
                 ]
 
                 # Scan last few audit logs to figure out ban details.
@@ -91,20 +87,7 @@ async def setup(bot: commands.Bot) -> None:
                         )
 
                         # For each logging channel:
-                        for log_guild, log_channel in log_channels:
-                            # Before sending the notification itself - make sure ban does not
-                            # already exist.
-                            try:
-                                await log_guild.fetch_ban(member)
-                                logger.info(
-                                    "Ban event: %s - already banned, skipped.",
-                                    member.id,
-                                )
-                                continue
-                            except discord.errors.NotFound:
-                                # Ban not found, we can proceed with notification.
-                                pass
-
+                        for log_channel in log_channels:
                             msg = await t.cast(discord.TextChannel, log_channel).send(
                                 embed=embed,
                             )
@@ -113,7 +96,8 @@ async def setup(bot: commands.Bot) -> None:
                             # value depends on the language of the discord interface and will
                             # give errors on language mismatch.
                             await msg.reply(
-                                f"/ban user:{target.id} delete_messages:{reason if log.reason else ''}"
+                                f"/ban user:{target.id} delete_messages:{reason if log.reason else ''}",
+                                suppress_embeds=True,
                             )
 
                         # Mark ban as seen.
