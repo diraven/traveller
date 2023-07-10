@@ -88,17 +88,24 @@ async def setup(bot: commands.Bot) -> None:
 
                         # For each logging channel:
                         for log_channel in log_channels:
-                            msg = await t.cast(discord.TextChannel, log_channel).send(
-                                embed=embed,
-                            )
-                            reason = f" reason:{log.reason}"
-                            # We have to leave "delete_messages" parameter below empty since it's
-                            # value depends on the language of the discord interface and will
-                            # give errors on language mismatch.
-                            await msg.reply(
-                                f"/ban user:{target.id} delete_messages:{reason if log.reason else ''}",
-                                suppress_embeds=True,
-                            )
+                            try:
+                                msg = await t.cast(
+                                    discord.TextChannel, log_channel
+                                ).send(
+                                    embed=embed,
+                                )
+                                reason = f" reason:{log.reason}"
+                                # We have to leave "delete_messages" parameter below empty since it's
+                                # value depends on the language of the discord interface and will
+                                # give errors on language mismatch.
+                                await msg.reply(
+                                    f"/ban user:{target.id} delete_messages:{reason if log.reason else ''}",
+                                    suppress_embeds=True,
+                                )
+                            except discord.errors.Forbidden:
+                                logger.warning(
+                                    "Cannot send message to %s.", log_channel
+                                )
 
                         # Mark ban as seen.
                         logger.info(
