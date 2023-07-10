@@ -7,117 +7,8 @@ import sqlalchemy.orm as sa_orm
 from discord.ext import commands
 
 import models
-import utils
 
 logger = logging.getLogger("mod")
-
-BANNED_ID_FIELD_NAME = "ID забаненого"
-BAN_REASON_FIELD_NAME = "Причина бану"
-
-
-class BanView(discord.ui.View):
-    def __init__(self, *, timeout: float | None = 180):
-        self.message: t.Optional[discord.Message] = None
-        super().__init__(timeout=timeout)
-
-    async def on_timeout(self) -> None:
-        # Disable all controls.
-        for item in self.children:
-            item.disabled = True  # type: ignore # pylint: disable=no-member
-        # Update the message.
-        if self.message:
-            await self.message.edit(view=self)
-
-    @discord.ui.button(label="Теж забанити", style=discord.ButtonStyle.red)
-    async def ban(
-        self,
-        interaction: discord.Interaction[commands.Bot],
-        button: discord.ui.Button["BanView"],  # pylint: disable=unused-argument
-    ) -> None:
-        if self.message:
-            # Make sure only people with ban_members permission can do this.
-            if not utils.has_permission_for_interaction(interaction, "ban_members"):
-                embed = discord.Embed(
-                    color=discord.Color.red(),
-                    title="Помилка",
-                    description="Відсутній доступ.",
-                )
-                await interaction.response.send_message(
-                    embed=embed,
-                    ephemeral=True,
-                )
-                return
-
-            # Add status field into the embed.
-            self.message.embeds[0].add_field(
-                name="Статус",
-                value=f"Теж забанено модератором {interaction.user.mention}",
-            )
-
-            # Get banned id.
-            banned_id = int(
-                next(
-                    field
-                    for field in self.message.embeds[0].fields
-                    if field.name == BANNED_ID_FIELD_NAME
-                ).value
-                or ""
-            )
-            # Get banned reason.
-            banned_reason = next(
-                field
-                for field in self.message.embeds[0].fields
-                if field.name == BAN_REASON_FIELD_NAME
-            ).value
-
-            # Perform ban itself.
-            if interaction.guild:
-                await interaction.guild.ban(
-                    discord.Object(banned_id), reason=banned_reason
-                )
-
-            # Disable all the controls.
-            for item in self.children:
-                item.disabled = True  # type: ignore # pylint: disable=no-member
-            # Update message and it's view.
-            await interaction.response.edit_message(
-                embed=self.message.embeds[0], view=self
-            )
-
-    @discord.ui.button(label="Ігнорувати", style=discord.ButtonStyle.gray)
-    @discord.app_commands.checks.has_permissions(ban_members=True)
-    async def skip(
-        self,
-        interaction: discord.Interaction[commands.Bot],
-        button: discord.ui.Button["BanView"],  # pylint: disable=unused-argument
-    ) -> None:
-        if self.message:
-            # Make sure only people with ban_members permission can do this.
-            if not utils.has_permission_for_interaction(interaction, "ban_members"):
-                embed = discord.Embed(
-                    color=discord.Color.red(),
-                    title="Помилка",
-                    description="Відсутній доступ.",
-                )
-                await interaction.response.send_message(
-                    embed=embed,
-                    ephemeral=True,
-                )
-                return
-
-            # Add status field into the embed.
-            self.message.embeds[0].add_field(
-                name="Статус",
-                value=f"Проігноровано модератором {interaction.user.mention}",
-            )
-
-            # Disable all the controls.
-            for item in self.children:
-                item.disabled = True  # type: ignore # pylint: disable=no-member
-            # Update message and it's view.
-            await interaction.response.edit_message(
-                embed=self.message.embeds[0], view=self
-            )
 
 
 async def setup(bot: commands.Bot) -> None:
@@ -184,15 +75,20 @@ async def setup(bot: commands.Bot) -> None:
                         )
                         embed.add_field(
                             name="Модератор",
-                            value=f"{log.user.mention} '{log.user.name}' ({log.user.id})",
+                            value=f"{log.user.display_name} '{log.user.name}' ({log.user.id})",
                         )
                         embed.add_field(
                             name="Забанений",
                             value=f"{target.mention} '{target.name}' ({target.id})",
                         )
-                        embed.add_field(name=BANNED_ID_FIELD_NAME, value=target.id)
-                        embed.add_field(name=BAN_REASON_FIELD_NAME, value=log.reason)
-                        embed.set_footer(text=log.created_at)
+                        embed.add_field(name="Причина бану", value=log.reason)
+                        if target.avatar:
+                            embed.set_thumbnail(url=target.avatar.url)
+                        embed.set_footer(
+                            text="Для створення такого самого бану на "
+                            "цьому сервері - скопіюйте та "
+                            "відправте текстову команду нижче."
+                        )
 
                         # For each logging channel:
                         for log_guild, log_channel in log_channels:
@@ -209,12 +105,15 @@ async def setup(bot: commands.Bot) -> None:
                                 # Ban not found, we can proceed with notification.
                                 pass
 
-                            ban_view = BanView()
-                            ban_view.message = await t.cast(
-                                discord.TextChannel, log_channel
-                            ).send(
+                            msg = await t.cast(discord.TextChannel, log_channel).send(
                                 embed=embed,
-                                view=ban_view,
+                            )
+                            reason = f" reason:{log.reason}"
+                            # We have to leave "delete_messages" parameter below empty since it's
+                            # value depends on the language of the discord interface and will
+                            # give errors on language mismatch.
+                            await msg.reply(
+                                f"/ban user:{target.id} delete_messages:{reason if log.reason else ''}"
                             )
 
                         # Mark ban as seen.
