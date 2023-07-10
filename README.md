@@ -29,7 +29,8 @@ docker-compose up -d
 Для підключення до сповіщень про бани треба:
 
 - Запросити бота на свій сервер: https://discord.com/oauth2/authorize?client_id=966727208586584135&permissions=2176&scope=bot%20applications.commands
-- Налаштувати канал сповіщень за допомогою /config log_channel.
+- Налаштувати канал сповіщень за допомогою `/config log_channel`.
+- Перевірити що все налаштовано правильно за допомогою `/config check`.
 
 ## ЧаПи
 
