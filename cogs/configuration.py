@@ -31,7 +31,11 @@ async def setup(bot: commands.Bot) -> None:
             # Make sure we can access specified channel.
             try:
                 await channel.send(
-                    f"Тестове повідомлення для перевірки доступу до каналу сповіщень {channel.mention}."
+                    embed=discord.Embed(
+                        title="Перевірка",
+                        description="Тестове повідомлення для перевірки "
+                        f"доступу до каналу сповіщень {channel.mention}.",
+                    )
                 )
             except discord.errors.Forbidden:
                 embed = discord.Embed(
@@ -64,10 +68,10 @@ async def setup(bot: commands.Bot) -> None:
                 embed=embed,
             )
 
-        @root_command.command(description="Перевірити налаштування")  # type: ignore
+        @root_command.command(description="Перевірити налаштування шарингу банів")  # type: ignore
         @discord.app_commands.guild_only()
         @discord.app_commands.checks.has_permissions(administrator=True)
-        async def check(
+        async def check_bans_sharing(
             self,
             interaction: discord.Interaction[commands.Bot],
         ) -> None:
@@ -98,13 +102,17 @@ async def setup(bot: commands.Bot) -> None:
                     )
                     try:
                         await channel.send(
-                            f"Тестове повідомлення для перевірки доступу до каналу сповіщень {channel.mention}."
+                            embed=discord.Embed(
+                                title="Перевірка",
+                                description="Тестове повідомлення для перевірки "
+                                f"доступу до каналу сповіщень {channel.mention}.",
+                            )
                         )
                     except discord.errors.Forbidden:
                         problems.append(
                             (
                                 f"Відсутній дозвіл для відправки повідомлень в канал сповіщень {channel.mention}.",
-                                "Перевірте налаштування доступу до каналу сповіщень для бота.",
+                                "Щоб у бота були права на Post Messages та Embed Links.",
                             )
                         )
                 else:
@@ -118,7 +126,7 @@ async def setup(bot: commands.Bot) -> None:
 
             # Post check results.
             embed = discord.Embed(
-                title="Результати перевірки налаштувань",
+                title="Результати перевірки налаштувань шарингу банів",
                 description="Все ок." if len(problems) == 0 else "",
                 color=discord.Color.green()
                 if len(problems) == 0
