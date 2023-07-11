@@ -15,6 +15,7 @@ class Guild(Base):  # pylint: disable=too-few-public-methods
     id: sa_orm.Mapped[int] = sa_orm.mapped_column(primary_key=True)
     name: sa_orm.Mapped[t.Optional[str]] = sa_orm.mapped_column(sa.String(100))
     bans_sharing_channel_id: sa_orm.Mapped[t.Optional[int]] = sa_orm.mapped_column()
+    verification_role_id: sa_orm.Mapped[t.Optional[int]] = sa_orm.mapped_column()
 
     def __repr__(self) -> str:
         return f"Guild(id={self.id}, name={self.name})"

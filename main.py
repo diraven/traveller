@@ -4,7 +4,7 @@ from discord.ext import commands
 
 import models
 import settings
-from cogs import bans_sharing, faq, rusni_pyzda, slap, sum20, sum_
+from cogs import bans_sharing, faq, rusni_pyzda, slap, sum20, sum_, verification
 
 if settings.SENTRY_DSN:
     import sentry_sdk
@@ -63,6 +63,7 @@ async def on_ready() -> None:
         sum_,
         sum20,
         bans_sharing,
+        verification,
     ]:
         await module.setup(bot)
 
