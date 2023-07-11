@@ -116,7 +116,7 @@ async def setup(bot: commands.Bot) -> None:  # pylint: disable=too-many-statemen
         @discord.app_commands.command(description="Верифікувати користувача")  # type: ignore
         @discord.app_commands.guilds(*bot.guilds)
         @discord.app_commands.guild_only()
-        async def verify(
+        async def verify(  # pylint: disable=too-many-return-statements
             self,
             interaction: discord.Interaction[commands.Bot],
             member: discord.Member,
@@ -202,8 +202,10 @@ async def setup(bot: commands.Bot) -> None:  # pylint: disable=too-many-statemen
                         await target.add_roles(role)
                     except discord.errors.Forbidden:
                         await interaction.response.send_message(embed=error_embed)
+                        return
                 else:
                     await interaction.response.send_message(embed=error_embed)
+                    return
 
             # Send confirmation message.
             embed = discord.Embed(
