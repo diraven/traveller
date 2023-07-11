@@ -199,7 +199,9 @@ async def setup(bot: commands.Bot) -> None:  # pylint: disable=too-many-statemen
 
                     # Assign the role.
                     try:
-                        await target.add_roles(role)
+                        await target.add_roles(
+                            role, reason=f"{actor.mention} '{actor.name}' ({actor.id})"
+                        )
                     except discord.errors.Forbidden:
                         await interaction.response.send_message(embed=error_embed)
                         return
