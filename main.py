@@ -4,7 +4,7 @@ from discord.ext import commands
 
 import models
 import settings
-from cogs import bans_sharing, configuration, faq, rusni_pyzda, slap, sum20, sum_
+from cogs import bans_sharing, faq, rusni_pyzda, slap, sum20, sum_
 
 if settings.SENTRY_DSN:
     import sentry_sdk
@@ -57,7 +57,6 @@ async def on_guild_remove(guild: discord.Guild) -> None:
 @bot.event
 async def on_ready() -> None:
     for module in [
-        configuration,
         faq,
         rusni_pyzda,
         slap,

@@ -11,11 +11,11 @@ import models
 logger = logging.getLogger("mod")
 
 
-async def setup(bot: commands.Bot) -> None:
+async def setup(bot: commands.Bot) -> None:  # pylint:disable=too-many-statements
     class BansSharingCog(commands.Cog):
         root_command = discord.app_commands.Group(
-            name="mod",
-            description="Модерація",
+            name="bans_sharing",
+            description="Шаринг банів",
             guild_ids=[guild.id for guild in bot.guilds],
         )
 
@@ -57,8 +57,8 @@ async def setup(bot: commands.Bot) -> None:
                 # Get channels we'll be sending notifications into.
                 # Getting all that are set except for originating server.
                 log_channels_ids = session.execute(
-                    sa.select(models.Guild.log_channel_id).filter(
-                        models.Guild.log_channel_id.is_not(None),
+                    sa.select(models.Guild.bans_sharing_channel_id).filter(
+                        models.Guild.bans_sharing_channel_id.is_not(None),
                         models.Guild.id != guild.id,
                     )
                 )
@@ -118,5 +118,124 @@ async def setup(bot: commands.Bot) -> None:
                     target.id,
                 )
                 session.add(models.KnownBan(id=target.id, reason=entry.reason))
+
+        @root_command.command(description="Налаштувати канал сповіщень")  # type: ignore
+        @discord.app_commands.guild_only()
+        @discord.app_commands.checks.has_permissions(administrator=True)
+        async def set_channel(
+            self,
+            interaction: discord.Interaction[commands.Bot],
+            channel: discord.TextChannel,
+        ) -> None:
+            # Make sure we can access specified channel.
+            try:
+                await channel.send(
+                    embed=discord.Embed(
+                        title="Перевірка",
+                        description="Тестове повідомлення для перевірки "
+                        f"доступу до каналу сповіщень {channel.mention}.",
+                    )
+                )
+            except discord.errors.Forbidden:
+                embed = discord.Embed(
+                    title="Відсутній доступ",
+                    description=f"Відсутній доступ до каналу сповіщень {channel.mention}, "
+                    "перевірте налаштування ролей.",
+                    color=discord.Color.red(),
+                )
+                await interaction.response.send_message(
+                    embed=embed,
+                )
+                return
+
+            # Save new log channel id.
+            with sa_orm.Session(models.engine) as session:
+                guild = session.execute(
+                    sa.select(models.Guild).filter_by(id=interaction.guild_id)
+                ).scalar_one()
+                guild.bans_sharing_channel_id = channel.id
+                session.commit()
+
+            # Send confirmation message.
+            embed = discord.Embed(
+                title="Змінено канал сповіщень бота",
+                description=f"Новий канал сповіщень: {channel.mention}",
+                color=discord.Color.green(),
+            )
+
+            await interaction.response.send_message(
+                embed=embed,
+            )
+
+        @root_command.command(description="Перевірити налаштування шарингу банів")  # type: ignore
+        @discord.app_commands.guild_only()
+        @discord.app_commands.checks.has_permissions(administrator=True)
+        async def check_config(
+            self,
+            interaction: discord.Interaction[commands.Bot],
+        ) -> None:
+            if not interaction.guild:
+                return
+
+            problems = []
+
+            # Check Audit Log access.
+            permissions = interaction.guild.me.guild_permissions
+            if not permissions.view_audit_log:
+                problems.append(
+                    (
+                        "Відсутній дозвіл на перегляд Audit Log.",
+                        "Надайте боту доступ до Audit Log.",
+                    )
+                )
+
+            # Check if bot is able to post into the log channel.
+            with sa_orm.Session(models.engine) as session:
+                guild: models.Guild = session.execute(
+                    sa.select(models.Guild).filter_by(id=interaction.guild_id)
+                ).scalar_one()
+                if guild.bans_sharing_channel_id:
+                    # Make sure bot is able to post into the log channel.
+                    channel = t.cast(
+                        discord.TextChannel,
+                        bot.get_channel(guild.bans_sharing_channel_id),
+                    )
+                    try:
+                        await channel.send(
+                            embed=discord.Embed(
+                                title="Перевірка",
+                                description="Тестове повідомлення для перевірки "
+                                f"доступу до каналу сповіщень {channel.mention}.",
+                            )
+                        )
+                    except discord.errors.Forbidden:
+                        problems.append(
+                            (
+                                f"Відсутній дозвіл для відправки повідомлень в канал сповіщень {channel.mention}.",
+                                "Щоб у бота були права на Post Messages та Embed Links.",
+                            )
+                        )
+                else:
+                    # Log channel is not defined.
+                    problems.append(
+                        (
+                            "Не налаштовано канал сповіщень.",
+                            "Налаштуйте канал сповіщень за допомогою команди `/config log_channel`",
+                        )
+                    )
+
+            # Post check results.
+            embed = discord.Embed(
+                title="Результати перевірки налаштувань шарингу банів",
+                description="Все ок." if len(problems) == 0 else "",
+                color=discord.Color.green()
+                if len(problems) == 0
+                else discord.Color.red(),
+            )
+            for problem, suggestion in problems:
+                embed.add_field(name=problem, value=suggestion, inline=False)
+            await interaction.response.send_message(
+                embed=embed,
+            )
 
     await bot.add_cog(BansSharingCog())
