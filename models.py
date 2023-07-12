@@ -1,3 +1,4 @@
+import datetime
 import typing as t
 
 import sqlalchemy as sa
@@ -24,7 +25,10 @@ class Guild(Base):  # pylint: disable=too-few-public-methods
 class KnownBan(Base):  # pylint: disable=too-few-public-methods
     __tablename__ = "ban"
     id: sa_orm.Mapped[int] = sa_orm.mapped_column(primary_key=True)
+    created_at: sa_orm.Mapped[datetime.datetime] = sa_orm.mapped_column(
+        sa.types.DateTime(timezone=True), default=sa.func.now
+    )
     reason: sa_orm.Mapped[t.Optional[str]] = sa_orm.mapped_column(sa.String(500))
 
     def __repr__(self) -> str:
-        return f"KnownBan(user_id={self.id}, reason={self.reason})"
+        return f"KnownBan(member_id={self.id}, reason={self.reason})"
