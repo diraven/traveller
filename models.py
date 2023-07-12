@@ -26,7 +26,7 @@ class KnownBan(Base):  # pylint: disable=too-few-public-methods
     __tablename__ = "ban"
     id: sa_orm.Mapped[int] = sa_orm.mapped_column(primary_key=True)
     created_at: sa_orm.Mapped[datetime.datetime] = sa_orm.mapped_column(
-        sa.types.DateTime(timezone=True), default=sa.func.now
+        sa.types.DateTime(timezone=True), default=datetime.datetime.utcnow
     )
     reason: sa_orm.Mapped[t.Optional[str]] = sa_orm.mapped_column(sa.String(500))
 
