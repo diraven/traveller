@@ -66,7 +66,6 @@ async def on_ready() -> None:
         await module.setup(bot)
 
     # Sync commands.
-    await bot.tree.sync()
     if settings.DEBUG and settings.DISCORD_DEV_GUILD_ID:
         guild = bot.get_guild(settings.DISCORD_DEV_GUILD_ID)
         if guild:
@@ -74,6 +73,8 @@ async def on_ready() -> None:
             await bot.tree.sync(guild=guild)
         else:
             raise RuntimeError(f"guild {settings.DISCORD_DEV_GUILD_ID} not found")
+    else:
+        await bot.tree.sync()
 
     with sa_orm.Session(models.engine) as session, session.begin():
         # Add guilds that bot is a member of.
