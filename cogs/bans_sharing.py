@@ -211,7 +211,7 @@ async def setup(bot: commands.Bot) -> None:  # pylint:disable=too-many-statement
                         problems.append(
                             (
                                 f"Відсутній дозвіл для відправки повідомлень в канал сповіщень {channel.mention}.",
-                                "Щоб у бота були права на Post Messages та Embed Links.",
+                                "Перевірте наявність у бота прав Post Messages та Embed Links.",
                             )
                         )
                 else:
