@@ -16,7 +16,6 @@ async def setup(bot: commands.Bot) -> None:  # pylint:disable=too-many-statement
         root_command = discord.app_commands.Group(
             name="bans_sharing",
             description="Шаринг банів",
-            guild_ids=[guild.id for guild in bot.guilds],
         )
 
         def __init__(self) -> None:

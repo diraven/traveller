@@ -77,9 +77,7 @@ Server languages: Ukrainian and English. Please, see this and other rules in the
 
 async def setup(bot: commands.Bot) -> None:
     class FaqCog(commands.Cog):
-        root_command = discord.app_commands.Group(
-            name="faq", description="ЧаПи", guild_ids=[guild.id for guild in bot.guilds]
-        )
+        root_command = discord.app_commands.Group(name="faq", description="ЧаПи")
 
         for name, entry in ENTRIES.items():
             # pylint: disable=cell-var-from-loop

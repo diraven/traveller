@@ -14,7 +14,6 @@ async def setup(bot: commands.Bot) -> None:
             super().__init__()
 
         @discord.app_commands.command(description="Втрати РФ станом на сьогодні.")  # type: ignore
-        @discord.app_commands.guilds(*bot.guilds)
         @discord.app_commands.guild_only()
         async def rusni_pyzda(
             self, interaction: discord.Interaction[commands.Bot]

@@ -11,7 +11,6 @@ async def setup(bot: commands.Bot) -> None:
             super().__init__()
 
         @discord.app_commands.command(description="Словник української мови (sum.in.ua)")  # type: ignore
-        @discord.app_commands.guilds(*bot.guilds)
         @discord.app_commands.guild_only()
         async def sum(
             self, interaction: discord.Interaction[commands.Bot], word: str

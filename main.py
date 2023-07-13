@@ -44,8 +44,6 @@ async def on_guild_join(guild: discord.Guild) -> None:
     # Add new guild to database.
     with sa_orm.Session(models.engine) as session, session.begin():
         session.add(models.Guild(id=guild.id, name=guild.name))
-        # Sync commands.
-        await bot.tree.sync(guild=guild)
 
 
 @bot.event
@@ -67,13 +65,21 @@ async def on_ready() -> None:
     ]:
         await module.setup(bot)
 
+    # Sync commands.
+    await bot.tree.sync()
+    if settings.DEBUG and settings.DISCORD_DEV_GUILD_ID:
+        guild = bot.get_guild(settings.DISCORD_DEV_GUILD_ID)
+        if guild:
+            bot.tree.copy_global_to(guild=guild)
+            await bot.tree.sync(guild=guild)
+        else:
+            raise RuntimeError(f"guild {settings.DISCORD_DEV_GUILD_ID} not found")
+
     with sa_orm.Session(models.engine) as session, session.begin():
         # Add guilds that bot is a member of.
         # We still need this in case if guild was added while bot was offline.
         for guild in bot.guilds:
             session.merge(models.Guild(id=guild.id, name=guild.name))
-            # Sync commands.
-            await bot.tree.sync(guild=guild)
 
         # Remove guilds bot is not a member of any more.
         # We still need this in case if guild was removed while bot was offline.

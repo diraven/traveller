@@ -13,7 +13,6 @@ async def setup(bot: commands.Bot) -> None:  # pylint: disable=too-many-statemen
         root_command = discord.app_commands.Group(
             name="verification",
             description="Верифікація",
-            guild_ids=[guild.id for guild in bot.guilds],
         )
 
         def __init__(self) -> None:
@@ -114,7 +113,6 @@ async def setup(bot: commands.Bot) -> None:  # pylint: disable=too-many-statemen
             )
 
         @discord.app_commands.command(description="Верифікувати користувача")  # type: ignore
-        @discord.app_commands.guilds(*bot.guilds)
         @discord.app_commands.guild_only()
         async def verify(  # pylint: disable=too-many-return-statements
             self,
