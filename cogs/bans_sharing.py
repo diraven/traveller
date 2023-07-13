@@ -78,7 +78,7 @@ async def setup(bot: commands.Bot) -> None:  # pylint:disable=too-many-statement
                 )
                 embed.add_field(
                     name="Забанений",
-                    value=f"{target.mention} '{target.name}' ({target.id})",
+                    value=f"{target.mention} '{target.display_name}' '{target.name}' ({target.id})",
                 )
                 embed.add_field(name="Причина бану", value=entry.reason)
                 if target.avatar:
