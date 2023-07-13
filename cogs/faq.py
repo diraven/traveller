@@ -71,6 +71,12 @@ Server languages: Ukrainian and English. Please, see this and other rules in the
 
 Тобто, робиш грі вміст, рекламу і прибуток навіть не вносячи грошей напряму. І, тим самим, спонсоруєш ті ракети які потім летять по українських містах.""",
     },
+    "ukrainian_enhanced_kb_layout": {
+        "title": "Розширена українська розкладка клавиатури",
+        "description": """Для тих, кому доводиться, час від часу, набирати відсутні в українському алфавіті літери слов'янських мов, але не хочеться ставити інші розкладки.
+
+https://oleksiyrudenko.github.io/Ukrainian-Enhanced-Keyboard-WIndows/""",
+    },
 }
 # pylint: enable=line-too-long
 
