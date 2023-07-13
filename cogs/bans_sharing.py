@@ -69,7 +69,7 @@ async def setup(bot: commands.Bot) -> None:  # pylint:disable=too-many-statement
 
                 # Create embed and populate it with data.
                 embed = discord.Embed(
-                    title="Новий бан",
+                    title=f"Бан на сервері {guild.name}",
                 )
                 embed.add_field(name="Сервер", value=f"{guild.name} ({guild.id})")
                 embed.add_field(
