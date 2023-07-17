@@ -197,21 +197,29 @@ async def setup(bot: commands.Bot) -> None:  # pylint:disable=too-many-statement
                     # Make sure bot is able to post into the log channel.
                     channel = t.cast(
                         discord.TextChannel,
-                        bot.get_channel(guild.bans_sharing_channel_id),
+                        interaction.guild.get_channel(guild.bans_sharing_channel_id),
                     )
+                    try:
+                        await channel.send(content="Тестове текстове повідомлення.")
+                    except discord.errors.Forbidden:
+                        problems.append(
+                            (
+                                f"Не вдалося відправити текстове повідомлення в канал {channel.mention}.",
+                                "Перевірте наявність у бота дозволів Post Messages та View Channel.",
+                            )
+                        )
                     try:
                         await channel.send(
                             embed=discord.Embed(
                                 title="Перевірка",
-                                description="Тестове повідомлення для перевірки "
-                                f"доступу до каналу сповіщень {channel.mention}.",
+                                description="Тестове повідомлення-вставка (embed).",
                             )
                         )
                     except discord.errors.Forbidden:
                         problems.append(
                             (
-                                f"Відсутній дозвіл для відправки повідомлень в канал сповіщень {channel.mention}.",
-                                "Перевірте наявність у бота прав Post Messages та Embed Links.",
+                                f"Не вдалося відправити вставку (embed) в канал {channel.mention}.",
+                                "Перевірте наявність у бота дозволів Embed Links та View Channel.",
                             )
                         )
                 else:
