@@ -2,6 +2,7 @@ import logging
 import typing as t
 
 import discord
+import sentry_sdk
 import sqlalchemy as sa
 import sqlalchemy.orm as sa_orm
 from discord.ext import commands
@@ -34,10 +35,9 @@ async def setup(bot: commands.Bot) -> None:  # pylint:disable=too-many-statement
             guild = entry.guild
 
             if actor is None or target is None:
-                logger.warning(
-                    "Audit log entry: %s - missing actor or target.", entry.id
+                raise RuntimeError(
+                    f"Audit log entry: {entry.id} - missing actor or target."
                 )
-                return
 
             logger.info("Ban event: %s - received.", target.id)
             with sa_orm.Session(models.engine) as session, session.begin():
@@ -104,12 +104,8 @@ async def setup(bot: commands.Bot) -> None:  # pylint:disable=too-many-statement
                             f"/ban user:{target.id} delete_messages:{reason if entry.reason else ''}",
                             suppress_embeds=True,
                         )
-                    except discord.errors.Forbidden:
-                        logger.warning(
-                            "Cannot send message to %s (%s).",
-                            log_channel.name,
-                            log_channel.guild.name,
-                        )
+                    except discord.errors.Forbidden as exc:
+                        sentry_sdk.capture_exception(exc)
 
                 # Mark ban as seen.
                 logger.info(
