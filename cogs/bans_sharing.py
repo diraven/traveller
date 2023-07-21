@@ -196,26 +196,18 @@ async def setup(bot: commands.Bot) -> None:  # pylint:disable=too-many-statement
                         interaction.guild.get_channel(guild.bans_sharing_channel_id),
                     )
                     try:
-                        await channel.send(content="Тестове текстове повідомлення.")
-                    except discord.errors.Forbidden:
-                        problems.append(
-                            (
-                                f"Не вдалося відправити текстове повідомлення в канал {channel.mention}.",
-                                "Перевірте наявність у бота дозволів Post Messages та View Channel.",
-                            )
-                        )
-                    try:
-                        await channel.send(
+                        msg = await channel.send(
                             embed=discord.Embed(
                                 title="Перевірка",
                                 description="Тестове повідомлення-вставка (embed).",
                             )
                         )
-                    except discord.errors.Forbidden:
+                        await msg.reply(content="Тестове текстове повідомлення.")
+                    except discord.errors.Forbidden as exc:
                         problems.append(
                             (
-                                f"Не вдалося відправити вставку (embed) в канал {channel.mention}.",
-                                "Перевірте наявність у бота дозволів Embed Links та View Channel.",
+                                f"Не вдалося відправити повідомлення в канал {channel.mention}.",
+                                str(exc),
                             )
                         )
                 else:
@@ -230,7 +222,13 @@ async def setup(bot: commands.Bot) -> None:  # pylint:disable=too-many-statement
             # Post check results.
             embed = discord.Embed(
                 title="Результати перевірки налаштувань шарингу банів",
-                description="Все ок." if len(problems) == 0 else "",
+                description="Все ок."
+                if len(problems) == 0
+                else """Помилка. Для коректної роботи боту необхідні наступні права для каналу сповіщень:
+* View Channel
+* Send Messages
+* Read Messages History
+* Embed Links""",
                 color=discord.Color.green()
                 if len(problems) == 0
                 else discord.Color.red(),

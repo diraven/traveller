@@ -28,7 +28,7 @@ docker-compose up -d
 
 Для підключення до сповіщень про бани треба:
 
-- Запросити бота на свій сервер: https://discord.com/oauth2/authorize?client_id=966727208586584135&permissions=18560&scope=bot%20applications.commands
+- Запросити бота на свій сервер: https://discord.com/oauth2/authorize?client_id=966727208586584135&permissions=84096&scope=bot%20applications.commands
 - Налаштувати канал сповіщень за допомогою `/bans_sharing set_channel`.
 - Перевірити що все налаштовано правильно за допомогою `/bans_sharing check_config`.
 
