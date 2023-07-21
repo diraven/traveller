@@ -36,7 +36,11 @@ async def setup(bot: commands.Bot) -> None:
                             url=data["resource"],
                         )
                         for key, val in data["stats"].items():
-                            embed.add_field(name=key, value=val, inline=True)
+                            embed.add_field(
+                                name=key,
+                                value=f"{val} (+{data['increase'][key]})",
+                                inline=True,
+                            )
                         embed.set_footer(
                             text=f"Станом на {data['date']}, {data['day']}й день війни"
                         )
