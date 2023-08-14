@@ -10,6 +10,7 @@ jobs:
     permissions:
       packages: write
       contents: read
+    environment: production
 
     steps:
       - uses: actions/checkout@v3
