@@ -65,20 +65,13 @@ async def process(
             for (channel_id,) in log_channels_ids
         ]
 
-        # Detect whether bot has ban permissions.
-        if not bot.user:
-            raise RuntimeError("Unable to fetch own user.")
-        bot_member = guild.get_member(bot.user.id)
-        if not bot_member:
-            raise RuntimeError("Unable to fetch own member.")
-
         await _post_embed(
+            bot,
             guild,
             actor,
             target,
             entry.reason,
             log_channels,
-            is_interactive=bot_member.guild_permissions.ban_members,
         )
 
         # Mark ban as seen.
@@ -91,13 +84,12 @@ async def process(
 
 
 async def _post_embed(
+    bot: commands.Bot,
     guild: discord.Guild,
     actor: discord.Member,
     target: discord.User,
     reason: t.Optional[str],
     log_channels: t.List[discord.TextChannel],
-    *,
-    is_interactive: bool = False,
 ) -> None:
     # Create embed and populate it with data.
     embed = discord.Embed(
@@ -120,24 +112,30 @@ async def _post_embed(
     if target.avatar:
         embed.set_thumbnail(url=target.avatar.url)
 
-    if not is_interactive:
-        embed.set_footer(
-            text="Для створення такого самого бану на "
-            "цьому сервері - скопіюйте та "
-            "відправте текстову команду нижче."
-        )
-
     # For each logging channel:
     reason = f" reason: {reason}"
     for log_channel in log_channels:
         try:
-            if is_interactive:
+            # Detect whether bot has ban permissions.
+            if not bot.user:
+                raise RuntimeError("Unable to fetch own user.")
+            bot_member = guild.get_member(bot.user.id)
+            if not bot_member:
+                raise RuntimeError("Unable to fetch own member.")
+            can_ban = bot_member.guild_permissions.ban_members
+
+            if can_ban:
                 view = ban_view.BanView(timeout=3600)
                 view.message = await log_channel.send(
                     embed=embed,
                     view=view,
                 )
             else:
+                embed.set_footer(
+                    text="Для створення такого самого бану на "
+                    "цьому сервері - скопіюйте та "
+                    "відправте текстову команду нижче."
+                )
                 msg = await log_channel.send(
                     embed=embed,
                 )
