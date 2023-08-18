@@ -8,7 +8,7 @@ from discord.ext import commands
 import models
 
 
-async def setup(bot: commands.Bot) -> None:  # pylint: disable=too-many-statements
+async def setup(bot: commands.Bot) -> None:
     class VerificationCog(commands.Cog):
         root_command = discord.app_commands.Group(
             name="verification",
@@ -19,7 +19,9 @@ async def setup(bot: commands.Bot) -> None:  # pylint: disable=too-many-statemen
             self._bot = bot
             super().__init__()
 
-        @root_command.command(description="Налаштувати роль верифікації")  # type: ignore
+        @root_command.command(  # type: ignore
+            description="Налаштувати роль верифікації",
+        )
         @discord.app_commands.guild_only()
         @discord.app_commands.checks.has_permissions(administrator=True)
         async def set_role(
@@ -45,7 +47,9 @@ async def setup(bot: commands.Bot) -> None:  # pylint: disable=too-many-statemen
                 embed=embed,
             )
 
-        @root_command.command(description="Перевірити налаштування верифікації")  # type: ignore
+        @root_command.command(  # type: ignore
+            description="Перевірити налаштування верифікації",
+        )
         @discord.app_commands.guild_only()
         @discord.app_commands.checks.has_permissions(administrator=True)
         async def check_config(
@@ -94,7 +98,8 @@ async def setup(bot: commands.Bot) -> None:  # pylint: disable=too-many-statemen
                     problems.append(
                         (
                             "Роль верифікації не задана.",
-                            "Вкажіть роль верифікації для бота за допомогою команди `/verification set_role`.",
+                            "Вкажіть роль верифікації для бота за допомогою команди "
+                            "`/verification set_role`.",
                         )
                     )
 
@@ -112,9 +117,11 @@ async def setup(bot: commands.Bot) -> None:  # pylint: disable=too-many-statemen
                 embed=embed,
             )
 
-        @discord.app_commands.command(description="Верифікувати користувача")  # type: ignore
+        @discord.app_commands.command(  # type: ignore
+            description="Верифікувати користувача",
+        )
         @discord.app_commands.guild_only()
-        async def verify(  # pylint: disable=too-many-return-statements
+        async def verify(
             self,
             interaction: discord.Interaction[commands.Bot],
             member: discord.Member,

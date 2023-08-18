@@ -25,6 +25,11 @@ repos:
     hooks:
       - id: commitizen
         stages: [commit-msg]
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.0.285
+    hooks:
+      - id: ruff
+
   - repo: local
     hooks:
       - id: mypy
@@ -33,11 +38,3 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
-  - repo: local
-    hooks:
-      - id: pylint
-        name: pylint
-        entry: pylint --score no
-        language: system
-        files: ".*\\.py"
-        exclude: ^alembic/

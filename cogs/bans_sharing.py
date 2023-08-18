@@ -12,7 +12,7 @@ import models
 logger = logging.getLogger("mod")
 
 
-async def setup(bot: commands.Bot) -> None:  # pylint:disable=too-many-statements
+async def setup(bot: commands.Bot) -> None:
     class BansSharingCog(commands.Cog):
         root_command = discord.app_commands.Group(
             name="bans_sharing",
@@ -41,7 +41,8 @@ async def setup(bot: commands.Bot) -> None:  # pylint:disable=too-many-statement
 
             logger.info("Ban event: %s - received.", target.id)
             with sa_orm.Session(models.engine) as session, session.begin():
-                # Before doing anything else - make sure we did not see this ban already.
+                # Before doing anything else,
+                # make sure we did not see this ban already.
                 try:
                     session.execute(
                         sa.select(models.KnownBan).filter(
@@ -78,7 +79,10 @@ async def setup(bot: commands.Bot) -> None:  # pylint:disable=too-many-statement
                 )
                 embed.add_field(
                     name="Забанений",
-                    value=f"{target.mention} '{target.display_name}' '{target.name}' ({target.id})",
+                    value=(
+                        f"{target.mention} '{target.display_name}' '{target.name}' "
+                        f"({target.id})"
+                    ),
                 )
                 embed.add_field(name="Причина бану", value=entry.reason)
                 if target.avatar:
@@ -96,12 +100,13 @@ async def setup(bot: commands.Bot) -> None:  # pylint:disable=too-many-statement
                             embed=embed,
                         )
                         reason = f" reason:{entry.reason}"
-                        # We have to leave "delete_messages" parameter below empty since it's
-                        # value depends on the language of the discord interface and will
-                        # give errors on language mismatch.
+                        # We have to leave "delete_messages" parameter below empty since
+                        # it's value depends on the language of the discord interface
+                        # and will give errors on language mismatch.
                         # Post the message.
                         await msg.reply(
-                            f"/ban user:{target.id} delete_messages:{reason if entry.reason else ''}",
+                            f"/ban user:{target.id} "
+                            f"delete_messages:{reason if entry.reason else ''}",
                             suppress_embeds=True,
                         )
                     except discord.errors.Forbidden as exc:
@@ -134,8 +139,11 @@ async def setup(bot: commands.Bot) -> None:  # pylint:disable=too-many-statement
             except discord.errors.Forbidden:
                 embed = discord.Embed(
                     title="Відсутній доступ",
-                    description=f"Відсутній доступ до каналу сповіщень {channel.mention}, "
-                    "перевірте налаштування ролей.",
+                    description=(
+                        "Відсутній доступ до каналу "
+                        f"сповіщень {channel.mention}, "
+                        "перевірте налаштування ролей."
+                    ),
                     color=discord.Color.red(),
                 )
                 await interaction.response.send_message(
@@ -162,7 +170,9 @@ async def setup(bot: commands.Bot) -> None:  # pylint:disable=too-many-statement
                 embed=embed,
             )
 
-        @root_command.command(description="Перевірити налаштування шарингу банів")  # type: ignore
+        @root_command.command(  # type: ignore
+            description="Перевірити налаштування шарингу банів",
+        )
         @discord.app_commands.guild_only()
         @discord.app_commands.checks.has_permissions(administrator=True)
         async def check_config(
@@ -206,7 +216,8 @@ async def setup(bot: commands.Bot) -> None:  # pylint:disable=too-many-statement
                     except discord.errors.Forbidden as exc:
                         problems.append(
                             (
-                                f"Не вдалося відправити повідомлення в канал {channel.mention}.",
+                                "Не вдалося відправити повідомлення "
+                                f"в канал {channel.mention}.",
                                 str(exc),
                             )
                         )
@@ -215,7 +226,8 @@ async def setup(bot: commands.Bot) -> None:  # pylint:disable=too-many-statement
                     problems.append(
                         (
                             "Не налаштовано канал сповіщень.",
-                            "Налаштуйте канал сповіщень за допомогою команди `/config log_channel`",
+                            "Налаштуйте канал сповіщень за допомогою команди "
+                            "`/config log_channel`",
                         )
                     )
 
@@ -224,7 +236,7 @@ async def setup(bot: commands.Bot) -> None:  # pylint:disable=too-many-statement
                 title="Результати перевірки налаштувань шарингу банів",
                 description="Все ок."
                 if len(problems) == 0
-                else """Помилка. Для коректної роботи боту необхідні наступні права для каналу сповіщень:
+                else """Помилка. Необхідні наступні права для каналу сповіщень:
 * View Channel
 * Send Messages
 * Read Messages History
