@@ -128,6 +128,7 @@ async def _post_embed(
         )
 
     # For each logging channel:
+    reason = f" reason: {reason}"
     for log_channel in log_channels:
         try:
             if is_interactive:
@@ -140,14 +141,13 @@ async def _post_embed(
                 msg = await log_channel.send(
                     embed=embed,
                 )
-                reason = f" reason: {reason}"
                 # We have to leave "delete_messages" parameter below empty since
                 # it's value depends on the language of the discord interface
                 # and will give errors on language mismatch.
                 # Post the message.
                 await msg.reply(
                     f"/ban user:{target.id} "
-                    f"delete_messages:{reason if reason else ''}",
+                    f"delete_messages: {reason if reason else ''}",
                     suppress_embeds=True,
                 )
         except discord.errors.Forbidden as exc:
