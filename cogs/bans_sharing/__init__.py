@@ -26,7 +26,9 @@ class BansSharingCog(models.Cog):
             )
         ban_guild = entry.guild
         ban_actor = t.cast(discord.Member, entry.user)
-        ban_target = await self.bot.fetch_user(int(entry.target.id))
+        ban_target = self.bot.get_user(
+            int(entry.target.id)
+        ) or await self.bot.fetch_user(int(entry.target.id))
         ban_reason = entry.reason or ""
 
         with models.Session.begin() as session:
@@ -197,10 +199,12 @@ class BansSharingCog(models.Cog):
                 raise RuntimeError(
                     f"Audit log entry: {ban_entry.id} - missing actor or target."
                 )
-            actor = t.cast(discord.Member, ban_entry.user)
             guild = ban_entry.guild
+            actor = t.cast(discord.Member, ban_entry.user)
+            target = self.bot.get_user(
+                int(ban_entry.target.id)
+            ) or await self.bot.fetch_user(int(ban_entry.target.id))
             reason = ban_entry.reason or ""
-            target = await self.bot.fetch_user(int(ban_entry.target.id))
 
             with models.Session.begin() as session:
                 await confirm_share.process(

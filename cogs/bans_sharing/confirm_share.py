@@ -73,8 +73,12 @@ class View(discord.ui.View):
 
             # Send bans.
             ban_guild = self.bot.get_guild(int(data.guild_id))
-            ban_target = await self.bot.fetch_user(int(data.target_id))
-            ban_actor = await self.bot.fetch_user(int(data.actor_id))
+            ban_target = self.bot.get_user(
+                int(data.target_id)
+            ) or await self.bot.fetch_user(int(data.target_id))
+            ban_actor = self.bot.get_user(
+                int(data.actor_id)
+            ) or await self.bot.fetch_user(int(data.actor_id))
             if not interaction.guild:
                 raise RuntimeError("Interaction has no guild.")
             if not ban_guild:
