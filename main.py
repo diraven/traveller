@@ -1,6 +1,5 @@
 import discord
 import sqlalchemy as sa
-import sqlalchemy.orm as sa_orm
 from discord.ext import commands
 
 import models
