@@ -1,4 +1,5 @@
 import discord
+import sqlalchemy as sa
 import sqlalchemy.orm as sa_orm
 from discord.ext import commands
 
@@ -17,7 +18,7 @@ if settings.SENTRY_DSN:
         release="0.0.1",
     )
 
-bot = commands.Bot("!", intents=settings.intents)
+bot = models.Bot("!", intents=settings.intents)
 
 
 @bot.tree.error
@@ -42,28 +43,26 @@ async def error_handler(
 @bot.event
 async def on_guild_join(guild: discord.Guild) -> None:
     # Add new guild to database.
-    with sa_orm.Session(models.engine) as session, session.begin():
-        session.add(models.Guild(id=guild.id, name=guild.name))
+    with models.Session.begin() as session:
+        session.add(models.Guild(id_=guild.id, name=guild.name))
 
 
 @bot.event
 async def on_guild_remove(guild: discord.Guild) -> None:
-    with sa_orm.Session(models.engine) as session, session.begin():
-        session.query(models.Guild).filter(models.Guild.id == guild.id).delete()
+    with models.Session.begin() as session:
+        session.delete(models.Guild(id_=guild.id))
 
 
 @bot.event
 async def on_ready() -> None:
-    for module in [
-        faq,
-        rusni_pyzda,
-        slap,
-        sum_,
-        sum20,
-        bans_sharing,
-        verification,
-    ]:
-        await module.setup(bot)
+    # Add cogs.
+    await bot.add_cog(bans_sharing.BansSharingCog(bot=bot))
+    await bot.add_cog(faq.FaqCog(bot=bot))
+    await bot.add_cog(rusni_pyzda.RusniPyzdaCog(bot=bot))
+    await bot.add_cog(slap.SlapCog(bot=bot))
+    await bot.add_cog(sum_.SumCog(bot=bot))
+    await bot.add_cog(sum20.Sum20Cog(bot=bot))
+    await bot.add_cog(verification.VerificationCog(bot=bot))
 
     # Sync commands.
     if settings.DEBUG and settings.DISCORD_DEV_GUILD_ID:
@@ -76,20 +75,18 @@ async def on_ready() -> None:
     else:
         await bot.tree.sync()
 
-    with sa_orm.Session(models.engine) as session, session.begin():
+    with models.Session.begin() as session:
         # Add guilds that bot is a member of.
         # We still need this in case if guild was added while bot was offline.
         for guild in bot.guilds:
-            session.merge(models.Guild(id=guild.id, name=guild.name))
+            session.merge(models.Guild(id_=guild.id, name=guild.name))
 
         # Remove guilds bot is not a member of any more.
         # We still need this in case if guild was removed while bot was offline.
-        for stored_guild in session.query(models.Guild):
-            if not bot.get_guild(stored_guild.id):
+        statement = sa.select(models.Guild)
+        for stored_guild in session.execute(statement).scalars():
+            if not bot.get_guild(stored_guild.id_):
                 session.delete(stored_guild)
-
-        # Save guilds we are connected to.
-        session.commit()
 
 
 bot.run(settings.DISCORD_BOT_TOKEN)

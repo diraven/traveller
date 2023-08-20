@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
 
+import models
+
 ENTRIES = {
     "ru_interface": {
         "title": "Російськомовний інтерфейс.",
@@ -79,29 +81,22 @@ https://oleksiyrudenko.github.io/Ukrainian-Enhanced-Keyboard-WIndows/""",  # noq
 }
 
 
-async def setup(bot: commands.Bot) -> None:
-    class FaqCog(commands.Cog):
-        root_command = discord.app_commands.Group(name="faq", description="ЧаПи")
+class FaqCog(models.Cog):
+    root_command = discord.app_commands.Group(name="faq", description="ЧаПи")
 
-        for name, entry in ENTRIES.items():
+    for name, entry in ENTRIES.items():
 
-            @root_command.command(name=name, description=entry["title"])  # type: ignore
-            @discord.app_commands.guild_only()
-            async def cmd(self, interaction: discord.Interaction[commands.Bot]) -> None:
-                if not interaction.command:
-                    return
-                entry = ENTRIES[interaction.command.name]
-                embed = discord.Embed(
-                    title=entry["title"],
-                    description=entry["description"],
-                )
-                embed.set_image(url=entry.get("image"))
-                await interaction.response.send_message(
-                    embed=embed,
-                )
-
-        def __init__(self) -> None:
-            self._bot = bot
-            super().__init__()
-
-    await bot.add_cog(FaqCog())
+        @root_command.command(name=name, description=entry["title"])  # type: ignore
+        @discord.app_commands.guild_only()
+        async def cmd(self, interaction: discord.Interaction[commands.Bot]) -> None:
+            if not interaction.command:
+                return
+            entry = ENTRIES[interaction.command.name]
+            embed = discord.Embed(
+                title=entry["title"],
+                description=entry["description"],
+            )
+            embed.set_image(url=entry.get("image"))
+            await interaction.response.send_message(
+                embed=embed,
+            )
