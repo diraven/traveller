@@ -35,7 +35,7 @@ class View(discord.ui.View):
         if self.message:
             await self.message.edit(embed=self.message.embeds[0], view=self)
 
-    @discord.ui.button(label="Поширити", style=discord.ButtonStyle.red)
+    @discord.ui.button(label="Поширити на інші сервери", style=discord.ButtonStyle.red)
     async def yes(
         self,
         interaction: discord.Interaction[commands.Bot],
@@ -58,7 +58,7 @@ class View(discord.ui.View):
             # Add status field into the embed.
             self.message.embeds[0].add_field(
                 name="Статус",
-                value=f"Розшарено модератором {interaction.user.mention}.",
+                value=f"Поширено на інші сервери модератором {interaction.user.mention}.",
             )
 
             # Disable all the controls.
