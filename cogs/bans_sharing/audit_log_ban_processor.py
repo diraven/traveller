@@ -119,7 +119,7 @@ async def _post_embed(
             # Detect whether bot has ban permissions.
             if not bot.user:
                 raise RuntimeError("Unable to fetch own user.")
-            bot_member = guild.get_member(bot.user.id)
+            bot_member = log_channel.guild.get_member(bot.user.id)
             if not bot_member:
                 raise RuntimeError("Unable to fetch own member.")
             can_ban = bot_member.guild_permissions.ban_members
