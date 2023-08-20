@@ -20,10 +20,17 @@ class BansSharingCog(models.Cog):
 
     @commands.Cog.listener()
     async def on_audit_log_entry_create(self, entry: discord.AuditLogEntry) -> None:
+        # Skip non-ban entries.
+        if entry.action != discord.AuditLogAction.ban:
+            return
+
+        # Verify entry user and target.
         if entry.user is None or entry.target is None:
             raise RuntimeError(
                 f"Audit log entry: {entry.id} - missing actor or target."
             )
+
+        # Get all the objects.
         ban_guild = entry.guild
         ban_actor = t.cast(discord.Member, entry.user)
         ban_target = self.bot.get_user(
@@ -31,6 +38,7 @@ class BansSharingCog(models.Cog):
         ) or await self.bot.fetch_user(int(entry.target.id))
         ban_reason = entry.reason or ""
 
+        # Start processing.
         with models.Session.begin() as session:
             await confirm_share.process(
                 bot=self.bot,
