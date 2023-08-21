@@ -187,9 +187,9 @@ async def process(
                 # it's value depends on the language of the discord interface
                 # and will give errors on language mismatch.
                 # Post the message.
+                cmd_reason = f" reason: {ban_reason}" if ban_reason else ""
                 await msg.reply(
-                    f"/ban user:{ban_target.id} "
-                    f"delete_messages: {ban_reason if ban_reason else ''}",
+                    f"/ban user:{ban_target.id} " f"delete_messages:{cmd_reason}",
                     suppress_embeds=True,
                 )
         except discord.errors.Forbidden as exc:
