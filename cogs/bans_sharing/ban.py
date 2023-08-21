@@ -28,11 +28,11 @@ class View(discord.ui.View):
         for item in self.children:
             item.disabled = True  # type: ignore
         # Update message and it's view.
-        if self.message:
-            self.message.embeds[0].add_field(
-                name="Статус",
-                value="Проігноровано.",
-            )
+        # if self.message:
+        #     self.message.embeds[0].add_field(
+        #         name="Статус",
+        #         value="Проігноровано.",
+        #     )
         # Update the message.
         if self.message:
             await self.message.edit(embed=self.message.embeds[0], view=self)
@@ -168,7 +168,7 @@ async def process(
             can_ban = bot_member.guild_permissions.ban_members
 
             if can_ban:
-                view = View(bot=bot, timeout=3600)
+                view = View(bot=bot, timeout=3600 * 24)
                 view.message = await log_channel.send(
                     embed=embed,
                     view=view,

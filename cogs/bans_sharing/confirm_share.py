@@ -26,12 +26,12 @@ class View(discord.ui.View):
         for item in self.children:
             item.disabled = True  # type: ignore
         # Update message and it's view.
-        if self.message:
-            self.message.embeds[0].add_field(
-                name="Статус",
-                value="Проігноровано.",
-            )
-        # Update the message.
+        # if self.message:
+        #     self.message.embeds[0].add_field(
+        #         name="Статус",
+        #         value="Проігноровано.",
+        #     )
+        # # Update the message.
         if self.message:
             await self.message.edit(embed=self.message.embeds[0], view=self)
 
@@ -184,7 +184,7 @@ async def process(
         raise RuntimeError(f"Unable to retrieve log channnel {bans_sharing_channel_id}")
 
     # Post confirmation embed before sending bans further.
-    view = View(bot=bot, timeout=3600)
+    view = View(bot=bot)
     embed = await classes.Fields(
         guild_id=str(ban_guild.id),
         actor_id=str(ban_actor.id),
