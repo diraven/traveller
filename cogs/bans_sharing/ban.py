@@ -27,14 +27,8 @@ class View(discord.ui.View):
         # Disable all controls.
         for item in self.children:
             item.disabled = True  # type: ignore
-        # Update message and it's view.
-        # if self.message:
-        #     self.message.embeds[0].add_field(
-        #         name="Статус",
-        #         value="Проігноровано.",
-        #     )
-        # Update the message.
         if self.message:
+            self.message.embeds[0].description = "**Статус:** проігноровано"
             await self.message.edit(embed=self.message.embeds[0], view=self)
 
     @discord.ui.button(label="Теж забанити", style=discord.ButtonStyle.red)
@@ -58,9 +52,10 @@ class View(discord.ui.View):
                 return
 
             # Add status field into the embed.
-            self.message.embeds[0].add_field(
-                name="Статус",
-                value=f"Теж забанено модератором {interaction.user.mention}.",
+            self.message.embeds[
+                0
+            ].description = (
+                f"**Статус:** теж забанено модератором {interaction.user.mention}."
             )
 
             data = classes.Fields.from_embed(self.message.embeds[0])
@@ -101,9 +96,10 @@ class View(discord.ui.View):
                 return
 
             # Add status field into the embed.
-            self.message.embeds[0].add_field(
-                name="Статус",
-                value=f"Проігноровано модератором {interaction.user.mention}",
+            self.message.embeds[
+                0
+            ].description = (
+                f"**Статус:** проігноровано модератором {interaction.user.mention}"
             )
 
             # Disable all the controls.
