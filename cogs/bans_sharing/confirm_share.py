@@ -136,7 +136,7 @@ async def process(
     ban_guild: discord.Guild,
     ban_actor: discord.Member,
     ban_target: discord.User,
-    ban_reason: str,
+    ban_reason: t.Optional[str],
 ) -> None:
     logger.info("Ban event: %s - received.", ban_target.id)
     # Before doing anything else,

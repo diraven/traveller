@@ -12,7 +12,7 @@ class Fields:
     guild_id: str
     actor_id: str
     target_id: str
-    reason: str
+    reason: t.Optional[str] = ""
 
     @classmethod
     def from_embed(cls, embed: discord.Embed) -> "Fields":

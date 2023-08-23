@@ -118,7 +118,7 @@ async def process(
     ban_guild: discord.Guild,
     ban_actor: discord.User,
     ban_target: discord.User,
-    ban_reason: str,
+    ban_reason: t.Optional[str],
 ) -> None:
     logger.info("Ban event: %s - received.", ban_target.id)
     if not settings.DEBUG:
@@ -150,7 +150,7 @@ async def process(
             guild_id=str(ban_guild.id),
             actor_id=str(ban_actor.id),
             target_id=str(ban_target.id),
-            reason=ban_reason or "",
+            reason=ban_reason,
         ).to_embed(bot)
         embed.title = "Новий бан на іншому сервері"
 

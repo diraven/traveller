@@ -36,7 +36,7 @@ class BansSharingCog(models.Cog):
         ban_target = self.bot.get_user(
             int(entry.target.id)
         ) or await self.bot.fetch_user(int(entry.target.id))
-        ban_reason = entry.reason or ""
+        ban_reason = entry.reason
 
         # Start processing.
         with models.Session.begin() as session:
@@ -212,7 +212,7 @@ class BansSharingCog(models.Cog):
             target = self.bot.get_user(
                 int(ban_entry.target.id)
             ) or await self.bot.fetch_user(int(ban_entry.target.id))
-            reason = ban_entry.reason or ""
+            reason = ban_entry.reason
 
             with models.Session.begin() as session:
                 await confirm_share.process(
