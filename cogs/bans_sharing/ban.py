@@ -27,7 +27,7 @@ class View(discord.ui.View):
         # Disable all controls.
         for item in self.children:
             item.disabled = True  # type: ignore
-        if self.message:
+        if self.message and not self.message.embeds[0].description:
             self.message.embeds[0].description = "**Статус:** проігноровано"
             await self.message.edit(embed=self.message.embeds[0], view=self)
 
