@@ -163,12 +163,22 @@ async def process(
                 raise RuntimeError("Unable to fetch own member.")
             can_ban = bot_member.guild_permissions.ban_members
 
+            msg = None
             if can_ban:
                 view = View(bot=bot, timeout=3600 * 24)
-                view.message = await log_channel.send(
+                embed.set_footer(
+                    text="Якщо кнопки з якоїсь причини не "
+                    "працюють, скористайтеся "
+                    "командою нижче."
+                )
+                msg = await log_channel.send(
+                    content=utils.get_embed_field(
+                        embed, classes.BANNED_FIELD_NAME
+                    ).value,
                     embed=embed,
                     view=view,
                 )
+                view.message = msg
             else:
                 embed.set_footer(
                     text="У бота відсутні права на бан. "
@@ -177,16 +187,19 @@ async def process(
                     "відправити текстову команду нижче."
                 )
                 msg = await log_channel.send(
+                    content=utils.get_embed_field(
+                        embed, classes.BANNED_FIELD_NAME
+                    ).value,
                     embed=embed,
                 )
-                # We have to leave "delete_messages" parameter below empty since
-                # it's value depends on the language of the discord interface
-                # and will give errors on language mismatch.
-                # Post the message.
-                cmd_reason = f" reason: {ban_reason}" if ban_reason else ""
-                await msg.reply(
-                    f"/ban user:{ban_target.id} " f"delete_messages:{cmd_reason}",
-                    suppress_embeds=True,
-                )
+            # We have to leave "delete_messages" parameter below empty since
+            # it's value depends on the language of the discord interface
+            # and will give errors on language mismatch.
+            # Post the message.
+            cmd_reason = f" reason: {ban_reason}" if ban_reason else ""
+            await msg.reply(
+                f"/ban user:{ban_target.id} " f"delete_messages:{cmd_reason}",
+                suppress_embeds=True,
+            )
         except discord.errors.Forbidden as exc:
             sentry_sdk.capture_exception(exc)

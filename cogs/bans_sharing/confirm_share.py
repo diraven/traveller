@@ -187,7 +187,18 @@ async def process(
         reason=ban_reason,
     ).to_embed(bot)
     embed.title = "Новий бан на цьому сервері"
+    embed.set_footer(text="Для застосування бану вручну, скористайтеся командою нижче.")
     view.message = await log_channel.send(
+        content=utils.get_embed_field(embed, classes.BANNED_FIELD_NAME).value,
         embed=embed,
         view=view,
+    )
+    # We have to leave "delete_messages" parameter below empty since
+    # it's value depends on the language of the discord interface
+    # and will give errors on language mismatch.
+    # Post the message.
+    cmd_reason = f" reason: {ban_reason}" if ban_reason else ""
+    await view.message.reply(
+        f"/ban user:{ban_target.id} " f"delete_messages:{cmd_reason}",
+        suppress_embeds=True,
     )

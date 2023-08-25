@@ -5,6 +5,8 @@ import discord
 
 import models
 
+BANNED_FIELD_NAME = "Забанений"
+
 
 @dataclasses.dataclass
 class Fields:
@@ -51,7 +53,7 @@ class Fields:
             value=f"{ban_actor.display_name} '{ban_actor.name}'",
         )
         embed.add_field(
-            name="Забанений",
+            name=BANNED_FIELD_NAME,
             value=(
                 f"{ban_target.mention} '{ban_target.display_name}' '{ban_target.name}' "
             ),

@@ -2,6 +2,12 @@ import discord
 from discord.ext import commands
 
 
+def get_embed_field(
+    embed: discord.Embed, field_name: str
+) -> "discord.embeds._EmbedFieldProxy":
+    return next(field for field in embed.fields if field.name == field_name)
+
+
 def has_permission_for_interaction(
     interaction: discord.Interaction[commands.Bot],
     permission: str,
