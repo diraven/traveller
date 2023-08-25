@@ -179,7 +179,7 @@ async def process(
         raise RuntimeError(f"Unable to retrieve log channnel {bans_sharing_channel_id}")
 
     # Post confirmation embed before sending bans further.
-    view = View(bot=bot)
+    view = View(bot=bot, timeout=600)
     embed = await classes.Fields(
         guild_id=str(ban_guild.id),
         actor_id=str(ban_actor.id),
