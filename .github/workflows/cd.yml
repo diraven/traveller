@@ -1,7 +1,7 @@
 name: Continuous Delivery
 on:
-  push:
-    branches: [master]
+  release:
+    types: [released]
 env:
   IMAGE_NAME: traveller
 jobs:
