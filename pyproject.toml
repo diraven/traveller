@@ -1,17 +1,23 @@
+[tool.commitizen]
+version = "0.2.0"
+tag_format = "v$version"
+version_files = ["pyproject.toml:version"]
+
 [tool.poetry]
 name = "traveller"
-version = "0.1.0"
+version = "0.2.0"
 description = ""
 authors = ["DiRaven"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.11"
+python = ">=3.11,<4.0"
 discord-py = ">=2.3.1"
 aiohttp = ">=3.8.4"
 beautifulsoup4 = ">=4.12.2"
 alembic = ">=1.11.1"
 sentry-sdk = ">=1.28.0"
+commitizen = "^3.8.2"
 
 
 [tool.poetry.group.dev.dependencies]
