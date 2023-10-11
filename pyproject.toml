@@ -1,11 +1,11 @@
 [tool.commitizen]
-version = "0.4.0"
+version = "0.4.1"
 tag_format = "v$version"
 version_files = ["pyproject.toml:version"]
 
 [tool.poetry]
 name = "traveller"
-version = "0.4.0"
+version = "0.4.1"
 description = ""
 authors = ["DiRaven"]
 readme = "README.md"
