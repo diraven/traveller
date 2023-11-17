@@ -12,10 +12,6 @@ repos:
         exclude: ".*(\\.vscode).*"
       - id: detect-private-key
       - id: trailing-whitespace
-  - repo: https://github.com/psf/black
-    rev: 23.10.1
-    hooks:
-      - id: black
   - repo: https://github.com/PyCQA/bandit
     rev: 1.7.5
     hooks:
@@ -26,15 +22,16 @@ repos:
       - id: commitizen
         stages: [commit-msg]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.3
+    rev: v0.1.5
     hooks:
       - id: ruff
+      - id: ruff-format
 
   - repo: local
     hooks:
-      - id: mypy
-        name: mypy
-        entry: mypy main.py
-        language: system
+      - id: pyright
+        name: pyright
+        entry: pyright .
         pass_filenames: false
         always_run: true
+        language: system
