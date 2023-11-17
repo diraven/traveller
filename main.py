@@ -20,7 +20,7 @@ if settings.SENTRY_DSN:
 bot = models.Bot("!", intents=settings.intents)
 
 
-@bot.tree.error
+@bot.tree.error  # type: ignore
 async def error_handler(
     interaction: discord.Interaction[commands.Bot],
     error: Exception,
