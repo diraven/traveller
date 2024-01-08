@@ -30,7 +30,7 @@ class View(discord.ui.View):
             self.message.embeds[0].description = "**Статус:** проігноровано"
             await self.message.edit(embed=self.message.embeds[0], view=self)
 
-    @discord.ui.button(label="Поширити на інші сервери", style=discord.ButtonStyle.red)
+    @discord.ui.button(label="Поширити на інші сервери", style=discord.ButtonStyle.red)  # type: ignore
     async def yes(
         self,
         interaction: discord.Interaction[commands.Bot],
@@ -92,7 +92,7 @@ class View(discord.ui.View):
                     ban_reason=data.reason,
                 )
 
-    @discord.ui.button(label="Не поширювати", style=discord.ButtonStyle.gray)
+    @discord.ui.button(label="Не поширювати", style=discord.ButtonStyle.gray)  # type: ignore
     @discord.app_commands.checks.has_permissions(ban_members=True)
     async def no(
         self,
