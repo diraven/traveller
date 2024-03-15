@@ -1,5 +1,4 @@
 .*
-!.github
 !.gitignore
-!.pre-commit-config.yaml
-!.dockerignore
+
+/target
