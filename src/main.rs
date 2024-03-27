@@ -37,7 +37,7 @@ async fn main() {
     // FrameworkOptions contains all of poise's configuration option in one struct
     // Every option can be omitted to use its default value
     let options = poise::FrameworkOptions {
-        commands: vec![commands::faq::faq()],
+        commands: vec![commands::faq::faq(), commands::rusni_pyzda::rusni_pyzda()],
         prefix_options: poise::PrefixFrameworkOptions {
             ..Default::default()
         },

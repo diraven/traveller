@@ -4,7 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-env_logger = "0.11.2"                          # logging
-poise = "^0.6.1"                               # discord bot framework
-tokio = { version = "1", features = ["full"] } # asyncio
+env_logger = "0.11.2"                                  # logging
+poise = "^0.6.1"                                       # discord bot framework
+tokio = { version = "1", features = ["full"] }         # asyncio
 dotenv = "^0.15.0"
+reqwest = { version = "^0.12.2", features = ["json"] }
+serde_json = "^1.0.115"
+chrono = "^0.4.37"
