@@ -4,7 +4,7 @@ from discord.ext import commands
 
 def get_embed_field(
     embed: discord.Embed, field_name: str
-) -> "discord.embeds._EmbedFieldProxy":
+) -> "discord.embeds._EmbedFieldProxy":  # type: ignore
     return next(field for field in embed.fields if field.name == field_name)
 
 

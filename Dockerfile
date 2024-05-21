@@ -1,12 +1,11 @@
 FROM python:3.11
 
 WORKDIR /app
-RUN pip install poetry
+RUN pip install uv
 
-COPY pyproject.toml poetry.lock ./
+COPY requirements.txt ./
 
-RUN python -m poetry config virtualenvs.in-project true && \
-    poetry install --only main
+RUN uv venv && uv pip install --requirement requirements.txt
 
 COPY . .
 

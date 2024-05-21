@@ -39,7 +39,8 @@ class KnownBan(Base):
     __tablename__ = "ban"
     id_: sa_orm.Mapped[int] = sa_orm.mapped_column(primary_key=True)
     created_at: sa_orm.Mapped[datetime.datetime] = sa_orm.mapped_column(
-        sa.types.DateTime(timezone=True), default=datetime.datetime.utcnow
+        sa.types.DateTime(timezone=True),
+        default=datetime.datetime.now(tz=datetime.timezone.utc),
     )
     reason: sa_orm.Mapped[t.Optional[str]] = sa_orm.mapped_column(sa.String(500))
 

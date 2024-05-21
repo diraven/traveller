@@ -57,7 +57,7 @@ class VerificationCog(commands.Cog):
         if not interaction.guild:
             return
 
-        problems = []
+        problems: list[tuple[str, str]] = []
 
         # Make sure bot has manage roles permission.
         permissions = interaction.guild.me.guild_permissions

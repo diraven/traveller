@@ -176,7 +176,7 @@ async def process(
         bot.get_channel(bans_sharing_channel_id),
     )
     if not log_channel:
-        raise RuntimeError(f"Unable to retrieve log channnel {bans_sharing_channel_id}")
+        raise RuntimeError(f"Unable to retrieve log channel {bans_sharing_channel_id}")
 
     # Post confirmation embed before sending bans further.
     view = View(bot=bot, timeout=3600 * 24)

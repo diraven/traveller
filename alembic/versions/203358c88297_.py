@@ -5,10 +5,10 @@ Revises: 04ca088b8f21
 Create Date: 2023-07-12 17:40:13.733915
 
 """
+
 import datetime
 
 import sqlalchemy as sa
-
 from alembic import op
 
 # revision identifiers, used by Alembic.
@@ -26,7 +26,7 @@ def upgrade() -> None:
             "created_at",
             sa.DateTime(timezone=True),
             nullable=False,
-            server_default=str(datetime.datetime.utcnow()),
+            server_default=str(datetime.datetime.now(tz=datetime.timezone.utc)),
         ),
     )
     # ### end Alembic commands ###

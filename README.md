@@ -1,4 +1,4 @@
-# Traveller
+# Traveler
 
 A simplistic discord both developed for select Ukrainian discord communitites.
 
@@ -15,11 +15,13 @@ A simplistic discord both developed for select Ukrainian discord communitites.
 # Setup
 
 ```sh
+uv venv
+uv pip install -r requirements.txt --strict
 cp example.env .env
 vi .env # add your credentials
 touch .data.sqlite
-docker-compose build
-docker-compose up -d
+docker compose build
+docker compose up -d
 ```
 
 # Шаринг банів між серверами
@@ -53,7 +55,7 @@ docker-compose up -d
 
 ### Мені заважають інші слеш-команди бота. Як їх прибрати?
 
-Діскорд дозволяє забрати доступ до використання окремих слеш-команд по ролях. Користуйтеся.
+Discord дозволяє забрати доступ до використання окремих слеш-команд по ролях. Користуйтеся.
 
 ### А може краще окремого бота конкретно під цю задачу?
 

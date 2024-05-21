@@ -111,7 +111,7 @@ class BansSharingCog(models.Cog):
         if not interaction.guild:
             return
 
-        problems = []
+        problems: list[tuple[str, str]] = []
 
         # Check Audit Log access.
         permissions = interaction.guild.me.guild_permissions

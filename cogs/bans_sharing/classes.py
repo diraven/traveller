@@ -35,10 +35,6 @@ class Fields:
         ) or await bot.fetch_user(int(self.target_id))
         if ban_guild is None:
             raise RuntimeError("Missing ban_guild.")
-        if ban_actor is None:
-            raise RuntimeError("Missing ban_actor.")
-        if ban_target is None:
-            raise RuntimeError("Missing ban_target.")
 
         embed = discord.Embed(
             title="Новий бан",
