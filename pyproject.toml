@@ -36,7 +36,7 @@ build-backend = "hatchling.build"
 [tool.commitizen]
 version = "0.10.0"
 tag_format = "v$version"
-version_files = ["pyproject.toml:^version", "src/__init__.py"]
+version_files = ["pyproject.toml:^version", "__init__.py"]
 
 [tool.pyright]
 include = ["src"]
