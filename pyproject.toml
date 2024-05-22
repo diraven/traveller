@@ -15,6 +15,9 @@ optional-dependencies = { dev = [
     "bandit",
     "types-beautifulsoup4",
     "pyright",
+    "pytest",
+    "pytest-asyncio",
+    "dpytest",
 ] }
 name = "traveller"
 version = "0.10.1"
