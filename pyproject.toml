@@ -40,8 +40,7 @@ tag_format = "v$version"
 version_files = ["pyproject.toml:^version", "__init__.py"]
 
 [tool.pyright]
-include = ["src"]
-ignore = ["src/platform/v1"]
+ignore = [".*", "node_modules"]
 reportMissingImports = true
 reportMissingTypeStubs = true
 pythonVersion = "3.12"
