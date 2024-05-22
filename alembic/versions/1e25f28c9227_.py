@@ -21,11 +21,11 @@ def upgrade() -> None:
     op.rename_table("bans", "bans_sharing_bans")
     op.create_table(
         "bans_sharing_trusted_moderators",
-        sa.Column("id_", sa.Integer(), nullable=False),
+        sa.Column("id_", sa.BigInteger(), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
-        sa.Column("created_by", sa.Integer(), nullable=False),
-        sa.Column("guild_id", sa.Integer(), nullable=False),
-        sa.Column("user_id", sa.Integer(), nullable=False),
+        sa.Column("created_by", sa.BigInteger(), nullable=False),
+        sa.Column("guild_id", sa.BigInteger(), nullable=False),
+        sa.Column("user_id", sa.BigInteger(), nullable=False),
         sa.PrimaryKeyConstraint("id_"),
     )
 

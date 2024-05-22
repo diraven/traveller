@@ -80,6 +80,7 @@ pre-commit==3.7.1
     # via traveller (pyproject.toml)
 prompt-toolkit==3.0.36
     # via questionary
+psycopg==3.1.19
 pygments==2.18.0
     # via rich
 pyright==1.1.371
@@ -112,6 +113,7 @@ types-html5lib==1.1.11.20240228
 typing-extensions==4.12.2
     # via
     #   alembic
+    #   psycopg
     #   sqlalchemy
 urllib3==2.2.2
     # via sentry-sdk
