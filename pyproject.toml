@@ -1,23 +1,23 @@
 [project]
 dependencies = [
-    "discord-py",
     "aiohttp",
-    "beautifulsoup4",
     "alembic",
-    "sentry-sdk",
+    "beautifulsoup4",
     "commitizen",
-    "pyright",
+    "discord-py",
     "loguru",
+    "pyright",
+    "sentry-sdk",
 ]
 optional-dependencies = { dev = [
+    "bandit",
+    "dpytest",
     "isort",
     "pre-commit",
-    "bandit",
-    "types-beautifulsoup4",
     "pyright",
-    "pytest",
     "pytest-asyncio",
-    "dpytest",
+    "pytest",
+    "types-beautifulsoup4",
 ] }
 name = "traveller"
 version = "0.10.1"
