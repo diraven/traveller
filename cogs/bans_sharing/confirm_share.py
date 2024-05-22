@@ -143,7 +143,9 @@ async def process(
     # make sure we did not see this ban already.
     try:
         session.execute(
-            sa.select(models.KnownBan).filter(models.KnownBan.id_ == ban_target.id)
+            sa.select(models.BansSharingBan).filter(
+                models.BansSharingBan.id_ == ban_target.id
+            )
         ).one()
         if not settings.DEBUG:
             logger.info("Ban event: %s - already seen, skipped.", ban_target.id)
@@ -168,7 +170,7 @@ async def process(
             "Ban event: %s - is new, marking as seen.",
             ban_target.id,
         )
-        session.add(models.KnownBan(id_=ban_target.id, reason=ban_reason))
+        session.add(models.BansSharingBan(id_=ban_target.id, reason=ban_reason))
 
     # Get log channel.
     log_channel = t.cast(
