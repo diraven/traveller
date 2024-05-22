@@ -70,6 +70,7 @@ platformdirs==4.2.2
 pre-commit==3.7.1
 prompt-toolkit==3.0.36
     # via questionary
+psycopg==3.1.19
 pygments==2.18.0
     # via rich
 pyright==1.1.364
@@ -101,6 +102,7 @@ types-html5lib==1.1.11.20240228
 typing-extensions==4.11.0
     # via
     #   alembic
+    #   psycopg
     #   sqlalchemy
 urllib3==2.2.1
     # via sentry-sdk

@@ -8,6 +8,7 @@ dependencies = [
     "loguru",
     "pyright",
     "sentry-sdk",
+    "psycopg",
 ]
 optional-dependencies = { dev = [
     "bandit",
