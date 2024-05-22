@@ -19,7 +19,7 @@ charset-normalizer==3.3.2
     # via commitizen
 colorama==0.4.6
     # via commitizen
-commitizen==3.26.0
+commitizen==3.27.0
 decli==0.6.2
     # via commitizen
 discord-py==2.3.2
@@ -70,9 +70,10 @@ platformdirs==4.2.2
 pre-commit==3.7.1
 prompt-toolkit==3.0.36
     # via questionary
+psycopg==3.1.19
 pygments==2.18.0
     # via rich
-pyright==1.1.363
+pyright==1.1.364
 pyyaml==6.0.1
     # via
     #   bandit
@@ -101,6 +102,7 @@ types-html5lib==1.1.11.20240228
 typing-extensions==4.11.0
     # via
     #   alembic
+    #   psycopg
     #   sqlalchemy
 urllib3==2.2.1
     # via sentry-sdk
