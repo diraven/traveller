@@ -16,7 +16,7 @@ class Base(sa_orm.DeclarativeBase):
 
 
 class Guild(Base):
-    __tablename__ = "guild"
+    __tablename__ = "guilds"
     id_: sa_orm.Mapped[int] = sa_orm.mapped_column(primary_key=True)
     name: sa_orm.Mapped[t.Optional[str]] = sa_orm.mapped_column(sa.String(100))
     bans_sharing_channel_id: sa_orm.Mapped[t.Optional[int]] = sa_orm.mapped_column()
@@ -36,7 +36,7 @@ class Guild(Base):
 
 
 class KnownBan(Base):
-    __tablename__ = "ban"
+    __tablename__ = "bans"
     id_: sa_orm.Mapped[int] = sa_orm.mapped_column(primary_key=True)
     created_at: sa_orm.Mapped[datetime.datetime] = sa_orm.mapped_column(
         sa.types.DateTime(timezone=True),
