@@ -35,8 +35,23 @@ class Guild(Base):
         )
 
 
-class KnownBan(Base):
-    __tablename__ = "bans"
+class BansSharingTrustedModerator(Base):
+    __tablename__ = "bans_sharing_trusted_moderators"
+    id_: sa_orm.Mapped[int] = sa_orm.mapped_column(primary_key=True)
+    created_at: sa_orm.Mapped[datetime.datetime] = sa_orm.mapped_column(
+        sa.types.DateTime(timezone=True),
+        default=datetime.datetime.now(tz=datetime.timezone.utc),
+    )
+    created_by: sa_orm.Mapped[int] = sa_orm.mapped_column()
+    guild_id: sa_orm.Mapped[int] = sa_orm.mapped_column()
+    user_id: sa_orm.Mapped[int] = sa_orm.mapped_column()
+
+    def __repr__(self) -> str:
+        return f"BansSharingTrustedModerator(created_by={self.created_by}, guild_id={self.guild_id}, user_id={self.user_id})"
+
+
+class BansSharingBan(Base):
+    __tablename__ = "bans_sharing_bans"
     id_: sa_orm.Mapped[int] = sa_orm.mapped_column(primary_key=True)
     created_at: sa_orm.Mapped[datetime.datetime] = sa_orm.mapped_column(
         sa.types.DateTime(timezone=True),
@@ -45,7 +60,7 @@ class KnownBan(Base):
     reason: sa_orm.Mapped[t.Optional[str]] = sa_orm.mapped_column(sa.String(500))
 
     def __repr__(self) -> str:
-        return f"KnownBan(member_id={self.id_}, reason={self.reason})"
+        return f"BansSharingBan(member_id={self.id_}, reason={self.reason})"
 
 
 class Bot(commands.Bot):
