@@ -11,7 +11,7 @@ attrs==23.2.0
     # via aiohttp
 bandit==1.7.8
 beautifulsoup4==4.12.3
-certifi==2024.2.2
+certifi==2024.7.4
     # via sentry-sdk
 cfgv==3.4.0
     # via pre-commit
