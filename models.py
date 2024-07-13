@@ -61,9 +61,7 @@ class BansSharingTrustedModerator(Base):
     created_by: sa_orm.Mapped[int] = sa_orm.mapped_column(sa.BigInteger)
     guild_id: sa_orm.Mapped[int] = sa_orm.mapped_column(sa.BigInteger)
     user_id: sa_orm.Mapped[int] = sa_orm.mapped_column(sa.BigInteger)
-    user_global_name: sa_orm.Mapped[str] = sa_orm.mapped_column(
-        sa.String(32), unique=True
-    )
+    user_global_name: sa_orm.Mapped[str] = sa_orm.mapped_column(sa.String(32))
 
     def __repr__(self) -> str:
         return f"BansSharingTrustedModerator(created_by={self.created_by}, guild_id={self.guild_id}, user_id={self.user_id})"
