@@ -46,13 +46,12 @@ jobs:
           mkdir -p ~/.ssh/
           echo "$SERVER_SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
           cat ~/.ssh/known_hosts
-          echo "test"
         shell: bash
         env:
           SERVER_SSH_KNOWN_HOSTS: ${{secrets.SERVER_SSH_KNOWN_HOSTS}}
 
       - name: Deploy
         run: |
-          ssh diraven@$SERVER_SSH_HOST 'cd services/traveller && docker-compose down && docker-compose pull && docker-compose up -d'
+          ssh diraven@$SERVER_SSH_HOST 'cd services/traveller && docker compose down && docker compose pull && docker compose run app alembic upgrade head && docker-compose up -d'
         env:
           SERVER_SSH_HOST: ${{secrets.SERVER_SSH_HOST}}
