@@ -4,6 +4,7 @@ from discord.ext import commands
 
 import models
 import settings
+from __init__ import __version__
 from cogs import bans_sharing, faq, rusni_pyzda, slap, sum20, sum_, verification
 
 if settings.SENTRY_DSN:
@@ -14,7 +15,7 @@ if settings.SENTRY_DSN:
         max_breadcrumbs=50,
         debug=settings.DEBUG,
         traces_sample_rate=1.0,
-        release="0.0.1",
+        release=__version__,
     )
 
 bot = models.Bot("!", intents=settings.intents)

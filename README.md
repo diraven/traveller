@@ -6,6 +6,8 @@ A simplistic discord both developed for select Ukrainian discord communitites.
 
 - pre-commit install --install-hooks
 - pre-commit install --install-hooks -t commit-msg
+- `docker compose up --detach db` - starting db without bot
+- `source .env && PGPASSWORD=$POSTGRES_PASSWORD psql --user postgres postgres` - connecting to local db
 
 # DB Migrations
 

@@ -1,20 +1,21 @@
 [project]
 dependencies = [
-    "discord-py",
     "aiohttp",
-    "beautifulsoup4",
     "alembic",
-    "sentry-sdk",
+    "beautifulsoup4",
     "commitizen",
-    "pyright",
+    "discord-py",
     "loguru",
+    "pyright",
+    "sentry-sdk",
+    "psycopg",
 ]
 optional-dependencies = { dev = [
+    "bandit",
     "isort",
     "pre-commit",
-    "bandit",
-    "types-beautifulsoup4",
     "pyright",
+    "types-beautifulsoup4",
 ] }
 name = "traveller"
 version = "0.10.1"
@@ -39,8 +40,7 @@ tag_format = "v$version"
 version_files = ["pyproject.toml:^version", "__init__.py"]
 
 [tool.pyright]
-include = ["src"]
-ignore = ["src/platform/v1"]
+ignore = [".*", "node_modules"]
 reportMissingImports = true
 reportMissingTypeStubs = true
 pythonVersion = "3.12"

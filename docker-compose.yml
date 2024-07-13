@@ -1,8 +1,19 @@
 services:
+  db:
+    image: postgres
+    restart: always
+    shm_size: 128mb
+    volumes:
+      - ./.data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    ports:
+      - "5432:5432" # remove this line if you don't want to expose the port to the host
+
   app:
     build: .
     init: true
-    env_file:
-      - .env
     volumes:
       - ./.data.sqlite:/app/.data.sqlite
+    env_file:
+      - .env
