@@ -1,3 +1,3 @@
 #!/bin/bash
-poetry update
-poetry run pre-commit autoupdate
+uv pip compile pyproject.toml > requirements.txt
+pre-commit autoupdate
