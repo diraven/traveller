@@ -156,7 +156,7 @@ class BansSharingCog(models.Cog):
                     (
                         "Не налаштовано канал сповіщень.",
                         "Налаштуйте канал сповіщень за допомогою команди "
-                        "`/config log_channel`",
+                        "`/bans_sharing set_channel`",
                     )
                 )
 
