@@ -13,7 +13,5 @@ services:
   app:
     build: .
     init: true
-    volumes:
-      - ./.data.sqlite:/app/.data.sqlite
     env_file:
       - .env

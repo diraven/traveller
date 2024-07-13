@@ -7,6 +7,7 @@ import sqlalchemy as sa
 import sqlalchemy.orm as sa_orm
 from discord.ext import commands
 
+
 DB_URL = f'postgresql+psycopg://postgres:{os.environ["POSTGRES_PASSWORD"]}@{os.environ["PGHOST"]}:5432/postgres'
 engine = sa.create_engine(DB_URL)
 Session = sa_orm.sessionmaker(engine)
