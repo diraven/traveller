@@ -26,12 +26,17 @@ jobs:
           IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-          # Strip git ref prefix from version
+
+          # Push version tag.
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          # Strip "v" prefix from tag name
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          # Use Docker `latest` tag convention
-          [ "$VERSION" == "master" ] && VERSION=latest
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
+
+          # Push "latest" tag.
+          VERSION=latest
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
           docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
@@ -52,6 +57,6 @@ jobs:
 
       - name: Deploy
         run: |
-          ssh diraven@$SERVER_SSH_HOST 'cd services/traveller && docker compose down && docker compose pull && docker compose run app alembic upgrade head && docker-compose up -d'
+          ssh diraven@$SERVER_SSH_HOST 'cd services/traveller && docker compose down && docker compose pull && docker-compose up -d'
         env:
           SERVER_SSH_HOST: ${{secrets.SERVER_SSH_HOST}}
