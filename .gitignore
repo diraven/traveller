@@ -4,4 +4,7 @@
 !.pre-commit-config.yaml
 !.dockerignore
 
+!.vscode
+.vscode/settings.json
+
 __pycache__

@@ -170,6 +170,25 @@ async def process(
             msg = None
             if can_ban:
                 view = View(bot=bot, timeout=3600 * 24)
+
+                # Find whether moderator who issued ban is trusted on the given server.
+                query = sa.select(models.BansSharingTrustedModerator).where(
+                    models.BansSharingTrustedModerator.guild_id == ban_guild.id,
+                    models.BansSharingTrustedModerator.user_id == ban_actor.id,
+                )
+                trusted_moderator = session.execute(query).scalar_one_or_none()
+                if trusted_moderator:
+                    # Add status field into the embed.
+                    embed.description = f"**Статус:** застосовано автоматично, довірений модератор: {trusted_moderator.user_global_name} ({trusted_moderator.user_id})"
+                    # Disable buttons.
+                    for item in view.children:
+                        item.disabled = True  # type: ignore
+                    # Perform ban itself.
+                    await log_channel.guild.ban(
+                        discord.Object(ban_target.id), reason=ban_reason
+                    )
+                    return
+
                 embed.set_footer(
                     text="Якщо кнопки з якоїсь причини не "
                     "працюють, скористайтеся "

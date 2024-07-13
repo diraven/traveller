@@ -1,6 +1,8 @@
 import discord
+import sentry_sdk
 import sqlalchemy as sa
 from discord.ext import commands
+from loguru import logger
 
 import models
 import settings
@@ -30,25 +32,30 @@ async def error_handler(
         color=discord.Color.red(),
         title="Помилка",
     )
+
     if isinstance(error, discord.app_commands.MissingPermissions):
         embed.description = "Відсутній доступ."
+        await interaction.response.send_message(
+            embed=embed,
+            ephemeral=True,
+        )
+
+    if settings.SENTRY_DSN:
+        sentry_sdk.capture_exception(error)
     else:
-        raise error
-    await interaction.response.send_message(
-        embed=embed,
-        ephemeral=True,
-    )
+        logger.exception(error)
 
 
 @bot.event
 async def on_guild_join(guild: discord.Guild) -> None:
     # Add new guild to database.
     with models.Session.begin() as session:
-        session.add(models.Guild(id_=guild.id, name=guild.name))
+        session.merge(models.Guild(id_=guild.id, name=guild.name))
 
 
 @bot.event
 async def on_guild_remove(guild: discord.Guild) -> None:
+    # Remove guild from database.
     with models.Session.begin() as session:
         session.delete(models.Guild(id_=guild.id))
 

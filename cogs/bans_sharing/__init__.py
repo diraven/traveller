@@ -3,6 +3,7 @@ import typing as t
 
 import discord
 import sqlalchemy as sa
+import sqlalchemy.exc as sa_exc
 from discord.ext import commands
 
 import models
@@ -48,6 +49,118 @@ class BansSharingCog(models.Cog):
                 ban_target=ban_target,
                 ban_reason=ban_reason,
             )
+
+    @root_command.command(description="Зробити модератора довіреним")  # type: ignore
+    @discord.app_commands.guild_only()
+    @discord.app_commands.checks.has_permissions(ban_members=True)
+    async def add_trusted_moderator(
+        self,
+        interaction: discord.Interaction[commands.Bot],
+        user_id: str,
+    ) -> None:
+        # Find user specified.
+        user = None
+        try:
+            user = interaction.client.get_user(int(user_id))
+            if not user:
+                raise ValueError("User not found.")
+        except ValueError:
+            embed = discord.Embed(
+                title="Користувача не знайдено",
+                description=(
+                    "Користувач з ідентифікатором " f"{user_id}, " "не знайдений."
+                ),
+                color=discord.Color.red(),
+            )
+            await interaction.response.send_message(
+                embed=embed,
+            )
+            return
+
+        # User found, add them as trusted moderator.
+        with models.Session.begin() as session:
+            try:
+                session.add(
+                    models.BansSharingTrustedModerator(
+                        created_by=interaction.user.id,
+                        guild_id=interaction.guild_id,
+                        user_id=user.id,
+                        user_global_name=user.global_name,
+                    )
+                )
+                session.commit()
+            except sa_exc.IntegrityError:
+                embed = discord.Embed(
+                    title="Помилка",
+                    description=(
+                        f"Користувач {user.global_name} вже є довіреним модератором на цьому сервері."
+                    ),
+                    color=discord.Color.red(),
+                )
+                await interaction.response.send_message(
+                    embed=embed,
+                )
+                return
+
+        embed = discord.Embed(
+            title="Успішно",
+            description=(
+                "Додано довіреного модератора: "
+                f"{user.global_name}. За умови наявності "
+                "відповідних дозволів у бота, бани цього модератора "
+                "на інших серверах будуть автоматично застосовані і тут."
+            ),
+            color=discord.Color.green(),
+        )
+        await interaction.response.send_message(
+            embed=embed,
+        )
+        return
+
+    @root_command.command(description="Прибрати модератора з довірених")  # type: ignore
+    @discord.app_commands.guild_only()
+    @discord.app_commands.checks.has_permissions(ban_members=True)
+    async def remove_trusted_moderator(
+        self,
+        interaction: discord.Interaction[commands.Bot],
+        user_id: str,
+    ) -> None:
+        with models.Session.begin() as session:
+            # Find user specified.
+            trusted_moderator = None
+            try:
+                query = sa.select(models.BansSharingTrustedModerator).where(
+                    models.BansSharingTrustedModerator.guild_id == interaction.guild_id,
+                    models.BansSharingTrustedModerator.user_id == int(user_id),
+                )
+                trusted_moderator = session.execute(query).scalar_one()
+            except (ValueError, sa_exc.NoResultFound):
+                embed = discord.Embed(
+                    title="Користувача не знайдено",
+                    description=(
+                        "Користувач з ідентифікатором " f"{user_id}, " "не знайдений."
+                    ),
+                    color=discord.Color.red(),
+                )
+                await interaction.response.send_message(
+                    embed=embed,
+                )
+                return
+
+            # User found. Just remove it from the database.
+            session.delete(trusted_moderator)
+
+            embed = discord.Embed(
+                title="Успішно",
+                description=(
+                    f"Видалено модератора з довірених: {trusted_moderator.user_global_name}."
+                ),
+                color=discord.Color.green(),
+            )
+            await interaction.response.send_message(
+                embed=embed,
+            )
+            return
 
     @root_command.command(description="Налаштувати канал сповіщень")  # type: ignore
     @discord.app_commands.guild_only()
@@ -156,14 +269,24 @@ class BansSharingCog(models.Cog):
                     (
                         "Не налаштовано канал сповіщень.",
                         "Налаштуйте канал сповіщень за допомогою команди "
-                        "`/config log_channel`",
+                        "`/bans_sharing set_channel`",
                     )
                 )
+
+            # Get list of trusted moderators.
+            trusted_moderators = session.execute(
+                sa.select(models.BansSharingTrustedModerator).filter_by(
+                    guild_id=interaction.guild_id
+                )
+            ).scalars()
+            trusted_moderators_names = [
+                f"{tm.user_global_name} ({tm.user_id})" for tm in trusted_moderators
+            ]
 
         # Post check results.
         embed = discord.Embed(
             title="Результати перевірки налаштувань шарингу банів",
-            description="Все ок."
+            description=f"Все ок.\nДовірені модератори: {trusted_moderators_names}"
             if len(problems) == 0
             else """Помилка. Необхідні наступні права для каналу сповіщень:
 * View Channel
