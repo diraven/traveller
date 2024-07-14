@@ -170,7 +170,11 @@ async def process(
             "Ban event: %s - is new, marking as seen.",
             ban_target.id,
         )
-        session.add(models.BansSharingBan(id_=ban_target.id, reason=ban_reason))
+        session.add(
+            models.BansSharingBan(
+                id_=ban_target.id, reason=ban_reason, created_by=ban_actor.id
+            )
+        )
 
     # Get log channel.
     log_channel = t.cast(
