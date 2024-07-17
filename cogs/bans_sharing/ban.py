@@ -194,7 +194,7 @@ async def process(
                         embed=embed,
                         view=view,
                     )
-                    return
+                    continue
 
                 embed.set_footer(
                     text="Якщо кнопки з якоїсь причини не "
