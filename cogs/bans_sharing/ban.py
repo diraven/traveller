@@ -228,7 +228,7 @@ async def process(
             # Post the message.
             cmd_reason = f" reason: {ban_reason}" if ban_reason else ""
             await msg.reply(
-                f"/ban user:{ban_target.id} " f"delete_messages:{cmd_reason}",
+                f"/ban user:{ban_target.id} delete_messages:{cmd_reason}",
                 suppress_embeds=True,
             )
         except discord.errors.Forbidden as exc:

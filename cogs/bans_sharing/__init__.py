@@ -67,9 +67,7 @@ class BansSharingCog(models.Cog):
         except ValueError:
             embed = discord.Embed(
                 title="Користувача не знайдено",
-                description=(
-                    "Користувач з ідентифікатором " f"{user_id}, " "не знайдений."
-                ),
+                description=(f"Користувач з ідентифікатором {user_id}, не знайдений."),
                 color=discord.Color.red(),
             )
             await interaction.response.send_message(
@@ -138,7 +136,7 @@ class BansSharingCog(models.Cog):
                 embed = discord.Embed(
                     title="Користувача не знайдено",
                     description=(
-                        "Користувач з ідентифікатором " f"{user_id}, " "не знайдений."
+                        f"Користувач з ідентифікатором {user_id}, не знайдений."
                     ),
                     color=discord.Color.red(),
                 )

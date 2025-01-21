@@ -205,6 +205,6 @@ async def process(
     # Post the message.
     cmd_reason = f" reason: {ban_reason}" if ban_reason else ""
     await view.message.reply(
-        f"/ban user:{ban_target.id} " f"delete_messages:{cmd_reason}",
+        f"/ban user:{ban_target.id} delete_messages:{cmd_reason}",
         suppress_embeds=True,
     )
