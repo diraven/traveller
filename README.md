@@ -1,29 +1,41 @@
 # Traveler
 
-A simplistic discord both developed for select Ukrainian discord communitites.
+A simplistic discord bot developed for select Ukrainian discord communities.
+
+Runs as an HTTP interactions endpoint on Cloudflare Workers: Discord posts every slash command to the worker, there is no gateway connection and no server to keep alive. Layout follows Discord's [cloudflare-sample-app](https://github.com/discord/cloudflare-sample-app): `src/commands.ts` (definitions), `src/register.ts` (registration), `src/server.ts` (routing), `src/handlers/` (one file per command), `test/` (Vitest running inside workerd).
+
+Commands: `/faq`, `/slap`, `/sum`, `/sum20`, `/rusni_pyzda`. Bans sharing and verification from the previous gateway-based version are not ported yet.
 
 # Development
 
-- pre-commit install --install-hooks
-- pre-commit install --install-hooks -t commit-msg
-- `docker compose up --detach db` - starting db without bot
-- `source .env && PGPASSWORD=$POSTGRES_PASSWORD psql --user postgres postgres` - connecting to local db
+```sh
+npm install
+cp .dev.vars.example .dev.vars
+vi .dev.vars                     # application id, public key, bot token from the Developer Portal
+npm test                         # unit tests
+npm run typecheck && npm run lint
+DISCORD_DEV_GUILD_ID=<id> npm run register   # register commands into one server instantly
+npm run register                 # or globally (propagates within an hour)
+npm start                        # local server on http://localhost:8787
+```
 
-# DB Migrations
+Point Discord at a local server by exposing it through a tunnel (for example `cloudflared tunnel --url http://localhost:8787`) and using that URL as the Interactions Endpoint URL.
 
-- `alembic revision --autogenerate` - generate new migration
-- `alembic upgrade head` - run migrations
+Commit hooks: `pre-commit install --install-hooks && pre-commit install --install-hooks -t commit-msg`. Releases: `cz bump`, then publish the GitHub release; delivery deploys the worker and registers commands.
 
-# Setup
+# Deployment
 
 ```sh
-uv venv
-uv pip install -r requirements.txt --strict
-cp example.env .env
-vi .env # add your credentials
-docker compose build
-docker compose up -d
+npx wrangler login
+npx wrangler secret put DISCORD_APPLICATION_ID
+npx wrangler secret put DISCORD_PUBLIC_KEY
+npx wrangler secret put DISCORD_TOKEN
+npm run deploy
 ```
+
+Then set the worker URL as "Interactions Endpoint URL" on the application's General Information page in the Developer Portal. Discord sends a PING to validate the endpoint, which the worker answers, and from then on interactions arrive over HTTPS.
+
+Continuous delivery needs these repository secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `DISCORD_APPLICATION_ID`, `DISCORD_TOKEN`.
 
 # Шаринг банів між серверами
 
