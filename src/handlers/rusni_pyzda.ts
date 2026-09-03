@@ -19,9 +19,8 @@ interface StatisticsResponse {
   };
 }
 
-export async function fetchLosses(date: Date): Promise<APIEmbed> {
-  const day = date.toISOString().slice(0, 10);
-  const response = await fetch(`${RUSSIAN_WARSHIP_API}/statistics/${day}`);
+export async function fetchLosses(): Promise<APIEmbed> {
+  const response = await fetch(`${RUSSIAN_WARSHIP_API}/statistics/latest`);
   const payload = (await response.json()) as StatisticsResponse;
 
   if (payload.errors || !payload.data) {
@@ -48,5 +47,5 @@ export async function fetchLosses(date: Date): Promise<APIEmbed> {
 
 export const rusniPyzda: CommandHandler = (interaction, env, ctx) =>
   deferred(interaction, env, ctx, async () => ({
-    embeds: [await fetchLosses(new Date())],
+    embeds: [await fetchLosses()],
   }));

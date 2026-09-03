@@ -15,7 +15,7 @@ beforeAll(async () => {
 
 const lookup = (response: Response) =>
   runDeferred(signer, chatInputInteraction("rusni_pyzda"), (request) => {
-    expect(request.url).toBe(`${RUSSIAN_WARSHIP_API}/statistics/${today()}`);
+    expect(request.url).toBe(`${RUSSIAN_WARSHIP_API}/statistics/latest`);
     return response;
   });
 
