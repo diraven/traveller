@@ -47,34 +47,6 @@ export const SLAP_COMMAND: RESTPostAPIChatInputApplicationCommandsJSONBody = {
   ],
 };
 
-export const SUM_COMMAND: RESTPostAPIChatInputApplicationCommandsJSONBody = {
-  ...GUILD_ONLY,
-  name: "sum",
-  description: "Словник української мови (sum.in.ua)",
-  options: [
-    {
-      type: ApplicationCommandOptionType.String,
-      name: "word",
-      description: "Слово",
-      required: true,
-    },
-  ],
-};
-
-export const SUM20_COMMAND: RESTPostAPIChatInputApplicationCommandsJSONBody = {
-  ...GUILD_ONLY,
-  name: "sum20",
-  description: "Словник української мови (sum20ua.com)",
-  options: [
-    {
-      type: ApplicationCommandOptionType.String,
-      name: "word",
-      description: "Слово",
-      required: true,
-    },
-  ],
-};
-
 export const RUSNI_PYZDA_COMMAND: RESTPostAPIChatInputApplicationCommandsJSONBody =
   {
     ...GUILD_ONLY,
@@ -85,7 +57,5 @@ export const RUSNI_PYZDA_COMMAND: RESTPostAPIChatInputApplicationCommandsJSONBod
 export const COMMANDS: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [
   FAQ_COMMAND,
   SLAP_COMMAND,
-  SUM_COMMAND,
-  SUM20_COMMAND,
   RUSNI_PYZDA_COMMAND,
 ];

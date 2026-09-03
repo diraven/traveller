@@ -14,13 +14,7 @@ import {
 import { verifyKey } from "discord-interactions";
 import { AutoRouter, type IRequest } from "itty-router";
 
-import {
-  FAQ_COMMAND,
-  RUSNI_PYZDA_COMMAND,
-  SLAP_COMMAND,
-  SUM20_COMMAND,
-  SUM_COMMAND,
-} from "./commands.ts";
+import { FAQ_COMMAND, RUSNI_PYZDA_COMMAND, SLAP_COMMAND } from "./commands.ts";
 import {
   JsonResponse,
   ephemeralError,
@@ -30,14 +24,10 @@ import type { Env } from "./env.ts";
 import { faq } from "./handlers/faq.ts";
 import { rusniPyzda } from "./handlers/rusni_pyzda.ts";
 import { slap } from "./handlers/slap.ts";
-import { sum } from "./handlers/sum.ts";
-import { sum20 } from "./handlers/sum20.ts";
 
 const HANDLERS: Record<string, CommandHandler> = {
   [FAQ_COMMAND.name]: faq,
   [SLAP_COMMAND.name]: slap,
-  [SUM_COMMAND.name]: sum,
-  [SUM20_COMMAND.name]: sum20,
   [RUSNI_PYZDA_COMMAND.name]: rusniPyzda,
 };
 

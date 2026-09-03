@@ -4,7 +4,7 @@ A simplistic discord bot developed for select Ukrainian discord communities.
 
 Runs as an HTTP interactions endpoint on Cloudflare Workers: Discord posts every slash command to the worker, there is no gateway connection and no server to keep alive. Layout follows Discord's [cloudflare-sample-app](https://github.com/discord/cloudflare-sample-app): `src/commands.ts` (definitions), `src/register.ts` (registration), `src/server.ts` (routing), `src/handlers/` (one file per command), `test/` (Vitest running inside workerd).
 
-Commands: `/faq`, `/slap`, `/sum`, `/sum20`, `/rusni_pyzda`. Bans sharing and verification from the previous gateway-based version are not ported yet.
+Commands: `/faq`, `/slap`, `/rusni_pyzda`. The dictionary commands were dropped: sum.in.ua is unreachable and sum20ua.com put a captcha in front of its API. Bans sharing and verification from the previous gateway-based version are not ported yet.
 
 # Development
 
