@@ -99,7 +99,7 @@ rich==13.9.4
     # via bandit
 sentry-sdk==2.20.0
     # via traveller (pyproject.toml)
-soupsieve==2.6
+soupsieve==2.8.4
     # via beautifulsoup4
 sqlalchemy==2.0.37
     # via alembic
