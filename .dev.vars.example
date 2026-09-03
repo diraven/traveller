@@ -1,0 +1,5 @@
+# Copy to .dev.vars for `wrangler dev` and `npm run register`.
+# All three values come from the Discord Developer Portal, "General Information" and "Bot" pages.
+DISCORD_APPLICATION_ID=your-application-id
+DISCORD_PUBLIC_KEY=your-public-key
+DISCORD_TOKEN=your-bot-token

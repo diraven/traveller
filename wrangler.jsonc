@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "traveller",
+  "main": "src/server.ts",
+  "compatibility_date": "2026-09-01",
+  "observability": {
+    "enabled": true,
+  },
+  // Secrets, set with `wrangler secret put <NAME>` (or `.dev.vars` locally):
+  //   DISCORD_APPLICATION_ID
+  //   DISCORD_PUBLIC_KEY
+  //   DISCORD_TOKEN
+}

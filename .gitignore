@@ -2,9 +2,13 @@
 !.github
 !.gitignore
 !.pre-commit-config.yaml
-!.dockerignore
+!.cz.toml
+!.dev.vars.example
+!.prettierrc
+!.prettierignore
 
 !.vscode
 .vscode/settings.json
 
-__pycache__
+node_modules
+worker-configuration.d.ts
