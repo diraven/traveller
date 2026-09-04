@@ -1,7 +1,7 @@
 import {
   Color,
   embedMessage,
-  getInvokerId,
+  getInvoker,
   getUserOption,
   userMention,
   type CommandHandler,
@@ -60,7 +60,7 @@ export const slap: CommandHandler = (interaction) => {
     title: "Йой!",
     description: renderSlap(
       template,
-      getInvokerId(interaction),
+      getInvoker(interaction).id,
       getUserOption(interaction, "member"),
     ),
     color: Color.blue,
