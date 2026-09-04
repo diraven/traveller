@@ -13,7 +13,7 @@ jobs:
     environment: production
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Build image
         run: docker build . --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
