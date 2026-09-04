@@ -11,6 +11,8 @@
     "start": "wrangler dev",
     "deploy": "wrangler deploy",
     "register": "node src/register.ts",
+    "db:migrate": "wrangler d1 migrations apply traveller --local",
+    "db:migrate:remote": "wrangler d1 migrations apply traveller --remote",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "wrangler types --include-env=false && tsc --noEmit",
