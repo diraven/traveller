@@ -1,11 +1,8 @@
 .*
 !.github
 !.gitignore
-!.pre-commit-config.yaml
-!.cz.toml
 !.dev.vars.example
-!.prettierrc
-!.prettierignore
+!.nvmrc
 
 !.vscode
 .vscode/settings.json

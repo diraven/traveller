@@ -1,0 +1,27 @@
+pre-commit:
+  parallel: true
+  jobs:
+    - name: biome
+      glob: "*.{ts,js,json,jsonc,css}"
+      run: pnpm exec biome check --write --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
+      stage_fixed: true
+
+    # Biome does not format Markdown, YAML or SQL, so enforce the one rule that
+    # matters for them here.
+    - name: trailing-newline
+      glob: "*.{md,yml,yaml,sql,toml}"
+      run: |
+        for file in {staged_files}; do
+          if [ -s "$file" ] && [ -n "$(tail -c 1 "$file")" ]; then
+            printf '\n' >> "$file"
+          fi
+        done
+      stage_fixed: true
+
+    - name: typecheck
+      run: pnpm typecheck
+
+commit-msg:
+  jobs:
+    - name: commitlint
+      run: pnpm exec commitlint --edit {1}
