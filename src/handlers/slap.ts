@@ -1,11 +1,7 @@
-import {
-	Color,
-	type CommandHandler,
-	embedMessage,
-	getInvoker,
-	getUserOption,
-	userMention,
-} from "../discord.ts";
+import { userMention } from "discord.js";
+
+import type { CommandHandler } from "../context.ts";
+import { Color } from "../discord.ts";
 
 /** `{actor}` and `{target}` are replaced with user mentions. */
 export const SLAP_TEMPLATES = [
@@ -52,17 +48,21 @@ export function renderSlap(
 		.replace("{target}", userMention(targetId));
 }
 
-export const slap: CommandHandler = (interaction) => {
+export const slap: CommandHandler = async (interaction) => {
 	const template =
 		SLAP_TEMPLATES[Math.floor(Math.random() * SLAP_TEMPLATES.length)] ??
 		SLAP_TEMPLATES[0];
-	return embedMessage({
-		title: "Йой!",
-		description: renderSlap(
-			template,
-			getInvoker(interaction).id,
-			getUserOption(interaction, "member"),
-		),
-		color: Color.blue,
+	await interaction.reply({
+		embeds: [
+			{
+				title: "Йой!",
+				description: renderSlap(
+					template,
+					interaction.user.id,
+					interaction.options.getUser("member", true).id,
+				),
+				color: Color.blue,
+			},
+		],
 	});
 };

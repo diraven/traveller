@@ -1,6 +1,7 @@
-import type { APIEmbed } from "discord-api-types/v10";
+import type { APIEmbed } from "discord.js";
 
-import { Color, type CommandHandler, deferred } from "../discord.ts";
+import type { CommandHandler } from "../context.ts";
+import { Color } from "../discord.ts";
 
 export const RUSSIAN_WARSHIP_API = "https://russianwarship.rip/api/v2";
 
@@ -45,7 +46,8 @@ export async function fetchLosses(): Promise<APIEmbed> {
 	};
 }
 
-export const rusniPyzda: CommandHandler = (interaction, env, ctx) =>
-	deferred(interaction, env, ctx, async () => ({
-		embeds: [await fetchLosses()],
-	}));
+export const rusniPyzda: CommandHandler = async (interaction) => {
+	// The upstream API is slow often enough to blow the three-second deadline.
+	await interaction.deferReply();
+	await interaction.editReply({ embeds: [await fetchLosses()] });
+};

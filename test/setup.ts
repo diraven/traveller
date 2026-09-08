@@ -1,15 +1,8 @@
 /**
- * Gives every test a clean, migrated D1 database: `reset()` clears all
- * bindings, then the migrations recreate the schema.
+ * Nothing in the handlers reads configuration, but anything that transitively
+ * imports `src/config.ts` would throw without these.
  */
+import process from "node:process";
 
-import { applyD1Migrations, env, reset } from "cloudflare:test";
-import type { D1Migration } from "@cloudflare/vitest-plugin";
-import { beforeEach } from "vitest";
-
-const bindings = env as typeof env & { TEST_MIGRATIONS: D1Migration[] };
-
-beforeEach(async () => {
-	await reset();
-	await applyD1Migrations(bindings.DB, bindings.TEST_MIGRATIONS);
-});
+process.env.DISCORD_TOKEN ??= "test-token";
+process.env.DATABASE_URL ??= "postgres://localhost/traveller_test";

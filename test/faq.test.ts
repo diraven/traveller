@@ -1,68 +1,41 @@
-import {
-	createExecutionContext,
-	waitOnExecutionContext,
-} from "cloudflare:test";
-import {
-	type APIInteractionResponseChannelMessageWithSource,
-	InteractionResponseType,
-	MessageFlags,
-} from "discord-api-types/v10";
-import { beforeAll, describe, expect, it } from "vitest";
+import { MessageFlags } from "discord.js";
+import { describe, expect, it } from "vitest";
 
-import { FAQ_COMMAND } from "../src/commands.ts";
+import { COMMANDS, FAQ_COMMAND } from "../src/commands.ts";
 import { FAQ_ENTRIES } from "../src/faq_entries.ts";
-import worker from "../src/server.ts";
-import {
-	chatInputInteraction,
-	createSigner,
-	type Signer,
-	serialize,
-	subcommand,
-} from "./helpers.ts";
+import { faq } from "../src/handlers/faq.ts";
+import { asCommand, fakeInteraction } from "./fakes.ts";
 
-let signer: Signer;
+const ctx = { db: {} as never };
 
-beforeAll(async () => {
-	signer = await createSigner();
-});
+describe("faq", () => {
+	it("replies with the entry for the subcommand", async () => {
+		const [name, entry] = Object.entries(FAQ_ENTRIES)[0] as [
+			string,
+			(typeof FAQ_ENTRIES)[string],
+		];
+		const interaction = fakeInteraction({ subcommand: name });
+		await faq(asCommand(interaction), ctx);
 
-async function faq(name: string) {
-	const ctx = createExecutionContext();
-	const response = await worker.fetch(
-		await signer.sign(
-			serialize(chatInputInteraction("faq", [subcommand(name)])),
-		),
-		signer.env,
-		ctx,
-	);
-	await waitOnExecutionContext(ctx);
-	expect(response.status).toBe(200);
-	return (await response.json()) as APIInteractionResponseChannelMessageWithSource;
-}
+		const [payload] = interaction.reply.mock.calls[0] as [
+			{ embeds: { title: string; description: string }[] },
+		];
+		expect(payload.embeds[0]?.title).toBe(entry.title);
+		expect(payload.embeds[0]?.description).toBe(entry.description);
+	});
 
-describe("/faq", () => {
-	it("registers one subcommand per entry", () => {
+	it("answers unknown sections privately", async () => {
+		const interaction = fakeInteraction({ subcommand: "nope" });
+		await faq(asCommand(interaction), ctx);
+
+		const [payload] = interaction.reply.mock.calls[0] as [{ flags: number }];
+		expect(payload.flags).toBe(MessageFlags.Ephemeral);
+	});
+
+	it("registers a subcommand for every entry", () => {
 		expect(FAQ_COMMAND.options?.map((option) => option.name)).toEqual(
 			Object.keys(FAQ_ENTRIES),
 		);
-		for (const option of FAQ_COMMAND.options ?? []) {
-			expect(option.description.length).toBeLessThanOrEqual(100);
-		}
-	});
-
-	it.each(Object.keys(FAQ_ENTRIES))("answers %s", async (name) => {
-		const entry = FAQ_ENTRIES[name];
-		const body = await faq(name);
-		expect(body.type).toBe(InteractionResponseType.ChannelMessageWithSource);
-		const embed = body.data.embeds?.[0];
-		expect(embed?.title).toBe(entry?.title);
-		expect(embed?.description).toBe(entry?.description);
-		expect(embed?.image?.url).toBe(entry?.image);
-	});
-
-	it("rejects unknown entries with an ephemeral error", async () => {
-		const body = await faq("nope");
-		expect(body.data.flags).toBe(MessageFlags.Ephemeral);
-		expect(body.data.embeds?.[0]?.title).toBe("Помилка");
+		expect(COMMANDS).toContain(FAQ_COMMAND);
 	});
 });

@@ -1,20 +1,23 @@
-import {
-	type CommandHandler,
-	embedMessage,
-	ephemeralError,
-	getSubcommandName,
-} from "../discord.ts";
+import type { CommandHandler } from "../context.ts";
+import { ephemeralError } from "../discord.ts";
 import { FAQ_ENTRIES } from "../faq_entries.ts";
 
-export const faq: CommandHandler = (interaction) => {
-	const name = getSubcommandName(interaction);
-	const entry = name ? FAQ_ENTRIES[name] : undefined;
+export const faq: CommandHandler = async (interaction) => {
+	const name = interaction.options.getSubcommand();
+	const entry = FAQ_ENTRIES[name];
 	if (!entry) {
-		return ephemeralError("Помилка", `Невідомий розділ ЧаПів: ${name}.`);
+		await interaction.reply(
+			ephemeralError("Помилка", `Невідомий розділ ЧаПів: ${name}.`),
+		);
+		return;
 	}
-	return embedMessage({
-		title: entry.title,
-		description: entry.description,
-		...(entry.image && { image: { url: entry.image } }),
+	await interaction.reply({
+		embeds: [
+			{
+				title: entry.title,
+				description: entry.description,
+				...(entry.image && { image: { url: entry.image } }),
+			},
+		],
 	});
 };

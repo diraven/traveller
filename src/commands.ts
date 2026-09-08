@@ -12,7 +12,7 @@ import {
 	type RESTPostAPIApplicationCommandsJSONBody,
 	type RESTPostAPIChatInputApplicationCommandsJSONBody,
 	type RESTPostAPIContextMenuApplicationCommandsJSONBody,
-} from "discord-api-types/v10";
+} from "discord.js";
 
 import { FAQ_ENTRIES } from "./faq_entries.ts";
 
@@ -149,15 +149,18 @@ export const BANS_SHARING_COMMAND: RESTPostAPIChatInputApplicationCommandsJSONBo
 				name: "check_config",
 				description: "Перевірити налаштування шарингу банів",
 			},
+			// A snowflake rather than a user option: the moderator being trusted is
+			// by definition from another server, and a user picker only lists
+			// members of this one.
 			{
 				type: ApplicationCommandOptionType.Subcommand,
 				name: "add_trusted_moderator",
 				description: "Зробити модератора довіреним",
 				options: [
 					{
-						type: ApplicationCommandOptionType.User,
-						name: "user",
-						description: "Модератор з іншого сервера",
+						type: ApplicationCommandOptionType.String,
+						name: "user_id",
+						description: "Ідентифікатор модератора з іншого сервера",
 						required: true,
 					},
 				],
@@ -168,9 +171,9 @@ export const BANS_SHARING_COMMAND: RESTPostAPIChatInputApplicationCommandsJSONBo
 				description: "Прибрати модератора з довірених",
 				options: [
 					{
-						type: ApplicationCommandOptionType.User,
-						name: "user",
-						description: "Модератор з іншого сервера",
+						type: ApplicationCommandOptionType.String,
+						name: "user_id",
+						description: "Ідентифікатор модератора з іншого сервера",
 						required: true,
 					},
 				],

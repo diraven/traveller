@@ -1,20 +1,22 @@
 {
 	"compilerOptions": {
-		"target": "ES2022",
-		"module": "ESNext",
-		"moduleResolution": "Bundler",
-		"lib": ["ES2022"],
-		"types": ["./worker-configuration.d.ts", "@cloudflare/vitest-plugin/types"],
+		"target": "ES2023",
+		"module": "nodenext",
+		"moduleResolution": "nodenext",
+		"lib": ["ES2023"],
+		"types": ["node"],
 		"strict": true,
 		"noUncheckedIndexedAccess": true,
 		"noImplicitOverride": true,
 		"exactOptionalPropertyTypes": true,
 		"noFallthroughCasesInSwitch": true,
 		"verbatimModuleSyntax": true,
+		// Node runs the TypeScript sources directly by stripping types, so every
+		// construct has to be erasable and imports have to name the .ts file.
 		"erasableSyntaxOnly": true,
 		"allowImportingTsExtensions": true,
 		"noEmit": true,
 		"skipLibCheck": true
 	},
-	"include": ["src", "test", "vitest.config.ts", "worker-configuration.d.ts"]
+	"include": ["src", "test", "vitest.config.ts"]
 }
