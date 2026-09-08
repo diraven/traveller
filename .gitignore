@@ -1,11 +1,10 @@
 .*
 !.github
 !.gitignore
-!.dev.vars.example
+!.env.example
 !.nvmrc
 
 !.vscode
 .vscode/settings.json
 
 node_modules
-worker-configuration.d.ts

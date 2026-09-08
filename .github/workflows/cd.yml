@@ -7,34 +7,17 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-      - name: Setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Apply database migrations
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: d1 migrations apply traveller --remote
-
-      - name: Deploy worker
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-      - name: Register commands
-        run: pnpm register
+      # Coolify builds the Dockerfile from the repository itself, so a deploy is
+      # just a nudge. Database migrations run when the bot starts, and commands
+      # are registered once it connects.
+      - name: Trigger Coolify deployment
+        run: |
+          # The token goes in a config file rather than an argument: arguments
+          # are visible in the process list.
+          umask 077
+          printf 'header = "Authorization: Bearer %s"\n' "$COOLIFY_TOKEN" > curl.conf
+          trap 'rm -f curl.conf' EXIT
+          curl --fail --silent --show-error --config curl.conf "$COOLIFY_WEBHOOK"
         env:
-          DISCORD_APPLICATION_ID: ${{ secrets.DISCORD_APPLICATION_ID }}
-          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+          COOLIFY_WEBHOOK: ${{ secrets.COOLIFY_WEBHOOK }}
