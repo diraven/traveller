@@ -1,7 +1,7 @@
 # Privacy Policy
 
 **Application:** Traveler (Подорожній) Discord bot
-**Last updated:** 2026-08-13
+**Last updated:** 2026-09-08
 
 This policy explains what data the Traveler Discord bot ("the bot") collects,
 why it collects it, how long it is kept, and how to request its deletion.
@@ -20,9 +20,10 @@ presence data, and no personal profile data** beyond what is listed below.
 | Trusted-moderator user IDs and global usernames | Apply the "trusted moderator" ban-sharing feature. |
 | Shared-ban records: banned user ID, ban reason, acting moderator ID, timestamp | Notify connected servers about bans and prevent duplicate notifications. |
 
-The bot does **not** use the Message Content or Presence intents. It operates
-entirely through slash commands and does not read message content or track user
-presence.
+The bot does **not** use the Message Content or Presence intents. It does not
+read message content or track user presence. Beyond slash commands, it receives
+audit-log entries for bans, which is how it offers to share a ban with connected
+servers.
 
 ## Where data is stored
 
