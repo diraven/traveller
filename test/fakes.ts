@@ -107,16 +107,23 @@ export interface FakeGuildOptions {
 	roles?: { id: string; position: number }[];
 	/** User ids that are banned; `bans.fetch` rejects for anything else. */
 	bans?: string[];
+	/**
+	 * False for a guild in the middle of an outage. discord.js keeps it in the
+	 * cache but has no data for it yet, so `name` is undefined.
+	 */
+	available?: boolean;
 }
 
 export function fakeGuild(options: FakeGuildOptions = {}) {
 	const channel = options.channel ?? fakeChannel();
 	const banned = new Set(options.bans ?? []);
 	const permissions = options.mePermissions ?? [];
+	const available = options.available ?? true;
 
 	return {
 		id: options.id ?? "guild1",
-		name: options.name ?? "Test Guild",
+		available,
+		name: available ? (options.name ?? "Test Guild") : undefined,
 		channel,
 		channels: {
 			// The real GuildChannelManager.fetch(id) does a REST GET and lets the
@@ -314,13 +321,21 @@ function replyState() {
 export interface FakeButtonOptions extends FakeInteractionOptions {
 	customId?: string;
 	embed?: APIEmbed;
+	/**
+	 * Whether the clicked button was disabled, which is how a notice records a
+	 * final decision. Discord sends the message as the clicking client had it,
+	 * so this is the state a stale click carries.
+	 */
+	disabled?: boolean;
 }
 
 export function fakeButtonInteraction(options: FakeButtonOptions = {}) {
+	const customId = options.customId ?? "button";
 	// Assigned onto the base rather than spread: spreading would flatten the
 	// deferred/replied getters into stale booleans.
 	return Object.assign(fakeInteraction(options), {
-		customId: options.customId ?? "button",
+		customId,
+		component: { customId, disabled: options.disabled ?? false },
 		message: {
 			embeds: options.embed
 				? [{ toJSON: () => options.embed as APIEmbed }]
@@ -368,14 +383,25 @@ export function fakeClient(
 	};
 }
 
+export interface FakeDbResponse {
+	match: string;
+	rows?: unknown[];
+	rowCount?: number;
+	/** Makes the matching query reject, standing in for a database outage. */
+	error?: Error;
+}
+
 /** A Queryable backed by canned responses, keyed by a substring of the SQL. */
 export function fakeDb(
-	responses: { match: string; rows?: unknown[]; rowCount?: number }[],
+	responses: FakeDbResponse[],
 ): Queryable & { queries: { sql: string; values: unknown[] }[] } {
 	const queries: { sql: string; values: unknown[] }[] = [];
 	const query = vi.fn(async (sql: string, values: unknown[] = []) => {
 		queries.push({ sql, values });
 		const canned = responses.find((response) => sql.includes(response.match));
+		if (canned?.error) {
+			throw canned.error;
+		}
 		const rows = canned?.rows ?? [];
 		return { rows, rowCount: canned?.rowCount ?? rows.length };
 	});

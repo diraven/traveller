@@ -416,9 +416,24 @@ export const bansSharing: CommandHandler = async (interaction, ctx) => {
 
 // Buttons on ban notices in receiving servers.
 
+/**
+ * Disabled buttons are how a notice records that its decision is final, so a
+ * click carrying one arrived against components a client still had cached.
+ * Acting on it would rewrite a settled status - "проігноровано" over a user who
+ * is actually banned.
+ *
+ * Note this deliberately does not look at the description: a failed ban attempt
+ * sets one and leaves the buttons live precisely so the moderator can retry.
+ */
+const SETTLED = ephemeralError("Помилка", "Це сповіщення вже опрацьовано.");
+
 export const banButton: ButtonHandler = async (interaction) => {
 	if (!interaction.memberPermissions.has(PermissionFlagsBits.BanMembers)) {
 		await interaction.reply(NO_ACCESS);
+		return;
+	}
+	if (interaction.component.disabled) {
+		await interaction.reply(SETTLED);
 		return;
 	}
 	const embed = interaction.message.embeds[0]?.toJSON();
@@ -469,6 +484,10 @@ export const banButton: ButtonHandler = async (interaction) => {
 export const skipButton: ButtonHandler = async (interaction) => {
 	if (!interaction.memberPermissions.has(PermissionFlagsBits.BanMembers)) {
 		await interaction.reply(NO_ACCESS);
+		return;
+	}
+	if (interaction.component.disabled) {
+		await interaction.reply(SETTLED);
 		return;
 	}
 	const embed = interaction.message.embeds[0]?.toJSON() ?? {};

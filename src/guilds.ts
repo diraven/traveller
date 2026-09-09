@@ -16,6 +16,12 @@ export async function reconcileGuilds(
 	const current = client.guilds.cache;
 
 	for (const guild of current.values()) {
+		// A guild in the middle of an outage is in the cache with no name yet;
+		// storing that would blank the name we already have. It is not gone, so
+		// the sweep below leaves its records alone either way.
+		if (!guild.available) {
+			continue;
+		}
 		await db.upsertGuild(queryable, guild.id, guild.name);
 	}
 

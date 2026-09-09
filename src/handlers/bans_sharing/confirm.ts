@@ -261,7 +261,30 @@ export const shareButton: ButtonHandler = async (interaction, ctx) => {
 		return;
 	}
 
-	const { delivered, total } = await fanOut(interaction.client, ctx.db, ban);
+	let delivered: number;
+	let total: number;
+	try {
+		({ delivered, total } = await fanOut(interaction.client, ctx.db, ban));
+	} catch (error) {
+		// fanOut swallows per-server failures, so a throw comes from reading the
+		// destination list - before anything was sent anywhere. Say so on the
+		// prompt first, since that cannot fail for the same reason, then release
+		// the claim so `/bans_sharing share` can retry. Without either the prompt
+		// stays "поширюється" forever with nobody notified.
+		await interaction.editReply({
+			embeds: [
+				{
+					...embed,
+					description:
+						"**Статус:** не вдалося поширити. Спробуйте `/bans_sharing share`.",
+				},
+			],
+			components: confirmButtons(true),
+		});
+		await db.releaseBan(ctx.db, ban.target.id);
+		throw error;
+	}
+
 	await interaction.editReply({
 		embeds: [
 			{

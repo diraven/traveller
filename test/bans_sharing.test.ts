@@ -352,6 +352,36 @@ describe("ban notice buttons", () => {
 		);
 	});
 
+	// Disabled buttons mean the decision is already made; a click still arriving
+	// came from a stale client and must not relabel a banned user as ignored.
+	it("refuses a click on a notice that is already settled", async () => {
+		const interaction = fakeButtonInteraction({
+			permissions: BAN_MEMBERS,
+			embed,
+			disabled: true,
+		});
+		await skipButton(asButton(interaction), { db: fakeDb([]) });
+
+		expect(interaction.update).not.toHaveBeenCalled();
+		expect(firstEmbed(interaction.reply)?.description).toBe(
+			"Це сповіщення вже опрацьовано.",
+		);
+	});
+
+	// The counterpart: a failed ban attempt writes a status but leaves the
+	// buttons live on purpose, so retrying has to keep working.
+	it("allows a retry after a failed ban attempt", async () => {
+		const guild = fakeGuild({ id: "clicked" });
+		const interaction = fakeButtonInteraction({
+			permissions: BAN_MEMBERS,
+			guild,
+			embed: { ...embed, description: "**Статус:** не вдалося забанити" },
+		});
+		await banButton(asButton(interaction), { db: fakeDb([]) });
+
+		expect(guild.bans.create).toHaveBeenCalledWith("20", { reason: "spam" });
+	});
+
 	it("marks the notice ignored and disables the buttons", async () => {
 		const interaction = fakeButtonInteraction({
 			permissions: BAN_MEMBERS,

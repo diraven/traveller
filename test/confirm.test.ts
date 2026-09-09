@@ -275,6 +275,32 @@ describe("confirm buttons", () => {
 		);
 	});
 
+	// The claim was taken when the prompt went up, so a fan-out that never ran
+	// has to give it back - otherwise the ban is marked handled network-wide
+	// with nobody notified, and the prompt sits at "поширюється" forever.
+	it("releases the claim when the fan-out cannot even start", async () => {
+		const interaction = fakeButtonInteraction({
+			permissions: [PermissionFlagsBits.BanMembers],
+			guild: fakeGuild({ id: "origin" }),
+			embed,
+			client: fakeClient([ACTOR, TARGET], []),
+		});
+		const db = fakeDb([
+			{ match: "AS channel_id", error: new Error("connection terminated") },
+		]);
+
+		await expect(shareButton(asButton(interaction), { db })).rejects.toThrow(
+			"connection terminated",
+		);
+
+		expect(firstEmbed(interaction.editReply)?.description).toContain(
+			"не вдалося поширити",
+		);
+		expect(
+			db.queries.some((q) => q.sql.includes("DELETE FROM bans_sharing_bans")),
+		).toBe(true);
+	});
+
 	it("marks the prompt ignored", async () => {
 		const interaction = fakeButtonInteraction({
 			permissions: [PermissionFlagsBits.BanMembers],
