@@ -3,6 +3,7 @@
 !.gitignore
 !.env.example
 !.nvmrc
+!.dockerignore
 
 !.vscode
 .vscode/settings.json

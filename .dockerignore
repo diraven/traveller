@@ -1,0 +1,15 @@
+# Only package manifests, migrations and src are copied into the image, but
+# everything here is still uploaded as build context - which Coolify does over
+# the network on every deploy.
+.git
+.github
+node_modules
+test
+docs
+.env
+.venv
+.data
+.data.sqlite
+.wrangler
+.vscode
+.idea
