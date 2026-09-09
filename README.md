@@ -22,10 +22,11 @@ DISCORD_DEV_GUILD_ID=<id> pnpm start   # register commands into one server insta
 pnpm start                        # or globally, which propagates within an hour
 ```
 
-Database tests run only when pointed at a throwaway database:
+Database tests run only when pointed at a throwaway database, and they truncate every table - so point them somewhere other than the development database above:
 
 ```sh
-TEST_DATABASE_URL=postgres://postgres:traveller@localhost:5432/traveller pnpm test
+docker run --rm -e POSTGRES_PASSWORD=test -e POSTGRES_DB=traveller_test -p 55432:5432 postgres:18-alpine
+TEST_DATABASE_URL=postgres://postgres:test@localhost:55432/traveller_test pnpm test
 ```
 
 Commit hooks install themselves with `pnpm install` (lefthook). Releases: publish a GitHub release, which triggers the deployment.
