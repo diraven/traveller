@@ -20,6 +20,8 @@ import {
 	fakeDb,
 	fakeGuild,
 	fakeUser,
+	firstArg,
+	firstEmbed,
 } from "./fakes.ts";
 
 const ACTOR = fakeUser({ id: "10", username: "mod" });
@@ -48,33 +50,26 @@ function guildRow(channelId: string | null) {
 	};
 }
 
-function firstEmbed(mock: { mock: { calls: unknown[][] } }) {
-	const [payload] = mock.mock.calls[0] as [
-		{ embeds: { title?: string; description?: string }[] },
-	];
-	return payload.embeds[0];
+/** The claim insert either wins (1) or loses to another server (0). */
+function claim(won: boolean) {
+	return { match: "INSERT INTO bans_sharing_bans", rowCount: won ? 1 : 0 };
 }
 
 describe("promptToShare", () => {
-	it("skips a ban that has already been seen anywhere", async () => {
-		const channel = fakeChannel();
+	it("skips a ban another server already claimed", async () => {
+		const channel = fakeChannel("chan1");
 		const guild = fakeGuild({ id: "origin", channel });
-		const db = fakeDb([
-			{ match: "SELECT 1 FROM bans_sharing_bans", rows: [{ ok: 1 }] },
-		]);
+		const db = fakeDb([guildRow("chan1"), claim(false)]);
 
 		await promptToShare(asClient(fakeClient([], [guild])), db, ban());
 
 		expect(channel.send).not.toHaveBeenCalled();
 	});
 
-	it("records nothing when the server has no notification channel", async () => {
+	it("claims nothing when the server has no notification channel", async () => {
 		const channel = fakeChannel();
 		const guild = fakeGuild({ id: "origin", channel });
-		const db = fakeDb([
-			{ match: "SELECT 1 FROM bans_sharing_bans", rowCount: 0 },
-			guildRow(null),
-		]);
+		const db = fakeDb([guildRow(null), claim(true)]);
 
 		await promptToShare(asClient(fakeClient([], [guild])), db, ban());
 
@@ -85,32 +80,74 @@ describe("promptToShare", () => {
 		).toBe(false);
 	});
 
-	it("asks the origin server to confirm, and marks the ban seen", async () => {
+	it("asks the origin server to confirm, and claims the ban", async () => {
 		const channel = fakeChannel("chan1");
 		const guild = fakeGuild({ id: "origin", channel });
-		const db = fakeDb([
-			{ match: "SELECT 1 FROM bans_sharing_bans", rowCount: 0 },
-			guildRow("chan1"),
-		]);
+		const db = fakeDb([guildRow("chan1"), claim(true)]);
 
 		await promptToShare(asClient(fakeClient([], [guild])), db, ban());
 
-		const [payload] = channel.send.mock.calls[0] as [
-			{ embeds: { title: string }[]; components: unknown[] },
-		];
+		const payload = firstArg<{
+			embeds: { title: string }[];
+			components: unknown[];
+		}>(channel.send);
 		expect(payload.embeds[0]?.title).toBe("Новий бан на цьому сервері");
 		expect(JSON.stringify(payload.components)).toContain(SHARE_BUTTON_ID);
 
 		// The copy-pasteable command comes as a reply to the prompt.
-		const [reply] = channel.message.reply.mock.calls[0] as [
-			{ content: string },
-		];
+		const reply = firstArg<{ content: string }>(channel.message.reply);
 		expect(reply.content).toContain("/ban user:20");
 
 		expect(
 			db.queries.find((q) => q.sql.includes("INSERT INTO bans_sharing_bans"))
 				?.values,
 		).toEqual(["20", "spam", "10"]);
+	});
+
+	// The regression that motivated the claim/release split: recording the ban
+	// before the notice went up meant a channel the bot could see but not post
+	// in silently swallowed the ban for the entire network, forever.
+	it("releases the claim when the notice cannot be posted", async () => {
+		const channel = fakeChannel("chan1", { sendFails: true });
+		const guild = fakeGuild({ id: "origin", channel });
+		const db = fakeDb([guildRow("chan1"), claim(true)]);
+
+		await expect(
+			promptToShare(asClient(fakeClient([], [guild])), db, ban()),
+		).rejects.toThrow();
+
+		expect(
+			db.queries.some((q) => q.sql.includes("DELETE FROM bans_sharing_bans")),
+		).toBe(true);
+	});
+
+	// The notice is what matters; the follow-up command is a convenience.
+	it("keeps the claim when only the follow-up command fails", async () => {
+		const channel = fakeChannel("chan1");
+		channel.message.reply.mockRejectedValueOnce(new Error("no history"));
+		const guild = fakeGuild({ id: "origin", channel });
+		const db = fakeDb([guildRow("chan1"), claim(true)]);
+
+		await promptToShare(asClient(fakeClient([], [guild])), db, ban());
+
+		expect(
+			db.queries.some((q) => q.sql.includes("DELETE FROM bans_sharing_bans")),
+		).toBe(false);
+	});
+
+	it("fails loudly when the notification channel has been deleted", async () => {
+		// channels.fetch throws for a missing channel; it never resolves to null.
+		const guild = fakeGuild({ id: "origin", channel: fakeChannel("gone") });
+		const db = fakeDb([guildRow("chan1"), claim(true)]);
+
+		await expect(
+			promptToShare(asClient(fakeClient([], [guild])), db, ban()),
+		).rejects.toThrow();
+
+		// Nothing was claimed, so the ban is not lost.
+		expect(
+			db.queries.some((q) => q.sql.includes("INSERT INTO bans_sharing_bans")),
+		).toBe(false);
 	});
 });
 
@@ -153,10 +190,7 @@ describe("onAuditLogEntry", () => {
 		const channel = fakeChannel("chan1");
 		const guild = fakeGuild({ id: "origin", channel });
 		const client = fakeClient([ACTOR, TARGET], [guild]);
-		const db = fakeDb([
-			{ match: "SELECT 1 FROM bans_sharing_bans", rowCount: 0 },
-			guildRow("chan1"),
-		]);
+		const db = fakeDb([guildRow("chan1"), claim(true)]);
 
 		await onAuditLogEntry(asClient(client), db)(
 			entry() as never,
@@ -177,6 +211,46 @@ describe("confirm buttons", () => {
 		expect(interaction.update).not.toHaveBeenCalled();
 		expect(firstEmbed(interaction.reply)?.description).toBe(
 			"Відсутній доступ.",
+		);
+	});
+
+	// Discord leaves stale buttons clickable, so an answered prompt has to
+	// refuse rather than fan out a second time.
+	it("refuses a prompt that already carries a status", async () => {
+		const answered = { ...embed, description: "**Статус:** проігноровано" };
+		const interaction = fakeButtonInteraction({
+			permissions: [PermissionFlagsBits.BanMembers],
+			embed: answered,
+			client: fakeClient([ACTOR, TARGET], []),
+		});
+		const db = fakeDb([{ match: "AS channel_id", rows: [] }]);
+
+		await shareButton(asButton(interaction), { db });
+
+		expect(interaction.update).not.toHaveBeenCalled();
+		expect(firstEmbed(interaction.reply)?.description).toBe(
+			"Цей бан вже опрацьовано.",
+		);
+	});
+
+	it("acknowledges before resolving users, so the click cannot time out", async () => {
+		const guild = fakeGuild({ id: "origin" });
+		// A cold cache, which is exactly the case after a restart.
+		const client = fakeClient([], []);
+		const interaction = fakeButtonInteraction({
+			permissions: [PermissionFlagsBits.BanMembers],
+			guild,
+			embed,
+			client,
+		});
+		const db = fakeDb([{ match: "AS channel_id", rows: [] }]);
+
+		await shareButton(asButton(interaction), { db });
+
+		// The ack came first; the failed lookup is reported by editing after it.
+		expect(interaction.update).toHaveBeenCalled();
+		expect(firstEmbed(interaction.editReply)?.description).toContain(
+			"дані бану неповні",
 		);
 	});
 
@@ -209,12 +283,10 @@ describe("confirm buttons", () => {
 		});
 		await noShareButton(asButton(interaction), { db: fakeDb([]) });
 
-		const [payload] = interaction.update.mock.calls[0] as [
-			{
-				embeds: { description: string }[];
-				components: { components: { disabled: boolean }[] }[];
-			},
-		];
+		const payload = firstArg<{
+			embeds: { description: string }[];
+			components: { components: { disabled: boolean }[] }[];
+		}>(interaction.update);
 		expect(payload.embeds[0]?.description).toContain("проігноровано");
 		expect(
 			payload.components[0]?.components.every((button) => button.disabled),

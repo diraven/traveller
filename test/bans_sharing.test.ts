@@ -22,6 +22,8 @@ import {
 	fakeGuild,
 	fakeInteraction,
 	fakeUser,
+	firstArg,
+	firstEmbed,
 } from "./fakes.ts";
 
 const BAN_MEMBERS = [PermissionFlagsBits.BanMembers];
@@ -38,13 +40,6 @@ function guildRow(channelId: string | null) {
 			},
 		],
 	};
-}
-
-function firstEmbed(mock: { mock: { calls: unknown[][] } }) {
-	const [payload] = mock.mock.calls[0] as [
-		{ embeds: { title?: string; description?: string }[] },
-	];
-	return payload.embeds[0];
 }
 
 describe("bans_sharing share", () => {
@@ -71,7 +66,7 @@ describe("bans_sharing share", () => {
 		});
 		await bansSharing(asCommand(interaction), { db: fakeDb([guildRow(null)]) });
 
-		const [payload] = interaction.reply.mock.calls[0] as [{ flags: number }];
+		const payload = firstArg<{ flags: number }>(interaction.reply);
 		expect(payload.flags).toBe(MessageFlags.Ephemeral);
 		expect(firstEmbed(interaction.reply)?.title).toBe(
 			"Не налаштовано канал сповіщень.",
@@ -90,7 +85,9 @@ describe("bans_sharing share", () => {
 		]);
 		await bansSharing(asCommand(interaction), { db });
 
-		expect(firstEmbed(interaction.reply)?.title).toBe("Бан вже поширено");
+		// "Опрацьовано", not "поширено": the record is written when a ban is first
+		// noticed, so it may have been declined rather than shared.
+		expect(firstEmbed(interaction.reply)?.title).toBe("Бан вже опрацьовано");
 		expect(interaction.deferReply).not.toHaveBeenCalled();
 	});
 
@@ -131,6 +128,7 @@ describe("bans_sharing share", () => {
 		const db = fakeDb([
 			guildRow("chan1"),
 			{ match: "SELECT 1 FROM bans_sharing_bans", rowCount: 0 },
+			{ match: "INSERT INTO bans_sharing_bans", rowCount: 1 },
 			{ match: "AS channel_id", rows: [] },
 		]);
 		await bansSharing(asCommand(interaction), { db });
@@ -146,11 +144,14 @@ describe("bans_sharing share", () => {
 
 describe("bans_sharing trusted moderators", () => {
 	it("resolves a moderator who is not a member of this server", async () => {
-		const outsider = fakeUser({ id: "999", displayName: "Outsider" });
+		const outsider = fakeUser({
+			id: "123456789012345678",
+			displayName: "Outsider",
+		});
 		const interaction = fakeInteraction({
 			subcommand: "add_trusted_moderator",
 			permissions: BAN_MEMBERS,
-			strings: { user_id: "999" },
+			strings: { user_id: "123456789012345678" },
 			user: fakeUser({ id: "1" }),
 			client: fakeClient([outsider]),
 		});
@@ -159,7 +160,12 @@ describe("bans_sharing trusted moderators", () => {
 		]);
 		await bansSharing(asCommand(interaction), { db });
 
-		expect(db.queries[0]?.values).toEqual(["1", "guild1", "999", "Outsider"]);
+		expect(db.queries[0]?.values).toEqual([
+			"1",
+			"guild1",
+			"123456789012345678",
+			"Outsider",
+		]);
 		expect(firstEmbed(interaction.reply)?.title).toBe("Успішно");
 	});
 
@@ -167,7 +173,7 @@ describe("bans_sharing trusted moderators", () => {
 		const interaction = fakeInteraction({
 			subcommand: "add_trusted_moderator",
 			permissions: BAN_MEMBERS,
-			strings: { user_id: "404" },
+			strings: { user_id: "999999999999999999" },
 			client: fakeClient([]),
 		});
 		await bansSharing(asCommand(interaction), { db: fakeDb([]) });
@@ -178,11 +184,14 @@ describe("bans_sharing trusted moderators", () => {
 	});
 
 	it("reports a duplicate", async () => {
-		const outsider = fakeUser({ id: "999", displayName: "Outsider" });
+		const outsider = fakeUser({
+			id: "123456789012345678",
+			displayName: "Outsider",
+		});
 		const interaction = fakeInteraction({
 			subcommand: "add_trusted_moderator",
 			permissions: BAN_MEMBERS,
-			strings: { user_id: "999" },
+			strings: { user_id: "123456789012345678" },
 			client: fakeClient([outsider]),
 		});
 		const db = fakeDb([
@@ -195,11 +204,28 @@ describe("bans_sharing trusted moderators", () => {
 		);
 	});
 
+	// Free text reaching a bigint column raised a Postgres cast error, which the
+	// moderator saw as "спробуйте ще раз пізніше".
+	it("reports a malformed id instead of letting it reach the database", async () => {
+		const interaction = fakeInteraction({
+			subcommand: "remove_trusted_moderator",
+			permissions: BAN_MEMBERS,
+			strings: { user_id: "not-a-snowflake" },
+		});
+		const db = fakeDb([]);
+		await bansSharing(asCommand(interaction), { db });
+
+		expect(db.queries).toHaveLength(0);
+		expect(firstEmbed(interaction.reply)?.title).toBe(
+			"Користувача не знайдено",
+		);
+	});
+
 	it("removes by snowflake", async () => {
 		const interaction = fakeInteraction({
 			subcommand: "remove_trusted_moderator",
 			permissions: BAN_MEMBERS,
-			strings: { user_id: "999" },
+			strings: { user_id: "123456789012345678" },
 		});
 		const db = fakeDb([
 			{
@@ -229,8 +255,10 @@ describe("bans_sharing set_channel", () => {
 		expect(db.queries[0]?.values).toEqual(["guild1", "chan9"]);
 	});
 
-	it("stores nothing when the channel is unreachable", async () => {
-		const channel = fakeChannel("chan9", false);
+	// The realistic failure: the bot can see the channel but cannot post in it,
+	// which no type check can catch - only the test message reveals it.
+	it("stores nothing when the test message is refused", async () => {
+		const channel = fakeChannel("chan9", { sendFails: true });
 		const interaction = fakeInteraction({
 			subcommand: "set_channel",
 			permissions: [PermissionFlagsBits.Administrator],
@@ -332,12 +360,10 @@ describe("ban notice buttons", () => {
 		});
 		await skipButton(asButton(interaction), { db: fakeDb([]) });
 
-		const [payload] = interaction.update.mock.calls[0] as [
-			{
-				embeds: { description: string }[];
-				components: { components: { disabled: boolean }[] }[];
-			},
-		];
+		const payload = firstArg<{
+			embeds: { description: string }[];
+			components: { components: { disabled: boolean }[] }[];
+		}>(interaction.update);
 		expect(payload.embeds[0]?.description).toContain("проігноровано");
 		expect(
 			payload.components[0]?.components.every((button) => button.disabled),

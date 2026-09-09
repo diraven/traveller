@@ -52,7 +52,7 @@ import { rusniPyzda } from "./handlers/rusni_pyzda.ts";
 import { slap } from "./handlers/slap.ts";
 import { verification, verify } from "./handlers/verification.ts";
 import { migrate } from "./migrate.ts";
-import { captureError } from "./sentry.ts";
+import { captureError, captureFatal } from "./sentry.ts";
 
 const CHAT_INPUT_HANDLERS: Record<string, CommandHandler> = {
 	[FAQ_COMMAND.name]: faq,
@@ -167,20 +167,34 @@ client.once(Events.ClientReady, (ready) => {
 });
 
 process.on("unhandledRejection", captureError);
-process.on("uncaughtException", captureError);
+// An uncaught exception leaves the process in an unknown state, so it exits and
+// lets the container restart rather than sitting there looking healthy.
+process.on("uncaughtException", (error) => void captureFatal(error));
 
 async function shutdown(signal: string): Promise<void> {
 	console.log(`Received ${signal}, shutting down.`);
-	await client.destroy();
-	await pool.end();
+	try {
+		await client.destroy();
+		await pool.end();
+	} catch (error) {
+		// Report it, but never hang: the runtime will SIGKILL us shortly.
+		captureError(error);
+		process.exit(1);
+	}
 	process.exit(0);
 }
 
 process.on("SIGTERM", () => void shutdown("SIGTERM"));
 process.on("SIGINT", () => void shutdown("SIGINT"));
 
-const applied = await migrate(pool);
-if (applied.length) {
-	console.log(`Applied migrations: ${applied.join(", ")}`);
+try {
+	const applied = await migrate(pool);
+	if (applied.length) {
+		console.log(`Applied migrations: ${applied.join(", ")}`);
+	}
+	await client.login(config.discordToken);
+} catch (error) {
+	// A bot that cannot migrate or log in has nothing to offer; exiting lets the
+	// container back off and retry.
+	await captureFatal(error);
 }
-await client.login(config.discordToken);

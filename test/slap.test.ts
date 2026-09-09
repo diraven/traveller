@@ -2,7 +2,7 @@ import { userMention } from "discord.js";
 import { describe, expect, it } from "vitest";
 
 import { renderSlap, SLAP_TEMPLATES, slap } from "../src/handlers/slap.ts";
-import { asCommand, fakeInteraction, fakeUser } from "./fakes.ts";
+import { asCommand, fakeInteraction, fakeUser, firstArg } from "./fakes.ts";
 
 describe("renderSlap", () => {
 	it("substitutes both mentions", () => {
@@ -28,9 +28,9 @@ describe("slap", () => {
 		});
 		await slap(asCommand(interaction), { db: {} as never });
 
-		const [payload] = interaction.reply.mock.calls[0] as [
-			{ embeds: { title: string; description: string }[] },
-		];
+		const payload = firstArg<{
+			embeds: { title: string; description: string }[];
+		}>(interaction.reply);
 		const embed = payload.embeds[0];
 		expect(embed?.title).toBe("Йой!");
 		expect(embed?.description).toContain(userMention("1"));

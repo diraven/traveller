@@ -19,6 +19,7 @@ import {
 } from "discord.js";
 
 import * as db from "../../db.ts";
+import { fetchSendableChannel } from "../../discord.ts";
 
 export const BAN_BUTTON_ID = "bans_sharing:ban";
 export const SKIP_BUTTON_ID = "bans_sharing:skip";
@@ -127,10 +128,10 @@ async function notifyGuild(
 	destination: db.BansSharingChannel,
 ): Promise<void> {
 	const guild = await client.guilds.fetch(destination.guild_id);
-	const channel = await guild.channels.fetch(destination.channel_id);
-	if (!channel?.isSendable()) {
+	const channel = await fetchSendableChannel(guild, destination.channel_id);
+	if (!channel) {
 		throw new Error(
-			`Channel ${destination.channel_id} in guild ${destination.guild_id} is not sendable.`,
+			`Channel ${destination.channel_id} in guild ${destination.guild_id} is gone or cannot be posted to.`,
 		);
 	}
 	const me = await guild.members.fetchMe();
@@ -172,10 +173,17 @@ async function notifyGuild(
 		// Buttons the bot could not act on would only ever fail.
 		...(canBan ? { components: banButtons(false) } : {}),
 	});
-	await posted.reply({
-		content: banCommandText(ban.target.id, ban.reason),
-		flags: MessageFlags.SuppressEmbeds,
-	});
+	// The notice is what matters, and it is already posted. Failing to attach
+	// the copy-pasteable command - Read Message History is missing, say - must
+	// not make this server count as unreached.
+	try {
+		await posted.reply({
+			content: banCommandText(ban.target.id, ban.reason),
+			flags: MessageFlags.SuppressEmbeds,
+		});
+	} catch (error) {
+		console.error(error);
+	}
 }
 
 export interface FanOutResult {

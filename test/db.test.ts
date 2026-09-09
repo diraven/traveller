@@ -110,11 +110,12 @@ describe.skipIf(!pool)("database", () => {
 		expect(listed.map((row) => row.user_id)).toEqual(["2"]);
 	});
 
-	it("records a ban once and remembers it", async () => {
+	it("grants the claim to exactly one caller", async () => {
 		expect(await db.hasSeenBan(conn, "20")).toBe(false);
-		await db.recordBan(conn, "20", "10", "spam");
-		// A second ban of the same user must not blow up on the primary key.
-		await db.recordBan(conn, "20", "11", undefined);
+		expect(await db.claimBan(conn, "20", "10", "spam")).toBe(true);
+		// The second server to ban the same user must be told it lost the race,
+		// not blow up on the primary key.
+		expect(await db.claimBan(conn, "20", "11", undefined)).toBe(false);
 
 		expect(await db.hasSeenBan(conn, "20")).toBe(true);
 		const { rows } = await conn.query(
@@ -124,13 +125,41 @@ describe.skipIf(!pool)("database", () => {
 		expect(rows[0]).toEqual({ reason: "spam", created_by: "10" });
 	});
 
+	it("releasing a claim makes the ban available again", async () => {
+		await db.claimBan(conn, "20", "10", "spam");
+		await db.releaseBan(conn, "20");
+
+		expect(await db.hasSeenBan(conn, "20")).toBe(false);
+		expect(await db.claimBan(conn, "20", "11", "other")).toBe(true);
+	});
+
+	it("truncates a reason that exceeds the column width", async () => {
+		// Discord allows 512 characters in an audit log reason; the column holds
+		// 500, and overflowing it used to abort the whole share.
+		await db.claimBan(conn, "22", "10", "x".repeat(512));
+
+		const { rows } = await conn.query<{ length: number }>(
+			"SELECT length(reason) AS length FROM bans_sharing_bans WHERE id_ = $1",
+			["22"],
+		);
+		expect(rows[0]?.length).toBe(500);
+	});
+
 	it("stores a null reason when there was none", async () => {
-		await db.recordBan(conn, "21", "10", undefined);
+		await db.claimBan(conn, "21", "10", undefined);
 		const { rows } = await conn.query(
 			"SELECT reason FROM bans_sharing_bans WHERE id_ = $1",
 			["21"],
 		);
 		expect(rows[0]?.reason).toBeNull();
+	});
+
+	it("rejects a non-numeric snowflake rather than corrupting a query", async () => {
+		// The commands guard against this; if one ever forgets, it must fail
+		// loudly here rather than silently matching nothing.
+		await expect(
+			db.removeTrustedModerator(conn, "1", "not-a-snowflake"),
+		).rejects.toThrow();
 	});
 
 	it("removes a guild's trusted moderators along with the guild", async () => {

@@ -28,6 +28,8 @@ import {
 	Color,
 	ephemeralError,
 	errorEmbed,
+	fetchSendableChannel,
+	isSnowflake,
 	NO_ACCESS,
 	successEmbed,
 	userFacingMessage,
@@ -53,6 +55,24 @@ export {
 	shareButton,
 } from "./confirm.ts";
 export { BAN_BUTTON_ID, SKIP_BUTTON_ID };
+
+/**
+ * One record per banned user is kept network-wide, and it is written when the
+ * ban is first noticed - not when it is actually passed on. So "handled" is the
+ * honest word here: the ban may have been shared, declined, or left to expire.
+ */
+const ALREADY_HANDLED = "Бан вже опрацьовано";
+
+function handledText(targetId: string): string {
+	return `Бан користувача ${userMention(targetId)} вже опрацьовано раніше.`;
+}
+
+function notFound(userId: string) {
+	return errorEmbed(
+		"Користувача не знайдено",
+		`Користувач з ідентифікатором ${userId}, не знайдений.`,
+	);
+}
 
 /**
  * Shares a ban on demand. Unlike the audit log path this cannot assume the ban
@@ -83,12 +103,11 @@ async function shareOnDemand(
 		);
 		return;
 	}
+	// A cheap upfront answer for the common case. The claim below is what
+	// actually prevents a double share.
 	if (await db.hasSeenBan(ctx.db, target.id)) {
 		await interaction.reply(
-			ephemeralError(
-				"Бан вже поширено",
-				`Бан користувача ${userMention(target.id)} вже було поширено раніше.`,
-			),
+			ephemeralError(ALREADY_HANDLED, handledText(target.id)),
 		);
 		return;
 	}
@@ -115,6 +134,15 @@ async function shareOnDemand(
 		throw error;
 	}
 
+	// Claimed before the fan-out, so two moderators sharing the same ban at the
+	// same moment cannot both notify every server.
+	if (!(await db.claimBan(ctx.db, target.id, interaction.user.id, reason))) {
+		await interaction.editReply({
+			embeds: [errorEmbed(ALREADY_HANDLED, handledText(target.id))],
+		});
+		return;
+	}
+
 	const ban: Ban = {
 		guildId: guild.id,
 		guildName: guild.name,
@@ -122,20 +150,33 @@ async function shareOnDemand(
 		target,
 		reason,
 	};
-	const { delivered, total } = await fanOut(interaction.client, ctx.db, ban);
-
-	// Recorded only once the fan-out has run, so a failure before this point
-	// leaves the ban shareable again rather than permanently marked seen.
-	await db.recordBan(ctx.db, target.id, interaction.user.id, reason);
+	let delivered: number;
+	let total: number;
+	try {
+		({ delivered, total } = await fanOut(interaction.client, ctx.db, ban));
+	} catch (error) {
+		// fanOut absorbs per-server failures, so this is something unexpected.
+		// Release the claim rather than marking the ban seen for good.
+		await db.releaseBan(ctx.db, target.id);
+		throw error;
+	}
 
 	// Local notice, so the originating server keeps a record too.
 	const local = banEmbed(ban);
 	local.title = "Новий бан на цьому сервері";
 	local.description = `**Статус:** поширено на ${delivered} з ${total} серверів модератором ${userMention(interaction.user.id)}`;
-	const channel = await guild.channels.fetch(stored.bans_sharing_channel_id);
-	if (channel?.isSendable()) {
+	const channel = await fetchSendableChannel(
+		guild,
+		stored.bans_sharing_channel_id,
+	);
+	if (channel) {
 		const content = embedField(local, BANNED_FIELD);
-		await channel.send({ ...(content && { content }), embeds: [local] });
+		try {
+			await channel.send({ ...(content && { content }), embeds: [local] });
+		} catch (error) {
+			// The fan-out already happened; the local copy is a convenience.
+			console.error(error);
+		}
 	}
 
 	await interaction.editReply({
@@ -167,18 +208,17 @@ const setChannel: CommandHandler = async (interaction, ctx) => {
 	const channel = interaction.options.getChannel("channel", true);
 	await interaction.deferReply();
 
-	const resolved = await interaction.guild.channels.fetch(channel.id);
-	if (!resolved?.isSendable()) {
-		await interaction.editReply({
-			embeds: [
-				errorEmbed(
-					"Відсутній доступ",
-					`Відсутній доступ до каналу сповіщень ${channelMention(channel.id)}, перевірте налаштування ролей.`,
-				),
-			],
-		});
+	const noAccess = errorEmbed(
+		"Відсутній доступ",
+		`Відсутній доступ до каналу сповіщень ${channelMention(channel.id)}, перевірте налаштування ролей.`,
+	);
+	const resolved = await fetchSendableChannel(interaction.guild, channel.id);
+	if (!resolved) {
+		await interaction.editReply({ embeds: [noAccess] });
 		return;
 	}
+	// isSendable only checks the channel type, so the test message below is what
+	// actually proves the bot can post there.
 	try {
 		await resolved.send({
 			embeds: [
@@ -190,14 +230,7 @@ const setChannel: CommandHandler = async (interaction, ctx) => {
 		});
 	} catch (error) {
 		if (error instanceof DiscordAPIError) {
-			await interaction.editReply({
-				embeds: [
-					errorEmbed(
-						"Відсутній доступ",
-						`Відсутній доступ до каналу сповіщень ${channelMention(channel.id)}, перевірте налаштування ролей.`,
-					),
-				],
-			});
+			await interaction.editReply({ embeds: [noAccess] });
 			return;
 		}
 		throw error;
@@ -238,9 +271,9 @@ const checkConfig: CommandHandler = async (interaction, ctx) => {
 	if (stored?.bans_sharing_channel_id) {
 		const channelId = stored.bans_sharing_channel_id;
 		try {
-			const channel = await guild.channels.fetch(channelId);
-			if (!channel?.isSendable()) {
-				throw new Error("Channel is not sendable.");
+			const channel = await fetchSendableChannel(guild, channelId);
+			if (!channel) {
+				throw new Error("Channel is gone or is not a text channel.");
 			}
 			const posted = await channel.send({
 				embeds: [
@@ -298,16 +331,12 @@ const addTrustedModerator: CommandHandler = async (interaction, ctx) => {
 	// is trusting a moderator from another server, and a user picker only offers
 	// members of this one.
 	const userId = interaction.options.getString("user_id", true);
-	const user = await interaction.client.users.fetch(userId).catch(() => null);
+	// Checked before it reaches a bigint column, which would raise a cast error.
+	const user = isSnowflake(userId)
+		? await interaction.client.users.fetch(userId).catch(() => null)
+		: null;
 	if (!user) {
-		await interaction.reply({
-			embeds: [
-				errorEmbed(
-					"Користувача не знайдено",
-					`Користувач з ідентифікатором ${userId}, не знайдений.`,
-				),
-			],
-		});
+		await interaction.reply({ embeds: [notFound(userId)] });
 		return;
 	}
 
@@ -344,11 +373,9 @@ const removeTrustedModerator: CommandHandler = async (interaction, ctx) => {
 		return;
 	}
 	const userId = interaction.options.getString("user_id", true);
-	const removed = await db.removeTrustedModerator(
-		ctx.db,
-		interaction.guild.id,
-		userId,
-	);
+	const removed = isSnowflake(userId)
+		? await db.removeTrustedModerator(ctx.db, interaction.guild.id, userId)
+		: null;
 	if (!removed) {
 		await interaction.reply({
 			embeds: [

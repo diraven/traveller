@@ -186,18 +186,35 @@ export async function hasSeenBan(
 	return (rowCount ?? 0) > 0;
 }
 
-export async function recordBan(
+/** The width of `bans_sharing_bans.reason`; audit log reasons can be longer. */
+const REASON_MAX_LENGTH = 500;
+
+/**
+ * Claims a ban for sharing, returning false when another server got there
+ * first. The insert itself is the lock, so two servers banning the same user at
+ * once cannot both go on to share it.
+ */
+export async function claimBan(
 	db: Queryable,
 	userId: string,
 	createdBy: string,
 	reason: string | undefined,
-): Promise<void> {
+): Promise<boolean> {
 	// id_ here is the banned user's snowflake, which is what makes the table
 	// deduplicate by user.
-	await db.query(
+	const result = await db.query(
 		`INSERT INTO bans_sharing_bans (id_, reason, created_by)
      VALUES ($1, $2, $3)
      ON CONFLICT (id_) DO NOTHING`,
-		[userId, reason ?? null, createdBy],
+		[userId, reason?.slice(0, REASON_MAX_LENGTH) ?? null, createdBy],
 	);
+	return (result.rowCount ?? 0) > 0;
+}
+
+/**
+ * Releases a claim. Used when posting the notice fails: leaving the row behind
+ * would mark the ban shared everywhere while nobody was ever told about it.
+ */
+export async function releaseBan(db: Queryable, userId: string): Promise<void> {
+	await db.query("DELETE FROM bans_sharing_bans WHERE id_ = $1", [userId]);
 }

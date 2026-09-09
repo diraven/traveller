@@ -13,6 +13,7 @@ import {
 	ComponentType,
 	type Guild,
 	type GuildAuditLogsEntry,
+	type Message,
 	MessageFlags,
 	PermissionFlagsBits,
 	userMention,
@@ -20,7 +21,11 @@ import {
 
 import type { ButtonHandler } from "../../context.ts";
 import * as db from "../../db.ts";
-import { ephemeralError, NO_ACCESS } from "../../discord.ts";
+import {
+	ephemeralError,
+	fetchSendableChannel,
+	NO_ACCESS,
+} from "../../discord.ts";
 import {
 	ACTOR_ID_FIELD,
 	BANNED_FIELD,
@@ -83,24 +88,31 @@ export async function promptToShare(
 	queryable: db.Queryable,
 	ban: Ban,
 ): Promise<void> {
-	if (await db.hasSeenBan(queryable, ban.target.id)) {
-		return;
-	}
-
+	// Read the configuration before claiming: a server with no notification
+	// channel must leave the ban unclaimed, so another server banning the same
+	// user still gets its own prompt.
 	const stored = await db.getGuild(queryable, ban.guildId);
 	if (!stored?.bans_sharing_channel_id) {
 		return;
 	}
 
 	const guild = await client.guilds.fetch(ban.guildId);
-	const channel = await guild.channels.fetch(stored.bans_sharing_channel_id);
-	if (!channel?.isSendable()) {
+	const channel = await fetchSendableChannel(
+		guild,
+		stored.bans_sharing_channel_id,
+	);
+	if (!channel) {
 		throw new Error(
-			`Channel ${stored.bans_sharing_channel_id} in guild ${ban.guildId} is not sendable.`,
+			`Channel ${stored.bans_sharing_channel_id} in guild ${ban.guildId} is gone or cannot be posted to.`,
 		);
 	}
 
-	await db.recordBan(queryable, ban.target.id, ban.actor.id, ban.reason);
+	// The claim is the deduplication: whoever inserts the row owns this ban.
+	if (
+		!(await db.claimBan(queryable, ban.target.id, ban.actor.id, ban.reason))
+	) {
+		return;
+	}
 
 	const embed = banEmbed(ban);
 	embed.title = "Новий бан на цьому сервері";
@@ -108,15 +120,32 @@ export async function promptToShare(
 		text: "Для застосування бану вручну, скористайтеся командою нижче.",
 	};
 	const content = embedField(embed, BANNED_FIELD);
-	const posted = await channel.send({
-		...(content && { content }),
-		embeds: [embed],
-		components: confirmButtons(false),
-	});
-	await posted.reply({
-		content: banCommandText(ban.target.id, ban.reason),
-		flags: MessageFlags.SuppressEmbeds,
-	});
+
+	let posted: Message;
+	try {
+		posted = await channel.send({
+			...(content && { content }),
+			embeds: [embed],
+			components: confirmButtons(false),
+		});
+	} catch (error) {
+		// Nobody was told, so the ban has to stay shareable - otherwise it is
+		// marked seen network-wide and silently disappears. Missing Send Messages
+		// or Embed Links on the notification channel lands here.
+		await db.releaseBan(queryable, ban.target.id);
+		throw error;
+	}
+
+	// The prompt is up, so the claim stands even if the follow-up fails: losing
+	// the copy-pasteable command is a cosmetic problem, losing the ban is not.
+	try {
+		await posted.reply({
+			content: banCommandText(ban.target.id, ban.reason),
+			flags: MessageFlags.SuppressEmbeds,
+		});
+	} catch (error) {
+		console.error(error);
+	}
 
 	// Matches the gateway bot's 24 hour view timeout. A restart drops the timer,
 	// which leaves the buttons live rather than breaking them - they carry all
@@ -162,14 +191,29 @@ async function banFromEmbed(
 	if (!actorId || !targetId) {
 		return null;
 	}
-	return {
-		guildId: guild.id,
-		guildName: guild.name,
-		actor: await client.users.fetch(actorId),
-		target: await client.users.fetch(targetId),
-		reason: embedReason(embed),
-	};
+	// Either account may have been deleted since the notice went up, and by now
+	// the interaction is already acknowledged: report it as a status rather than
+	// throwing and leaving the notice stuck mid-share.
+	try {
+		return {
+			guildId: guild.id,
+			guildName: guild.name,
+			actor: await client.users.fetch(actorId),
+			target: await client.users.fetch(targetId),
+			reason: embedReason(embed),
+		};
+	} catch (error) {
+		console.error(error);
+		return null;
+	}
 }
+
+/**
+ * A status line in the description means the prompt has already been answered,
+ * by another moderator or by the expiry timer. Discord leaves stale buttons
+ * clickable, so both handlers check before acting.
+ */
+const ALREADY_ANSWERED = ephemeralError("Помилка", "Цей бан вже опрацьовано.");
 
 export const shareButton: ButtonHandler = async (interaction, ctx) => {
 	if (!interaction.memberPermissions.has(PermissionFlagsBits.BanMembers)) {
@@ -181,16 +225,14 @@ export const shareButton: ButtonHandler = async (interaction, ctx) => {
 		await interaction.reply(NO_BAN_DATA);
 		return;
 	}
-
-	// The fan-out is attributed to the guild the button was clicked in, never
-	// the one named in the embed: embeds are editable in principle, the
-	// interaction's guild is signed by Discord.
-	const ban = await banFromEmbed(interaction.client, interaction.guild, embed);
-	if (!ban) {
-		await interaction.reply(NO_BAN_DATA);
+	if (embed.description) {
+		await interaction.reply(ALREADY_ANSWERED);
 		return;
 	}
 
+	// Acknowledged first, and with the buttons disabled: resolving the users
+	// below needs REST calls that can outlast the three-second deadline, and a
+	// live button in the meantime would let a second moderator share twice.
 	const actor = interaction.user;
 	await interaction.update({
 		embeds: [
@@ -201,6 +243,23 @@ export const shareButton: ButtonHandler = async (interaction, ctx) => {
 		],
 		components: confirmButtons(true),
 	});
+
+	// The fan-out is attributed to the guild the button was clicked in, never
+	// the one named in the embed: embeds are editable in principle, the
+	// interaction's guild is signed by Discord.
+	const ban = await banFromEmbed(interaction.client, interaction.guild, embed);
+	if (!ban) {
+		await interaction.editReply({
+			embeds: [
+				{
+					...embed,
+					description: "**Статус:** не вдалося поширити, дані бану неповні.",
+				},
+			],
+			components: confirmButtons(true),
+		});
+		return;
+	}
 
 	const { delivered, total } = await fanOut(interaction.client, ctx.db, ban);
 	await interaction.editReply({
@@ -220,6 +279,10 @@ export const noShareButton: ButtonHandler = async (interaction) => {
 		return;
 	}
 	const embed = interaction.message.embeds[0]?.toJSON() ?? {};
+	if (embed.description) {
+		await interaction.reply(ALREADY_ANSWERED);
+		return;
+	}
 	await interaction.update({
 		embeds: [
 			{

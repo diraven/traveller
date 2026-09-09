@@ -55,9 +55,20 @@ export function fakeMessage(id = "msg1"): FakeMessage {
 	return { id, reply: vi.fn(), edit: vi.fn() };
 }
 
+export interface FakeChannelOptions {
+	/**
+	 * Makes `send` reject the way Discord does when the bot holds View Channel
+	 * but not Send Messages or Embed Links. This is the realistic failure:
+	 * `isSendable()` cannot catch it, because the real one only checks the
+	 * channel *type* (`'send' in this`).
+	 */
+	sendFails?: boolean;
+	/** A non-text channel, which is the only thing isSendable actually rejects. */
+	textBased?: boolean;
+}
+
 export interface FakeChannel {
 	id: string;
-	sendable: boolean;
 	/** The message `send` resolves to, so tests can assert on its replies. */
 	message: FakeMessage;
 	send: ReturnType<typeof vi.fn>;
@@ -65,15 +76,23 @@ export interface FakeChannel {
 	isTextBased: () => boolean;
 }
 
-export function fakeChannel(id = "chan1", sendable = true): FakeChannel {
+export function fakeChannel(
+	id = "chan1",
+	options: FakeChannelOptions = {},
+): FakeChannel {
 	const message = fakeMessage();
+	const textBased = options.textBased ?? true;
 	return {
 		id,
-		sendable,
 		message,
-		send: vi.fn(async () => message),
-		isSendable: () => sendable,
-		isTextBased: () => true,
+		send: vi.fn(async () => {
+			if (options.sendFails) {
+				throw missingPermissionsError();
+			}
+			return message;
+		}),
+		isSendable: () => textBased,
+		isTextBased: () => textBased,
 	};
 }
 
@@ -99,7 +118,16 @@ export function fakeGuild(options: FakeGuildOptions = {}) {
 		id: options.id ?? "guild1",
 		name: options.name ?? "Test Guild",
 		channel,
-		channels: { fetch: vi.fn(async () => channel) },
+		channels: {
+			// The real GuildChannelManager.fetch(id) does a REST GET and lets the
+			// 404 propagate; it never resolves to null for a deleted channel.
+			fetch: vi.fn(async (id: string) => {
+				if (id !== channel.id) {
+					throw unknownChannelError();
+				}
+				return channel;
+			}),
+		},
 		roles: {
 			fetch: vi.fn(
 				async (id: string) =>
@@ -132,6 +160,33 @@ export function unknownBanError(): Error {
 		404,
 		"GET",
 		"/bans",
+		{},
+	);
+}
+
+/** What `channels.fetch` throws once the channel has been deleted. */
+export function unknownChannelError(): Error {
+	return new DiscordAPIError(
+		{ code: RESTJSONErrorCodes.UnknownChannel, message: "Unknown Channel" },
+		RESTJSONErrorCodes.UnknownChannel,
+		404,
+		"GET",
+		"/channels",
+		{},
+	);
+}
+
+/** What `send` throws when the bot cannot post in a channel it can see. */
+export function missingPermissionsError(): Error {
+	return new DiscordAPIError(
+		{
+			code: RESTJSONErrorCodes.MissingPermissions,
+			message: "Missing Permissions",
+		},
+		RESTJSONErrorCodes.MissingPermissions,
+		403,
+		"POST",
+		"/messages",
 		{},
 	);
 }
@@ -191,14 +246,68 @@ export function fakeInteraction(options: FakeInteractionOptions = {}) {
 				options.channels?.[name] ?? null,
 			getMember: (name: string) => options.members?.[name] ?? null,
 		},
-		deferred: false,
-		replied: false,
-		reply: vi.fn(),
-		deferReply: vi.fn(),
-		editReply: vi.fn(),
-		update: vi.fn(),
-		deferUpdate: vi.fn(),
-		followUp: vi.fn(),
+		...replyState(),
+	};
+}
+
+/**
+ * The acknowledgement state machine, so an illegal sequence fails a test rather
+ * than only failing against the real API.
+ *
+ * discord.js throws InteractionAlreadyReplied if an interaction is acked twice,
+ * and InteractionNotReplied if `editReply` runs before any ack. Without this a
+ * handler that replies then updates, or edits without deferring, passes every
+ * test and 500s in production.
+ */
+function replyState() {
+	const state = { deferred: false, replied: false };
+
+	const ack = (method: string) => {
+		if (state.deferred || state.replied) {
+			throw new Error(
+				`InteractionAlreadyReplied: ${method} called after the interaction was acknowledged.`,
+			);
+		}
+	};
+	const requireAck = (method: string) => {
+		if (!state.deferred && !state.replied) {
+			throw new Error(
+				`InteractionNotReplied: ${method} called before the interaction was acknowledged.`,
+			);
+		}
+	};
+
+	return {
+		// Getters, so handlers and reportToUser observe the live state.
+		get deferred() {
+			return state.deferred;
+		},
+		get replied() {
+			return state.replied;
+		},
+		reply: vi.fn(async () => {
+			ack("reply");
+			state.replied = true;
+		}),
+		update: vi.fn(async () => {
+			ack("update");
+			state.replied = true;
+		}),
+		deferReply: vi.fn(async () => {
+			ack("deferReply");
+			state.deferred = true;
+		}),
+		deferUpdate: vi.fn(async () => {
+			ack("deferUpdate");
+			state.deferred = true;
+		}),
+		editReply: vi.fn(async () => {
+			requireAck("editReply");
+		}),
+		followUp: vi.fn(async () => {
+			requireAck("followUp");
+		}),
+		isRepliable: () => true,
 	};
 }
 
@@ -208,16 +317,16 @@ export interface FakeButtonOptions extends FakeInteractionOptions {
 }
 
 export function fakeButtonInteraction(options: FakeButtonOptions = {}) {
-	const base = fakeInteraction(options);
-	return {
-		...base,
+	// Assigned onto the base rather than spread: spreading would flatten the
+	// deferred/replied getters into stale booleans.
+	return Object.assign(fakeInteraction(options), {
 		customId: options.customId ?? "button",
 		message: {
 			embeds: options.embed
 				? [{ toJSON: () => options.embed as APIEmbed }]
 				: [],
 		},
-	};
+	});
 }
 
 export interface FakeClient {
@@ -273,6 +382,30 @@ export function fakeDb(
 	return Object.assign({ query }, { queries }) as unknown as Queryable & {
 		queries: { sql: string; values: unknown[] }[];
 	};
+}
+
+/** The first argument of the first call, failing loudly if there was none. */
+export function firstArg<T>(mock: { mock: { calls: unknown[][] } }): T {
+	const call = mock.mock.calls[0];
+	if (!call) {
+		throw new Error("Expected the mock to have been called at least once.");
+	}
+	return call[0] as T;
+}
+
+/** The first embed of the first call, which is what most assertions want. */
+export function firstEmbed(mock: { mock: { calls: unknown[][] } }): {
+	title?: string;
+	description?: string;
+	color?: number;
+	fields?: { name: string; value: string }[];
+} {
+	const payload = firstArg<{ embeds?: unknown[] }>(mock);
+	const embeds = payload.embeds ?? [];
+	if (embeds.length === 0) {
+		throw new Error("Expected the payload to carry an embed.");
+	}
+	return embeds[0] as ReturnType<typeof firstEmbed>;
 }
 
 // Casts used at the call sites, kept here so the tests stay readable.

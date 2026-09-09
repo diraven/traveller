@@ -10,6 +10,7 @@ import {
 	fakeInteraction,
 	fakeMember,
 	fakeUser,
+	firstEmbed,
 } from "./fakes.ts";
 
 const ROLE_ID = "role1";
@@ -28,13 +29,6 @@ function configured(roleId: string | null = ROLE_ID) {
 			],
 		},
 	]);
-}
-
-function firstEmbed(mock: { mock: { calls: unknown[][] } }) {
-	const [payload] = mock.mock.calls[0] as [
-		{ embeds: { title?: string; description?: string; color?: number }[] },
-	];
-	return payload.embeds[0];
 }
 
 describe("verify", () => {

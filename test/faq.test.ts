@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { COMMANDS, FAQ_COMMAND } from "../src/commands.ts";
 import { FAQ_ENTRIES } from "../src/faq_entries.ts";
 import { faq } from "../src/handlers/faq.ts";
-import { asCommand, fakeInteraction } from "./fakes.ts";
+import { asCommand, fakeInteraction, firstArg } from "./fakes.ts";
 
 const ctx = { db: {} as never };
 
@@ -17,9 +17,9 @@ describe("faq", () => {
 		const interaction = fakeInteraction({ subcommand: name });
 		await faq(asCommand(interaction), ctx);
 
-		const [payload] = interaction.reply.mock.calls[0] as [
-			{ embeds: { title: string; description: string }[] },
-		];
+		const payload = firstArg<{
+			embeds: { title: string; description: string }[];
+		}>(interaction.reply);
 		expect(payload.embeds[0]?.title).toBe(entry.title);
 		expect(payload.embeds[0]?.description).toBe(entry.description);
 	});
@@ -28,7 +28,7 @@ describe("faq", () => {
 		const interaction = fakeInteraction({ subcommand: "nope" });
 		await faq(asCommand(interaction), ctx);
 
-		const [payload] = interaction.reply.mock.calls[0] as [{ flags: number }];
+		const payload = firstArg<{ flags: number }>(interaction.reply);
 		expect(payload.flags).toBe(MessageFlags.Ephemeral);
 	});
 

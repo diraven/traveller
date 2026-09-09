@@ -21,6 +21,7 @@ import {
 	fakeDb,
 	fakeGuild,
 	fakeUser,
+	firstArg,
 } from "./fakes.ts";
 
 function ban(reason?: string): Ban {
@@ -83,9 +84,10 @@ describe("fanOut", () => {
 		);
 
 		expect(result).toEqual({ delivered: 1, total: 1 });
-		const [payload] = channel.send.mock.calls[0] as [
-			{ components?: unknown[]; embeds: { title: string }[] },
-		];
+		const payload = firstArg<{
+			components?: unknown[];
+			embeds: { title: string }[];
+		}>(channel.send);
 		expect(payload.embeds[0]?.title).toBe("Новий бан на іншому сервері");
 		expect(JSON.stringify(payload.components)).toContain(BAN_BUTTON_ID);
 	});
@@ -111,9 +113,9 @@ describe("fanOut", () => {
 		await fanOut(asClient(fakeClient([], [guild])), db, ban("spam"));
 
 		expect(guild.bans.create).toHaveBeenCalledWith("20", { reason: "spam" });
-		const [payload] = channel.send.mock.calls[0] as [
-			{ embeds: { description?: string }[] },
-		];
+		const payload = firstArg<{ embeds: { description?: string }[] }>(
+			channel.send,
+		);
 		expect(payload.embeds[0]?.description).toContain("застосовано автоматично");
 		// No follow-up command message: there is nothing left to do by hand.
 		expect(channel.send).toHaveBeenCalledTimes(1);
@@ -131,9 +133,10 @@ describe("fanOut", () => {
 
 		await fanOut(asClient(fakeClient([], [guild])), db, ban("spam"));
 
-		const [payload] = channel.send.mock.calls[0] as [
-			{ components?: unknown[]; embeds: { footer?: { text: string } }[] },
-		];
+		const payload = firstArg<{
+			components?: unknown[];
+			embeds: { footer?: { text: string } }[];
+		}>(channel.send);
 		expect(payload.components).toBeUndefined();
 		expect(payload.embeds[0]?.footer?.text).toContain("відсутні права на бан");
 	});

@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Color } from "../src/discord.ts";
 import { fetchLosses, rusniPyzda } from "../src/handlers/rusni_pyzda.ts";
-import { asCommand, fakeInteraction } from "./fakes.ts";
+import { asCommand, fakeInteraction, firstArg } from "./fakes.ts";
 
 const PAYLOAD = {
 	data: {
@@ -63,9 +63,9 @@ describe("rusniPyzda", () => {
 
 		expect(interaction.deferReply).toHaveBeenCalled();
 		expect(interaction.reply).not.toHaveBeenCalled();
-		const [payload] = interaction.editReply.mock.calls[0] as [
-			{ embeds: { title: string }[] },
-		];
+		const payload = firstArg<{ embeds: { title: string }[] }>(
+			interaction.editReply,
+		);
 		expect(payload.embeds[0]?.title).toBe("Втрати ворога");
 	});
 });

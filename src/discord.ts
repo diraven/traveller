@@ -6,9 +6,11 @@
 import {
 	type APIEmbed,
 	DiscordAPIError,
+	type Guild,
 	HTTPError,
 	type InteractionReplyOptions,
 	MessageFlags,
+	type SendableChannels,
 } from "discord.js";
 
 /** Embed colors matching discord.py's `discord.Color` presets. */
@@ -46,6 +48,33 @@ export function userFacingMessage(error: unknown): string {
 	return "Спробуйте ще раз пізніше.";
 }
 
-export function truncate(text: string, maxLength: number): string {
-	return text.length < maxLength ? text : `${text.slice(0, maxLength)}...`;
+/**
+ * Discord snowflakes are numeric. Commands that take one as text have to check
+ * before it reaches a bigint column, which would otherwise raise a cast error.
+ */
+export function isSnowflake(value: string): boolean {
+	return /^\d{17,20}$/.test(value);
+}
+
+/**
+ * The channel if it exists and can be posted to, otherwise null.
+ *
+ * Two traps here. `channels.fetch(id)` throws rather than returning null when
+ * the channel is gone, and `isSendable()` only checks the channel *type* - it
+ * says nothing about permissions, so a send can still fail and callers have to
+ * handle that separately.
+ */
+export async function fetchSendableChannel(
+	guild: Guild,
+	channelId: string,
+): Promise<SendableChannels | null> {
+	try {
+		const channel = await guild.channels.fetch(channelId);
+		return channel?.isSendable() ? channel : null;
+	} catch (error) {
+		if (error instanceof DiscordAPIError) {
+			return null;
+		}
+		throw error;
+	}
 }

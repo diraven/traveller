@@ -3,7 +3,10 @@
 -- wants because snowflakes exceed 2^53.
 --
 -- IF NOT EXISTS throughout, so applying this to the existing production
--- database is a no-op and a fresh database gets the same shape.
+-- database is a no-op. A fresh database gets an equivalent shape rather than an
+-- identical one: SQLAlchemy rendered BIGSERIAL for every bigint primary key, so
+-- production carries sequences on guilds.id_ and bans_sharing_bans.id_ that are
+-- never used - both always receive a snowflake.
 
 CREATE TABLE IF NOT EXISTS guilds (
   id_ bigint PRIMARY KEY,
