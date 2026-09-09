@@ -221,6 +221,23 @@ describe("bans_sharing trusted moderators", () => {
 		);
 	});
 
+	// 20 digits is a valid number and not a valid snowflake: the columns are
+	// signed bigint, so it reaches Postgres as an out-of-range error.
+	it("reports an id too long for a bigint column", async () => {
+		const interaction = fakeInteraction({
+			subcommand: "remove_trusted_moderator",
+			permissions: BAN_MEMBERS,
+			strings: { user_id: "99999999999999999999" },
+		});
+		const db = fakeDb([]);
+		await bansSharing(asCommand(interaction), { db });
+
+		expect(db.queries).toHaveLength(0);
+		expect(firstEmbed(interaction.reply)?.title).toBe(
+			"Користувача не знайдено",
+		);
+	});
+
 	it("removes by snowflake", async () => {
 		const interaction = fakeInteraction({
 			subcommand: "remove_trusted_moderator",

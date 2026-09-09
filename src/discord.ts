@@ -48,12 +48,18 @@ export function userFacingMessage(error: unknown): string {
 	return "Спробуйте ще раз пізніше.";
 }
 
+/** The largest value a signed bigint column holds. */
+const MAX_BIGINT = 9223372036854775807n;
+
 /**
  * Discord snowflakes are numeric. Commands that take one as text have to check
- * before it reaches a bigint column, which would otherwise raise a cast error.
+ * before it reaches a bigint column, which would otherwise raise a cast error -
+ * and the column is signed, so a longer number is out of range rather than
+ * merely unknown. Real snowflakes stay well inside that for centuries: the top
+ * bits are a millisecond timestamp.
  */
 export function isSnowflake(value: string): boolean {
-	return /^\d{17,20}$/.test(value);
+	return /^\d{17,19}$/.test(value) && BigInt(value) <= MAX_BIGINT;
 }
 
 /**

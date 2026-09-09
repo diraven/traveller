@@ -141,6 +141,7 @@ async function notifyGuild(
 	embed.title = "Новий бан на іншому сервері";
 	const content = embedField(embed, BANNED_FIELD);
 
+	let autoBanned = false;
 	if (
 		canBan &&
 		(await db.isTrustedModerator(queryable, destination.guild_id, ban.actor.id))
@@ -149,17 +150,24 @@ async function notifyGuild(
 			await guild.bans.create(ban.target.id, {
 				...(ban.reason !== undefined && { reason: ban.reason }),
 			});
-			embed.description = `**Статус:** застосовано автоматично, довірений модератор ${ban.actor.displayName} (${ban.actor.id})`;
-			await channel.send({
-				...(content && { content }),
-				embeds: [embed],
-				components: banButtons(true),
-			});
-			return;
+			autoBanned = true;
 		} catch (error) {
-			// Fall through to the manual flow when the ban is refused.
+			// Fall through to the manual flow when the ban itself is refused.
 			console.error(error);
 		}
+	}
+
+	// Posting is deliberately outside the try above: a send that fails after the
+	// ban went through must not fall through to the manual flow, which would
+	// re-post the same embed with live buttons for a user already banned here.
+	if (autoBanned) {
+		embed.description = `**Статус:** застосовано автоматично, довірений модератор ${ban.actor.displayName} (${ban.actor.id})`;
+		await channel.send({
+			...(content && { content }),
+			embeds: [embed],
+			components: banButtons(true),
+		});
+		return;
 	}
 
 	embed.footer = {

@@ -252,6 +252,11 @@ describe("confirm buttons", () => {
 		expect(firstEmbed(interaction.editReply)?.description).toContain(
 			"дані бану неповні",
 		);
+		// And the claim goes back: the lookup may have been a transient failure,
+		// and nobody was notified either way.
+		expect(
+			db.queries.some((q) => q.sql.includes("DELETE FROM bans_sharing_bans")),
+		).toBe(true);
 	});
 
 	it("fans out and reports how many servers were reached", async () => {

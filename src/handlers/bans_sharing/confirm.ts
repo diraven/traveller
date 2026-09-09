@@ -221,7 +221,10 @@ export const shareButton: ButtonHandler = async (interaction, ctx) => {
 		return;
 	}
 	const embed = interaction.message.embeds[0]?.toJSON();
-	if (!embed) {
+	// The banned user's id is what the claim is keyed by, so without it there is
+	// nothing to share and nothing to release.
+	const targetId = embed ? embedField(embed, TARGET_ID_FIELD) : undefined;
+	if (!embed || !targetId) {
 		await interaction.reply(NO_BAN_DATA);
 		return;
 	}
@@ -249,15 +252,19 @@ export const shareButton: ButtonHandler = async (interaction, ctx) => {
 	// interaction's guild is signed by Discord.
 	const ban = await banFromEmbed(interaction.client, interaction.guild, embed);
 	if (!ban) {
+		// Nobody was notified, and the lookup may simply have been a transient
+		// REST failure, so the claim taken when the prompt went up has to go back.
 		await interaction.editReply({
 			embeds: [
 				{
 					...embed,
-					description: "**Статус:** не вдалося поширити, дані бану неповні.",
+					description:
+						"**Статус:** не вдалося поширити, дані бану неповні. Спробуйте `/bans_sharing share`.",
 				},
 			],
 			components: confirmButtons(true),
 		});
+		await db.releaseBan(ctx.db, targetId);
 		return;
 	}
 

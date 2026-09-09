@@ -96,7 +96,23 @@ async function dispatch(interaction: Interaction): Promise<void> {
 		return;
 	}
 	if (interaction.isButton()) {
-		await BUTTON_HANDLERS[interaction.customId]?.(interaction, ctx);
+		const handler = BUTTON_HANDLERS[interaction.customId];
+		if (handler) {
+			await handler(interaction, ctx);
+			return;
+		}
+		// Notices posted by the previous bot carry custom ids nothing answers any
+		// more - discord.py generated a random one per view. Say so, rather than
+		// leaving the moderator with Discord's bare "interaction failed".
+		await interaction.reply({
+			embeds: [
+				errorEmbed(
+					"Кнопка більше не працює",
+					"Це сповіщення залишилося від попередньої версії бота. Скористайтеся `/bans_sharing share`.",
+				),
+			],
+			flags: MessageFlags.Ephemeral,
+		});
 	}
 }
 

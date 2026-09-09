@@ -121,6 +121,40 @@ describe("fanOut", () => {
 		expect(channel.send).toHaveBeenCalledTimes(1);
 	});
 
+	// A send failure used to fall through to the manual flow, re-posting the
+	// "застосовано автоматично" embed with live buttons for a user who is
+	// already banned on that server.
+	it("does not fall back to the manual flow once the ban went through", async () => {
+		const channel = fakeChannel("chanA", { sendFails: true });
+		const guild = fakeGuild({
+			id: "guildA",
+			channel,
+			mePermissions: [PermissionFlagsBits.BanMembers],
+		});
+		const db = fakeDb([
+			{
+				match: "AS channel_id",
+				rows: [{ guild_id: "guildA", channel_id: "chanA" }],
+			},
+			{
+				match: "SELECT 1 FROM bans_sharing_trusted_moderators",
+				rows: [{ ok: 1 }],
+			},
+		]);
+
+		const result = await fanOut(
+			asClient(fakeClient([], [guild])),
+			db,
+			ban("spam"),
+		);
+
+		expect(guild.bans.create).toHaveBeenCalledTimes(1);
+		expect(channel.send).toHaveBeenCalledTimes(1);
+		// Nothing was posted, so the server counts as unreached - the ban itself
+		// did land, and fanOut only reports what was announced.
+		expect(result).toEqual({ delivered: 0, total: 1 });
+	});
+
 	it("omits buttons where the bot cannot ban", async () => {
 		const channel = fakeChannel("chanA");
 		const guild = fakeGuild({ id: "guildA", channel, mePermissions: [] });
