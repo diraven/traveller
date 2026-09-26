@@ -1,0 +1,1 @@
+- Test and roll out the TypeScript rewrite on `feat/discord-js-gateway` (discord.js gateway client on Postgres, container deployed through Coolify) to replace the Python bot on `main`.
