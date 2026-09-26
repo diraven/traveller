@@ -1,1 +1,7 @@
-- Test and roll out the TypeScript rewrite on `feat/discord-js-gateway` (discord.js gateway client on Postgres, container deployed through Coolify) to replace the Python bot on `main`.
+- Test and roll out the TypeScript rewrite on `feat/discord-js-gateway` (discord.js gateway client on Postgres) to replace the Python bot on `main`. Its CD no longer builds a ghcr image - a published release calls a Coolify deploy webhook and Coolify builds the Dockerfile from the repo. Steps:
+	- Test the branch end to end (verification, bans sharing, commands) against a non-production database.
+	- Check whether the Python bot's Postgres schema and data carry over, or plan a migration.
+	- Switch the Coolify resource (`service-k0g4os4kw80c0o004oc84488`, currently `ghcr.io/diraven/traveller`) to build from the git repo, or replace it with a new git-based resource.
+	- Add `COOLIFY_TOKEN` and `COOLIFY_WEBHOOK` secrets to the `production` environment on GitHub.
+	- Merge, publish a release, confirm the deploy, then update `kb/server/server-coolify.md` in the vault.
+	- Delete the stale `feat/cloudflare-worker` branch.
