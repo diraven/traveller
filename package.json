@@ -1,6 +1,6 @@
 {
 	"name": "traveller",
-	"version": "0.11.6",
+	"version": "0.12.0",
 	"description": "Automation bot for ukrainian servers",
 	"type": "module",
 	"private": true,
