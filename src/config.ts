@@ -9,17 +9,27 @@ if (existsSync(".env")) {
 	process.loadEnvFile(".env");
 }
 
-function required(name: string): string {
-	const value = process.env[name];
-	if (!value) {
-		throw new Error(`The ${name} environment variable is required.`);
+/** The first of `names` that is set, so a variable can have a legacy alias. */
+function required(...names: string[]): string {
+	for (const name of names) {
+		const value = process.env[name];
+		if (value) {
+			return value;
+		}
 	}
-	return value;
+	throw new Error(
+		`The ${names.join(" or ")} environment variable is required.`,
+	);
 }
 
 export const config = {
-	discordToken: required("DISCORD_TOKEN"),
-	databaseUrl: required("DATABASE_URL"),
+	// DISCORD_BOT_TOKEN is what the Python bot's deployment still supplies.
+	discordToken: required("DISCORD_TOKEN", "DISCORD_BOT_TOKEN"),
+	/**
+	 * Without it node-postgres falls back to the standard PGHOST, PGUSER,
+	 * PGPASSWORD and PGDATABASE variables, which the Coolify service sets.
+	 */
+	databaseUrl: process.env.DATABASE_URL,
 	/** Error reporting is optional; without a DSN errors only reach the logs. */
 	sentryDsn: process.env.SENTRY_DSN,
 	/**

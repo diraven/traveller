@@ -39,15 +39,15 @@ Snowflakes live in `bigint` columns. node-postgres returns `bigint` as a string,
 
 # Deployment
 
-Coolify builds the `Dockerfile` from the repository. It needs:
+A published release builds `ghcr.io/diraven/traveller` (tagged with the version and `latest`) and triggers a redeploy of the Coolify service that runs it. The service needs:
 
-- A Postgres service, with `DATABASE_URL` pointing at it.
-- `DISCORD_TOKEN` from the Developer Portal.
+- A Postgres service, with `DATABASE_URL` pointing at it, or the standard `PGHOST`/`PGUSER`/`PGPASSWORD`/`PGDATABASE` variables.
+- `DISCORD_TOKEN` (or `DISCORD_BOT_TOKEN`) from the Developer Portal.
 - Optionally `SENTRY_DSN` for error reporting, and `RELEASE` to tag it.
 
 No privileged gateway intents are needed: the bot uses Guilds and Guild Moderation. It does need the **View Audit Log** permission on each server, which is how it notices bans.
 
-Continuous delivery needs two repository secrets, `COOLIFY_WEBHOOK` and `COOLIFY_TOKEN`, taken from the Coolify application's webhook settings.
+Continuous delivery needs a `COOLIFY_TOKEN` secret in the `production` environment: a Coolify API token with the deploy ability. It restarts the service with `latest=true`, since Coolify's deploy webhook does not pull a newer image under the same tag.
 
 # Шаринг банів між серверами
 
