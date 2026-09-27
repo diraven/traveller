@@ -1,3 +1,2 @@
 - Delete the stale `feat/cloudflare-worker` branch and the merged `feat/discord-js-gateway` branch on GitHub.
-- Add Ban Members and Manage Roles to the README invite link (`permissions=84096`): shared bans and `/verify` need them, and new servers currently have to grant them by hand.
 - Bump `package.json`'s `version` with each release; it still says `0.11.6` while `v0.12.0` is deployed.
