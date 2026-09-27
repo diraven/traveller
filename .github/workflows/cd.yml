@@ -2,22 +2,44 @@ name: Continuous Delivery
 on:
   release:
     types: [released]
+env:
+  IMAGE: ghcr.io/diraven/traveller
 jobs:
   cd:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
     environment: production
     steps:
-      # Coolify builds the Dockerfile from the repository itself, so a deploy is
-      # just a nudge. Database migrations run when the bot starts, and commands
-      # are registered once it connects.
-      - name: Trigger Coolify deployment
+      - uses: actions/checkout@v7
+
+      # The Coolify service runs ghcr.io/diraven/traveller:latest, so a release
+      # pushes that tag, plus the version for rolling back.
+      - name: Build and push image
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          docker build . --tag "$IMAGE:$VERSION" --tag "$IMAGE:latest"
+          echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          docker push "$IMAGE:$VERSION"
+          docker push "$IMAGE:latest"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Restart rather than the deploy webhook: for a service the webhook runs
+      # `docker compose up` without pulling, so `latest` would stay at whatever
+      # image the server already has. `latest=true` pulls first. Database
+      # migrations run when the bot starts, and commands are registered once it
+      # connects.
+      - name: Restart the Coolify service
         run: |
           # The token goes in a config file rather than an argument: arguments
           # are visible in the process list.
           umask 077
           printf 'header = "Authorization: Bearer %s"\n' "$COOLIFY_TOKEN" > curl.conf
           trap 'rm -f curl.conf' EXIT
-          curl --fail --silent --show-error --config curl.conf "$COOLIFY_WEBHOOK"
+          curl --fail --silent --show-error --request POST --config curl.conf \
+            "https://coolify.diraven.com/api/v1/services/w8owcscs8o4scokw8w8oowks/restart?latest=true"
         env:
+          # A Coolify API token with the deploy ability.
           COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
-          COOLIFY_WEBHOOK: ${{ secrets.COOLIFY_WEBHOOK }}
