@@ -1,6 +1,5 @@
 - Roll out the TypeScript rewrite on `feat/discord-js-gateway` (discord.js gateway client on Postgres) to replace the Python bot on `main`. It passed end-to-end testing with a dev app against a copy of prod, and its migrations apply cleanly over the Python bot's schema with no data loss. The deploy shape stays as it is: CD pushes `ghcr.io/diraven/traveller` and the existing Coolify resource (`service-k0g4os4kw80c0o004oc84488`) runs it. Steps:
-	- Restore `main`'s `cd.yml` (build and push the ghcr image, then redeploy) on the branch in place of its Coolify-webhook-only CD, and drop the unused `COOLIFY_TOKEN`/`COOLIFY_WEBHOOK` references.
-	- Give the rewrite the env it reads: prod sets `DISCORD_BOT_TOKEN` and `POSTGRES_PASSWORD`/`PGHOST`, the rewrite wants `DISCORD_TOKEN` and `DATABASE_URL`. Add both to the Coolify service (`DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@db:5432/postgres`) or make `config.ts` fall back to the old names.
+	- Create a Coolify API token with the deploy ability and add it as the `COOLIFY_TOKEN` secret in the `production` environment on GitHub. CD pushes the image, then restarts the service (`w8owcscs8o4scokw8w8oowks`) with `latest=true`.
 	- Take a `pg_dump` of the prod database as the rollback point, then merge and publish a release. Rollback is pointing the resource at the last Python image tag; the Python bot re-syncs its global commands on start.
 	- Update `kb/server/server-coolify.md` in the vault if anything about the resource changed.
 	- Delete the stale `feat/cloudflare-worker` branch.
