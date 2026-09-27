@@ -172,9 +172,7 @@ client.once(Events.ClientReady, (ready) => {
 	void (async () => {
 		try {
 			await reconcileGuilds(ready, ctx.db);
-			const commands = config.devGuildId
-				? await ready.application.commands.set(COMMANDS, config.devGuildId)
-				: await ready.application.commands.set(COMMANDS);
+			const commands = await ready.application.commands.set(COMMANDS);
 			console.log(`Registered ${commands.size} commands.`);
 		} catch (error) {
 			captureError(error);

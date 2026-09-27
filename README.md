@@ -18,8 +18,7 @@ vi .env                           # bot token from the Developer Portal
 pnpm db:migrate                   # optional, the bot also migrates on startup
 pnpm typecheck && pnpm lint
 pnpm test                         # unit tests; database tests need TEST_DATABASE_URL
-DISCORD_DEV_GUILD_ID=<id> pnpm start   # register commands into one server instantly
-pnpm start                        # or globally, which propagates within an hour
+pnpm start                        # registers commands globally; reload Discord to see changes
 ```
 
 Database tests run only when pointed at a throwaway database, and they truncate every table - so point them somewhere other than the development database above:
