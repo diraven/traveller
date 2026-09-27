@@ -1,7 +1,4 @@
-- Roll out the TypeScript rewrite on `feat/discord-js-gateway` (discord.js gateway client on Postgres) to replace the Python bot on `main`. It passed end-to-end testing with a dev app against a copy of prod, and its migrations apply cleanly over the Python bot's schema with no data loss. The deploy shape stays as it is: CD pushes `ghcr.io/diraven/traveller` and the existing Coolify resource (`service-k0g4os4kw80c0o004oc84488`) runs it. Steps:
-	- Create a Coolify API token with the deploy ability and add it as the `COOLIFY_TOKEN` secret in the `production` environment on GitHub. CD pushes the image, then restarts the service (`w8owcscs8o4scokw8w8oowks`) with `latest=true`.
-	- Take a `pg_dump` of the prod database as the rollback point, then merge and publish a release. Rollback is pointing the resource at the last Python image tag; the Python bot re-syncs its global commands on start.
-	- Update `kb/server/server-coolify.md` in the vault if anything about the resource changed.
-	- Delete the stale `feat/cloudflare-worker` branch.
+- Delete the stale `feat/cloudflare-worker` branch and the merged `feat/discord-js-gateway` branch on GitHub.
 - Drop `DISCORD_DEV_GUILD_ID` from the rewrite: global command updates now show up almost immediately, and a dev run with it set leaves the app's earlier global commands behind as duplicates.
 - Add Ban Members and Manage Roles to the README invite link (`permissions=84096`): shared bans and `/verify` need them, and new servers currently have to grant them by hand.
+- Bump `package.json`'s `version` with each release; it still says `0.11.6` while `v0.12.0` is deployed.
