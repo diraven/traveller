@@ -1,1 +1,0 @@
-- Delete the stale `feat/cloudflare-worker` branch and the merged `feat/discord-js-gateway` branch on GitHub.
