@@ -12,6 +12,10 @@ if (config.sentryDsn) {
 	Sentry.init({
 		dsn: config.sentryDsn,
 		...(config.release && { release: config.release }),
+		// Local variables can hold the discord.js client, and with it the bot
+		// token; Sentry's token filtering only covers headers, cookies and query
+		// strings.
+		dataCollection: { stackFrameVariables: false },
 	});
 }
 
