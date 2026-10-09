@@ -20,18 +20,18 @@
 		"prepare": "lefthook install || true"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.5.14",
+		"@biomejs/biome": "^2.5.15",
 		"@commitlint/cli": "^21.2.3",
 		"@commitlint/config-conventional": "^21.2.3",
-		"@types/node": "^26.6.3",
+		"@types/node": "^26.6.4",
 		"@types/pg": "^8.23.1",
-		"lefthook": "^2.1.14",
+		"lefthook": "^2.1.17",
 		"typescript": "^7.0.2",
-		"vitest": "^5.0.2"
+		"vitest": "^5.0.3"
 	},
 	"dependencies": {
-		"@sentry/node": "^11.1.0",
+		"@sentry/node": "^11.4.0",
 		"discord.js": "^14.27.0",
-		"pg": "^8.23.0"
+		"pg": "^8.23.1"
 	}
 }
