@@ -12,12 +12,12 @@ The bot stores only the minimum data required for its features. All stored data
 consists of Discord identifiers and configuration — **no message content, no
 presence data, and no personal profile data** beyond what is listed below.
 
-| Data | Purpose |
-| --- | --- |
-| Server (guild) IDs and names | Identify the servers the bot operates in and their configuration. |
-| Notification-channel IDs | Know where to post ban-sharing notifications. |
-| Verification-role IDs | Know which role to grant during peer verification. |
-| Trusted-moderator user IDs and global usernames | Apply the "trusted moderator" ban-sharing feature. |
+| Data                                                                           | Purpose                                                                  |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| Server (guild) IDs and names                                                   | Identify the servers the bot operates in and their configuration.        |
+| Notification-channel IDs                                                       | Know where to post ban-sharing notifications.                            |
+| Verification-role IDs                                                          | Know which role to grant during peer verification.                       |
+| Trusted-moderator user IDs and global usernames                                | Apply the "trusted moderator" ban-sharing feature.                       |
 | Shared-ban records: banned user ID, ban reason, acting moderator ID, timestamp | Notify connected servers about bans and prevent duplicate notifications. |
 
 The bot does **not** use the Message Content or Presence intents. It does not
