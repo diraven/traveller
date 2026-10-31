@@ -20,7 +20,7 @@
 		"prepare": "lefthook install || true"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.5.15",
+		"@biomejs/biome": "^2.6.3",
 		"@commitlint/cli": "^21.2.4",
 		"@commitlint/config-conventional": "^21.2.4",
 		"@types/node": "^26.6.5",
@@ -30,7 +30,7 @@
 		"vitest": "^5.0.5"
 	},
 	"dependencies": {
-		"@sentry/node": "^11.8.0",
+		"@sentry/node": "^11.9.0",
 		"discord.js": "^14.27.0",
 		"pg": "^8.23.1"
 	}
